@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dual-Planet Analog Explorer - ESI Similarity Model (NASA APIs)</title>
+  <!-- Leaflet Map Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { display: flex; height: 100vh; background: #090d16; color: #e2e8f0; overflow: hidden; }
+    
+    /* Dual-Map Container on the Left */
+    #maps-wrapper {
+      flex: 1.5; display: flex; flex-direction: column; position: relative;
+      border-right: 1px solid #1e293b;
+    }
+
+    /* Top Site Selection Bar */
+    .location-bar {
+      position: absolute; top: 10px; left: 55px; right: 12px; z-index: 1000;
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .loc-btn {
+      background: rgba(15, 23, 42, 0.92); color: #38bdf8; border: 1px solid #0284c7;
+      padding: 5px 9px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11.5px;
+      transition: all 0.2s; backdrop-filter: blur(4px);
+    }
+    .loc-btn:hover, .loc-btn.active { background: #38bdf8; color: #090d16; border-color: #38bdf8; }
+    
+    /* Gold Border for NASA Baseline Benchmarks */
+    .loc-btn.baseline { border-color: #f59e0b; color: #fbbf24; }
+    .loc-btn.baseline:hover, .loc-btn.baseline.active { background: #f59e0b; color: #090d16; border-color: #f59e0b; }
+
+    .loc-btn span.score-pill {
+      display: inline-block; margin-left: 4px; padding: 1px 5px; border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3); font-size: 10px;
+    }
+
+    /* Synchronized Map Panes */
+    .map-pane { flex: 1; position: relative; width: 100%; }
+    #earth-map { width: 100%; height: 100%; border-bottom: 2px solid #38bdf8; }
+    #planet-map { width: 100%; height: 100%; background: #05070c; }
+
+    /* Map Labels */
+    .map-label {
+      position: absolute; bottom: 12px; left: 12px; z-index: 999;
+      background: rgba(9, 13, 22, 0.88); border: 1px solid #334155;
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold;
+      display: flex; align-items: center; gap: 8px; backdrop-filter: blur(4px);
+    }
+    .earth-tag { color: #34d399; border-color: #059669; }
+    .planet-tag { color: #fb923c; border-color: #ea580c; }
+
+    /* Right Analytical Sidebar */
+    #sidebar {
+      flex: 1; padding: 18px; overflow-y: auto; background: #111827;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .badge-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      padding: 4px 8px; border-radius: 4px; font-size: 10.5px; font-weight: bold;
+      background: #1e3a8a; color: #93c5fd; text-transform: uppercase;
+    }
+    .badge-baseline {
+      background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b;
+    }
+    .asi-display {
+      background: linear-gradient(135deg, #0284c7, #1d4ed8);
+      padding: 6px 14px; border-radius: 8px; text-align: right; min-width: 115px;
+    }
+    .asi-display .label { font-size: 9.5px; text-transform: uppercase; opacity: 0.9; }
+    .asi-display .value { font-size: 20px; font-weight: 800; color: #ffffff; }
+
+    h1 { font-size: 19px; color: #f8fafc; margin-top: 4px; }
+
+    .card {
+      background: #1e293b; padding: 12px; border-radius: 8px; border: 1px solid #334155;
+    }
+    .card h3 { font-size: 12.5px; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card p { font-size: 13px; line-height: 1.45; color: #cbd5e1; }
+
+    /* Formula Display Box */
+    .formula-pill {
+      font-family: 'Courier New', monospace; font-size: 11.5px; color: #a5f3fc;
+      background: #0f172a; padding: 6px 8px; border-radius: 5px; margin-bottom: 8px;
+      border-left: 3px solid #38bdf8;
+    }
+
+    /* Quantitative Comparison Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .data-table th, .data-table td { padding: 5px 6px; border-bottom: 1px solid #334155; text-align: left; }
+    .data-table th { color: #94a3b8; font-weight: 600; }
+    .data-table td.num { font-family: 'Courier New', monospace; color: #f8fafc; }
+
+    /* Mission Weight Sliders */
+    .weight-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+    .weight-row label { flex: 1.3; color: #cbd5e1; }
+    .weight-row input[type="range"] { flex: 1.4; accent-color: #38bdf8; cursor: pointer; }
+    .weight-row span { width: 30px; text-align: right; font-weight: bold; color: #38bdf8; }
+
+    .preset-btns { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+    .preset-btn {
+      background: #0f172a; color: #94a3b8; border: 1px solid #334155;
+      padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;
+    }
+    .preset-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+
+    /* Chart Container with padding to prevent label clipping */
+    .chart-box { height: 215px; width: 100%; position: relative; }
+    .warning-card { background: rgba(127, 29, 29, 0.25); border-color: #ef4444; }
+    .warning-card h3 { color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <!-- Dual Synchronized Maps (Earth & Moon/Mars) -->
+  <div id="maps-wrapper">
+    <div class="location-bar" id="btn-group"></div>
+    
+    <!-- Map 1: Earth (NASA GIBS) -->
+    <div class="map-pane">
+      <div id="earth-map"></div>
+      <div class="map-label earth-tag" id="earth-label">🌍 EARTH: Chư Bluk (Vietnam)</div>
+    </div>
+
+    <!-- Map 2: Moon / Mars (NASA Solar System Treks) -->
+    <div class="map-pane">
+      <div id="planet-map"></div>
+      <div class="map-label planet-tag" id="planet-label">🌑 MOON: Marius Hills (NASA LRO)</div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar: Quantitative Analysis & ESI Simulator -->
+  <div id="sidebar">
+    <div>
+      <div class="header-top">
+        <div class="badge-group">
+          <span class="badge" id="target-body">TARGET BODY</span>
+          <span class="badge badge-baseline" id="baseline-tag" style="display:none;">⭐ NASA BASELINE BENCHMARK</span>
+        </div>
+        <div class="asi-display">
+          <div class="label">Analog ESI Score</div>
+          <div class="value" id="asi-score">0%</div>
+        </div>
+      </div>
+      <h1 id="site-title">Site Name</h1>
+    </div>
+
+    <!-- Mission Weight Simulator -->
+    <div class="card">
+      <h3>🎛️ ESI Weight Simulator (Schulze-Makuch, 2011)</h3>
+      <div class="formula-pill">
+        ESI = [ Π (1 - |Xᵢ - X₀| / (Xᵢ + X₀))^wᵢ ]^(1 / Σwᵢ)
+      </div>
+      <div class="preset-btns">
+        <button class="preset-btn" onclick="applyPreset(1.0, 1.0, 0.5, 0.0)">Surface & Geology (Default)</button>
+        <button class="preset-btn" onclick="applyPreset(1.0, 0.9, 0.1, 0.0)">Rover Mobility Test</button>
+        <button class="preset-btn" onclick="applyPreset(1.0, 0.3, 0.6, 0.2)">Full Environmental (Incl. Pressure)</button>
+      </div>
+      <div class="weight-row">
+        <label>Mineralogy & Lithology (w₁)</label>
+        <input type="range" id="w-mineral" min="0" max="1" step="0.1" value="1" oninput="updateAll()">
+        <span id="val-mineral">1.0</span>
+      </div>
+      <div class="weight-row">
+        <label>Topographic Slope (w₂)</label>
+        <input type="range" id="w-slope" min="0" max="1" step="0.1" value="1" oninput="updateAll()">
+        <span id="val-slope">1.0</span>
+      </div>
+      <div class="weight-row">
+        <label>Surface Temperature (w₃)</label>
+        <input type="range" id="w-temp" min="0" max="1" step="0.1" value="0.5" oninput="updateAll()">
+        <span id="val-temp">0.5</span>
+      </div>
+      <div class="weight-row">
+        <label>Atmospheric Pressure (w₄)</label>
+        <input type="range" id="w-press" min="0" max="1" step="0.1" value="0.0" oninput="updateAll()">
+        <span id="val-press">0.0</span>
+      </div>
+    </div>
+
+    <!-- Quantitative Data Comparison Table -->
+    <div class="card">
+      <h3>📊 Quantitative Parameters (NASA Datasets)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Earth Site</th>
+            <th>Target Body</th>
+            <th>ESI (Sᵢ)</th>
+          </tr>
+        </thead>
+        <tbody id="quant-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Multi-Dimensional Radar Chart -->
+    <div class="card">
+      <h3>📈 Multi-Dimensional ESI Profile</h3>
+      <div class="chart-box">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Geological Context & Exploration Utility -->
+    <div class="card">
+      <h3>🚀 Geological Context & Exploration Utility</h3>
+      <p id="site-geology"></p>
+    </div>
+
+    <!-- Terrestrial Limitations -->
+    <div class="card warning-card">
+      <h3>⚠️ Terrestrial Limitations (Key Discrepancies)</h3>
+      <p id="site-limits"></p>
+    </div>
+  </div>
+
+  <script>
+    // 1. Quantitative Dataset for 7 Analog Sites (5 Under-explored + 2 NASA Baselines)
+    const analogs = [
+      {
+        id: "chubluk",
+        name: "1. Chư Bluk (Vietnam)",
+        isBaseline: false,
+        bodyType: "moon",
+        earthCoords: [12.485, 107.902],
+        earthZoom: 12,
+        planetCoords: [14.0, -56.0],
+        planetZoom: 7,
+        planetSiteName: "Marius Hills (Moon)",
+        target: "MOON (MARIUS HILLS)",
+        earth: { slope: 9.0, tempK: 296.6, pressureKpa: 96.0, mineralScore: 0.90, mineralText: "Basalt (FeO 12%)" },
+        planet: { slope: 9.5, tempK: 253.0, pressureKpa: 0.0, mineralScore: 0.90, mineralText: "Mare Basalt (FeO 17%)" },
+        geology: "Southeast Asia's longest volcanic lava tube system (>25 km, 100+ caves) hosted in young Pleistocene tholeiitic/alkali basalts. Ideal for testing GPS-denied autonomous SLAM navigation, ground-penetrating radar (GPR), and subsurface radiation shielding habitats.",
+        limits: "Tropical monsoon climate produces dense surface vegetation and rapid chemical weathering; experiences 1g Earth gravity (6x lunar gravity) and lacks high-vacuum conditions."
+      },
+      {
+        id: "lonar",
+        name: "2. Lonar Crater (India)",
+        isBaseline: false,
+        bodyType: "mars",
+        earthCoords: [19.976, 76.508],
+        earthZoom: 14,
+        planetCoords: [18.38, 77.58],
+        planetZoom: 7,
+        planetSiteName: "Jezero Crater (Mars)",
+        target: "MARS (JEZERO CRATER)",
+        earth: { slope: 20.5, tempK: 300.1, pressureKpa: 95.0, mineralScore: 0.95, mineralText: "Basalt, Maskelynite, Smectite" },
+        planet: { slope: 17.0, tempK: 218.1, pressureKpa: 0.65, mineralScore: 0.95, mineralText: "Basalt, Olivine, Smectite" },
+        geology: "A rare young hypervelocity impact crater (1.83 km diameter) excavated directly into Deccan flood basalts. Contains shock-metamorphosed maskelynite glass, smectite clays, and carbonates matching MRO CRISM and Perseverance observations at Jezero Crater.",
+        limits: "Hosts a perennial hyper-alkaline saline lake on the crater floor with active microbial/lacustrine ecosystems and monsoonal rainfall."
+      },
+      {
+        id: "qaidam",
+        name: "3. Qaidam Basin (China)",
+        isBaseline: false,
+        bodyType: "mars",
+        earthCoords: [37.500, 94.500],
+        earthZoom: 9,
+        planetCoords: [-5.4, 137.8],
+        planetZoom: 7,
+        planetSiteName: "Gale Crater (Mars)",
+        target: "MARS (GALE CRATER)",
+        earth: { slope: 2.5, tempK: 276.1, pressureKpa: 71.0, mineralScore: 0.92, mineralText: "Halite, Gypsum, MgSO₄" },
+        planet: { slope: 3.5, tempK: 223.1, pressureKpa: 0.75, mineralScore: 0.92, mineralText: "Gypsum, MgSO₄, Phyllosilicates" },
+        geology: "High-altitude (~2,800 m) hyper-arid desert rich in evaporite deposits (halite, gypsum, magnesium sulfates) and Earth's largest aerodynamic yardang field. Enables quantitative modeling of Martian aeolian erosion rates and rover mobility testing on fine regolith.",
+        limits: "Atmospheric pressure (~71 kPa) remains >100x higher than Mars (~0.75 kPa), and high atmospheric O₂ drives distinct surface oxidation chemistry."
+      },
+      {
+        id: "dallol",
+        name: "4. Dallol Geothermal (Ethiopia)",
+        isBaseline: false,
+        bodyType: "mars",
+        earthCoords: [14.242, 40.300],
+        earthZoom: 13,
+        planetCoords: [-14.5, 175.4],
+        planetZoom: 7,
+        planetSiteName: "Columbia Hills - Gusev (Mars)",
+        target: "EARLY MARS (GUSEV CRATER)",
+        earth: { slope: 5.0, tempK: 307.7, pressureKpa: 102.0, mineralScore: 0.88, mineralText: "Jarosite, Fe-Salts, Sulfur" },
+        planet: { slope: 7.0, tempK: 213.1, pressureKpa: 0.62, mineralScore: 0.88, mineralText: "Opaline Silica, Jarosite" },
+        geology: "Polyextreme volcanic hydrothermal system (pH down to 0.25, hypersaline brines >35%, iron- and sulfur-rich precipitates) modeling Noachian Mars hot springs (~3.5 Ga). Used to calibrate astrobiological instruments for detecting fossilized biosignatures in salt chimneys.",
+        limits: "Highest annual mean air temperature on Earth (+34.6°C / 307.7 K), contrasting sharply with present-day cryogenic Martian temperatures (-60°C)."
+      },
+      {
+        id: "boulby",
+        name: "5. Boulby Mine (UK)",
+        isBaseline: false,
+        bodyType: "mars",
+        earthCoords: [54.555, -0.825],
+        earthZoom: 13,
+        planetCoords: [-11.5, -121.0],
+        planetZoom: 7,
+        planetSiteName: "Arsia Mons Skylights (Mars)",
+        target: "SUBSURFACE MARS & MOON",
+        earth: { slope: 3.5, tempK: 301.6, pressureKpa: 112.0, mineralScore: 0.89, mineralText: "Halite, Sylvite, Polyhalite" },
+        planet: { slope: 5.5, tempK: 235.0, pressureKpa: 0.5, mineralScore: 0.89, mineralText: "Subsurface Sulfates & Chlorides" },
+        geology: "1.1 km deep Permian evaporite mine hosting the NASA/ESA MINAR (Mine Analog Research) facility. Provides a completely dark, GPS-denied, radiation-shielded environment to test autonomous subsurface rovers, deep-drilling rigs, and extremophile life-detection sensors.",
+        limits: "Geothermal gradient elevates ambient underground temperatures (~28.5°C) and barometric pressure (~112 kPa), opposite to cold, low-pressure Martian caves."
+      },
+      {
+        id: "atacama",
+        name: "⭐ 6. Atacama (Mars Baseline)",
+        isBaseline: true,
+        bodyType: "mars",
+        earthCoords: [-24.095, -69.925],
+        earthZoom: 11,
+        planetCoords: [4.5, 135.6],
+        planetZoom: 7,
+        planetSiteName: "Elysium Planitia (Mars)",
+        target: "MARS GOLD-STANDARD BASELINE",
+        earth: { slope: 4.0, tempK: 289.6, pressureKpa: 90.0, mineralScore: 0.94, mineralText: "Halite, Gypsum, Perchlorates" },
+        planet: { slope: 2.5, tempK: 215.1, pressureKpa: 0.65, mineralScore: 0.94, mineralText: "Dry Basalt, Sulfates, Perchlorates" },
+        geology: "NASA BENCHMARK SITE: The hyper-arid Yungay core (<1 mm/yr precipitation) features perchlorate-bearing soils and ultra-low microbial biomass, serving as the primary testbed for Viking, Curiosity, and Perseverance life-detection and mobility protocols.",
+        limits: "Located at ~1,000 m elevation, retaining ~90 kPa atmospheric pressure and Earth-like diurnal thermal cycles."
+      },
+      {
+        id: "iceland",
+        name: "⭐ 7. Krafla (Moon Baseline)",
+        isBaseline: true,
+        bodyType: "moon",
+        earthCoords: [65.715, -16.755],
+        earthZoom: 11,
+        planetCoords: [20.19, 30.77],
+        planetZoom: 7,
+        planetSiteName: "Taurus-Littrow - Apollo 17 (Moon)",
+        target: "MOON GOLD-STANDARD BASELINE",
+        earth: { slope: 10.0, tempK: 274.6, pressureKpa: 96.0, mineralScore: 0.93, mineralText: "Fresh Basalt, Volcanic Glass" },
+        planet: { slope: 11.0, tempK: 251.1, pressureKpa: 0.0, mineralScore: 0.93, mineralText: "Mare Basalt, Ilmenite, Glass Beads" },
+        geology: "NASA BENCHMARK SITE: Used to train Apollo astronauts and test Artemis EVA suits. Unvegetated young tholeiitic lava flows, cinder cones, and abrasive volcanic tephra closely replicate lunar mare surface mechanics.",
+        limits: "Subject to seasonal snow/ice hydrology, atmospheric weathering, and 1g terrestrial gravity."
+      }
+    ];
+
+    let currentIndex = 0;
+
+    // 2. Earth Similarity Index (ESI) Formula (Schulze-Makuch et al., 2011)
+    function esiComponent(xEarth, xTarget) {
+      if (xEarth + xTarget === 0) return 1.0;
+      return 1.0 - Math.abs(xEarth - xTarget) / (xEarth + xTarget);
+    }
+
+    function computeMetrics(site) {
+      const sMineral = site.earth.mineralScore;
+      const sSlope = esiComponent(site.earth.slope, site.planet.slope);
+      const sTemp = esiComponent(site.earth.tempK, site.planet.tempK);
+      const sPress = esiComponent(site.earth.pressureKpa, site.planet.pressureKpa);
+
+      const w1 = parseFloat(document.getElementById('w-mineral').value);
+      const w2 = parseFloat(document.getElementById('w-slope').value);
+      const w3 = parseFloat(document.getElementById('w-temp').value);
+      const w4 = parseFloat(document.getElementById('w-press').value);
+
+      const sumW = w1 + w2 + w3 + w4;
+      let esi = 0;
+
+      if (sumW > 0) {
+        // Apply small epsilon (0.01) only when w4 > 0 to avoid zero-product collapse on lunar vacuum
+        const safeSPress = Math.max(0.01, sPress);
+        const product =
+          Math.pow(Math.max(0.01, sMineral), w1) *
+          Math.pow(Math.max(0.01, sSlope), w2) *
+          Math.pow(Math.max(0.01, sTemp), w3) *
+          Math.pow(safeSPress, w4);
+
+        esi = Math.pow(product, 1.0 / sumW) * 100;
+      }
+
+      return { sMineral, sSlope, sTemp, sPress, esi: esi.toFixed(1) };
+    }
+
+    // 3. Initialize Map 1: EARTH (NASA GIBS)
+    const earthMap = L.map('earth-map').setView(analogs[0].earthCoords, analogs[0].earthZoom);
+
+    const earthSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Esri World Imagery'
+    }).addTo(earthMap);
+
+    const nasaEarthDEM = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/ASTER_GDEM_Color_Shaded_Relief/default/GoogleMapsCompatible_Level12/{z}/{y}/{x}.jpg', {
+      attribution: 'NASA GIBS - ASTER GDEM',
+      opacity: 0.65,
+      maxNativeZoom: 12
+    });
+
+    const nasaEarthTemp = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Land_Surface_Temp_Day/default/2023-04-15/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', {
+      attribution: 'NASA GIBS - MODIS LST',
+      opacity: 0.6,
+      maxNativeZoom: 7
+    });
+
+    L.control.layers(
+      { "Earth: True-Color Imagery": earthSat },
+      { 
+        "NASA: Elevation Relief (ASTER GDEM)": nasaEarthDEM,
+        "NASA: Land Surface Temp (MODIS)": nasaEarthTemp
+      },
+      { collapsed: true, position: 'bottomright' }
+    ).addTo(earthMap);
+
+    analogs.forEach((site, idx) => {
+      L.marker(site.earthCoords).addTo(earthMap)
+        .bindPopup(`<b>${site.name}</b>`)
+        .on('click', () => selectSite(idx));
+    });
+
+    // 4. Initialize Map 2: MOON & MARS (NASA Solar System Treks WMTS)
+    const planetMap = L.map('planet-map', {
+      crs: L.CRS.EPSG3857,
+      minZoom: 2,
+      maxZoom: 9
+    }).setView(analogs[0].planetCoords, analogs[0].planetZoom);
+
+    const moonTrekLayer = L.tileLayer('https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
+      attribution: 'NASA Moon Trek (LRO WAC)',
+      tms: false,
+      noWrap: true,
+      maxNativeZoom: 7,
+      maxZoom: 12
+    });
+
+    const marsTrekLayer = L.tileLayer('https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
+      attribution: 'NASA Mars Trek (Viking MDIM21)',
+      tms: false,
+      noWrap: true,
+      maxNativeZoom: 7,
+      maxZoom: 12
+    });
+
+    const marsMolaLayer = L.tileLayer('https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
+      attribution: 'NASA Mars Trek (MOLA/HRSC DEM)',
+      tms: false,
+      noWrap: true,
+      maxNativeZoom: 7,
+      maxZoom: 12
+    });
+
+    moonTrekLayer.addTo(planetMap);
+    let planetMarker = L.marker(analogs[0].planetCoords).addTo(planetMap);
+
+    L.control.layers(
+      {
+        "🌑 Moon: Surface Mosaic (NASA LRO)": moonTrekLayer,
+        "🔴 Mars: Color Mosaic (NASA Viking)": marsTrekLayer,
+        "🏔️ Mars: Elevation Relief (MOLA DEM)": marsMolaLayer
+      },
+      {},
+      { collapsed: true, position: 'bottomright' }
+    ).addTo(planetMap);
+
+    // 5. Initialize Radar Chart
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Mineralogy', 'Slope', 'Temperature', 'Pressure'],
+        datasets: [{
+          label: 'Component ESI (0 - 1)',
+          data: [0.9, 0.9, 0.9, 0.0],
+          backgroundColor: 'rgba(56, 189, 248, 0.25)',
+          borderColor: '#38bdf8',
+          pointBackgroundColor: '#38bdf8',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: { top: 10, right: 30, bottom: 10, left: 30 }
+        },
+        scales: {
+          r: {
+            min: 0, max: 1,
+            ticks: { display: false, stepSize: 0.2 },
+            grid: { color: '#334155' },
+            angleLines: { color: '#334155' },
+            pointLabels: {
+              color: '#cbd5e1',
+              font: { size: 11.5, weight: '600' },
+              padding: 6
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Component Sᵢ: ${(context.raw * 100).toFixed(1)}%`
+            }
+          }
+        }
+      }
+    });
+
+    // 6. Update UI & Real-Time ESI Calculation
+    function applyPreset(w1, w2, w3, w4) {
+      document.getElementById('w-mineral').value = w1;
+      document.getElementById('w-slope').value = w2;
+      document.getElementById('w-temp').value = w3;
+      document.getElementById('w-press').value = w4;
+      updateAll();
+    }
+
+    function updateAll() {
+      document.getElementById('val-mineral').innerText = parseFloat(document.getElementById('w-mineral').value).toFixed(1);
+      document.getElementById('val-slope').innerText = parseFloat(document.getElementById('w-slope').value).toFixed(1);
+      document.getElementById('val-temp').innerText = parseFloat(document.getElementById('w-temp').value).toFixed(1);
+      document.getElementById('val-press').innerText = parseFloat(document.getElementById('w-press').value).toFixed(1);
+
+      analogs.forEach((site, idx) => {
+        const m = computeMetrics(site);
+        const pill = document.getElementById(`pill-${idx}`);
+        if (pill) pill.innerText = `${m.esi}%`;
+      });
+
+      const site = analogs[currentIndex];
+      const metrics = computeMetrics(site);
+
+      document.getElementById('asi-score').innerText = `${metrics.esi}%`;
+      document.getElementById('target-body').innerText = `TARGET: ${site.target}`;
+      document.getElementById('baseline-tag').style.display = site.isBaseline ? 'inline-block' : 'none';
+      document.getElementById('site-title').innerText = site.name;
+      document.getElementById('site-geology').innerText = site.geology;
+      document.getElementById('site-limits').innerText = site.limits;
+
+      document.getElementById('quant-tbody').innerHTML = `
+        <tr>
+          <td>Mineralogy</td>
+          <td>${site.earth.mineralText}</td>
+          <td>${site.planet.mineralText}</td>
+          <td class="num">${(metrics.sMineral * 100).toFixed(0)}%</td>
+        </tr>
+        <tr>
+          <td>Mean Slope</td>
+          <td class="num">${site.earth.slope}°</td>
+          <td class="num">${site.planet.slope}°</td>
+          <td class="num">${(metrics.sSlope * 100).toFixed(0)}%</td>
+        </tr>
+        <tr>
+          <td>Mean Temp</td>
+          <td class="num">${site.earth.tempK} K</td>
+          <td class="num">${site.planet.tempK} K</td>
+          <td class="num">${(metrics.sTemp * 100).toFixed(0)}%</td>
+        </tr>
+        <tr>
+          <td>Pressure</td>
+          <td class="num">${site.earth.pressureKpa} kPa</td>
+          <td class="num">${site.planet.pressureKpa} kPa</td>
+          <td class="num">${(metrics.sPress * 100).toFixed(1)}%</td>
+        </tr>
+      `;
+
+      const chartColor = site.isBaseline ? '#f59e0b' : '#38bdf8';
+      const chartBg = site.isBaseline ? 'rgba(245, 158, 11, 0.25)' : 'rgba(56, 189, 248, 0.25)';
+      radarChart.data.datasets[0].borderColor = chartColor;
+      radarChart.data.datasets[0].pointBackgroundColor = chartColor;
+      radarChart.data.datasets[0].backgroundColor = chartBg;
+      radarChart.data.datasets[0].data = [metrics.sMineral, metrics.sSlope, metrics.sTemp, metrics.sPress];
+      radarChart.update();
+    }
+
+    function selectSite(index) {
+      currentIndex = index;
+      const site = analogs[index];
+
+      earthMap.flyTo(site.earthCoords, site.earthZoom, { duration: 1.2 });
+      document.getElementById('earth-label').innerText = `🌍 EARTH: ${site.name}`;
+
+      planetMap.removeLayer(moonTrekLayer);
+      planetMap.removeLayer(marsTrekLayer);
+      planetMap.removeLayer(marsMolaLayer);
+
+      if (site.bodyType === "moon") {
+        moonTrekLayer.addTo(planetMap);
+        document.getElementById('planet-label').innerText = `🌑 MOON: ${site.planetSiteName} (NASA LRO)`;
+      } else {
+        marsTrekLayer.addTo(planetMap);
+        document.getElementById('planet-label').innerText = `🔴 MARS: ${site.planetSiteName} (NASA Viking)`;
+      }
+
+      planetMap.flyTo(site.planetCoords, site.planetZoom, { duration: 1.2 });
+      planetMarker.setLatLng(site.planetCoords).bindPopup(`<b>${site.planetSiteName}</b>`).openPopup();
+
+      document.querySelectorAll('.loc-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === index);
+      });
+      updateAll();
+    }
+
+    // Generate 7 Site Selection Buttons
+    const btnGroup = document.getElementById('btn-group');
+    analogs.forEach((site, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'loc-btn' + (site.isBaseline ? ' baseline' : '') + (idx === 0 ? ' active' : '');
+      btn.innerHTML = `${site.name} <span class="score-pill" id="pill-${idx}">0%</span>`;
+      btn.onclick = () => selectSite(idx);
+      btnGroup.appendChild(btn);
+    });
+
+    // Responsive map resize handling
+    window.addEventListener('resize', () => {
+      earthMap.invalidateSize();
+      planetMap.invalidateSize();
+    });
+
+    selectSite(0);
+  </script>
+</body>
+</html>
