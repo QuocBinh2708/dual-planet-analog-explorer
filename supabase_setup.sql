@@ -70,7 +70,10 @@ drop policy if exists "Allow public delete access" on public.analog_sites;
 create policy "Allow public delete access"
   on public.analog_sites for delete to anon, authenticated using (true);
 
--- 4. NẠP TOÀN BỘ 12 ĐIỂM DỮ LIỆU ĐẦY ĐỦ VÀO DATABASE
+-- 4. DỌN SẠCH CÁC DÒNG CŨ ĐỂ ĐỒNG BỘ CHUẨN 12 ĐỊA ĐIỂM
+delete from public.analog_sites where is_custom = false or id in ('chubluk', 'boulby', 'dallol', 'iceland', 'qaidam');
+
+-- 5. NẠP TOÀN BỘ 12 ĐIỂM DỮ LIỆU ĐẦY ĐỦ VÀO DATABASE
 insert into public.analog_sites (
   id, name_vi, name_en, short_label, body_type, is_vietnam, is_baseline, is_custom,
   earth_lat, earth_lon, earth_zoom,
@@ -244,5 +247,5 @@ on conflict (id) do update set
   limits_vi = excluded.limits_vi,
   limits_en = excluded.limits_en;
 
--- 5. KIỂM TRA LẠI 12 DÒNG DỮ LIỆU ĐÃ NẠP
+-- 6. KIỂM TRA LẠI 12 DÒNG DỮ LIỆU ĐÃ NẠP
 select id, name_vi, body_type, mineral_score, earth_slope, earth_temp_k, earth_pressure_kpa, created_at from public.analog_sites order by created_at asc;
