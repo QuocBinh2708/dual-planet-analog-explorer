@@ -502,6 +502,58 @@
       border-left: 1px solid var(--border-subtle);
     }
 
+    /* Floating Krông Nô Cave Network Subbar on Earth Map */
+    .cave-hud-bar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 950;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding: 6px 10px;
+      background: rgba(17, 19, 24, 0.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cave-hud-bar::-webkit-scrollbar { display: none; }
+    .cave-hud-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fda4af;
+      white-space: nowrap;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .cave-pill-btn {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: #fecdd3;
+      padding: 4px 9px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .cave-pill-btn:hover, .cave-pill-btn.active {
+      background: #f43f5e;
+      border-color: #f43f5e;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
+    }
+
     /* Dark Theme Override for Leaflet Controls */
     .leaflet-control-zoom a,
     .leaflet-control-layers {
@@ -541,6 +593,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      padding-bottom: 50px;
     }
 
     .inspector-section {
@@ -863,9 +916,10 @@
 
     /* Radar Chart Container */
     .chart-box {
-      height: 210px;
+      height: 235px;
       width: 100%;
       position: relative;
+      margin: 4px 0 12px 0;
     }
 
     /* Editorial Field Notes */
@@ -1186,6 +1240,18 @@
     <main id="maps-wrapper">
       <div class="map-pane">
         <div id="earth-map"></div>
+
+        <!-- Krông Nô Cave Network Floating Subbar -->
+        <div class="cave-hud-bar" id="cave-hud-bar">
+          <span class="cave-hud-title">🌋 Krông Nô Lava Tubes:</span>
+          <button class="cave-pill-btn active" id="cave-btn-all" onclick="focusAllCaves()">Tất cả hang (Dòng chảy)</button>
+          <button class="cave-pill-btn" id="cave-btn-0" onclick="focusSingleCave(0)">Hang C7 (1,266.5m)</button>
+          <button class="cave-pill-btn" id="cave-btn-1" onclick="focusSingleCave(1)">Hang A1 (456.7m)</button>
+          <button class="cave-pill-btn" id="cave-btn-2" onclick="focusSingleCave(2)">Hang C3 (594.4m)</button>
+          <button class="cave-pill-btn" id="cave-btn-3" onclick="focusSingleCave(3)">Hang C8 (~320m)</button>
+          <button class="cave-pill-btn" id="cave-btn-4" onclick="focusSingleCave(4)">Miệng Chư Bluk (Nguồn)</button>
+        </div>
+
         <div class="map-hud">
           <span class="hud-dot earth"></span>
           <span class="hud-title" id="earth-label">Trái Đất</span>
@@ -1230,6 +1296,19 @@
               <div class="esi-bar-fill" id="esi-bar-fill" style="width: 0%;"></div>
             </div>
           </div>
+        </div>
+
+        <!-- Dedicated Krông Nô Cave Specs Sub-Card -->
+        <div class="cave-detail-card" id="cave-detail-card" style="display:none; margin-top:12px; background:rgba(244, 63, 94, 0.08); border:1px solid rgba(244, 63, 94, 0.28); border-radius:8px; padding:10px 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="font-size:12px; font-weight:700; color:#fda4af;" id="cave-card-title">🌋 Krông Nô Volcanic Cave Network (C7, A1, C3, C8)</div>
+            <span style="font-size:10px; font-family:'JetBrains Mono',monospace; color:#f43f5e; background:rgba(244, 63, 94, 0.15); padding:2px 6px; border-radius:4px;">UNESCO GEOPARK</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:11px; margin-bottom:6px;">
+            <div><span style="color:var(--text-muted);">Chiều dài:</span> <b style="color:var(--text-primary);" id="cave-spec-len">>25 km (50+ hang)</b></div>
+            <div><span style="color:var(--text-muted);">Hình thái:</span> <b style="color:var(--text-primary);" id="cave-spec-morph">Ống dung nham bazan</b></div>
+          </div>
+          <div style="font-size:11px; color:var(--text-secondary); line-height:1.4;" id="cave-card-desc">Hệ thống hang ống dung nham núi lửa dài nhất Đông Nam Á, tương đồng cấu trúc giếng sập và ống dung nham Marius Hills trên Mặt Trăng. Nhấp chọn từng hang ở trên để khám phá.</div>
         </div>
       </section>
 
@@ -1309,6 +1388,17 @@
       </div>
 
       <div class="modal-body">
+        <!-- Quick Sample Templates & NASA CSV Auto-Uploader -->
+        <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 10px; background:var(--bg-inset); border:1px solid var(--border-subtle); border-radius:7px; margin-bottom:12px;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-secondary);">⚡ Mẫu dữ liệu nhanh:</span>
+          <button type="button" class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="applyStudentTemplate('chudangya')">🇻🇳 Núi lửa Chư Đăng Ya (Moon)</button>
+          <button type="button" class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="applyStudentTemplate('muine')">🇻🇳 Đồi cát Mũi Né (Mars)</button>
+          <button type="button" class="btn-ghost" style="padding:4px 8px; font-size:11px;" onclick="applyStudentTemplate('lyson')">🇻🇳 Đảo Lý Sơn (Moon)</button>
+          <button type="button" class="btn-ghost" style="padding:4px 8px; font-size:11px; background:rgba(59,130,246,0.18); border-color:#3b82f6; color:#93c5fd;" onclick="document.getElementById('m-nasa-csv').click()">📂 Tải file CSV NASA POWER</button>
+          <input type="file" id="m-nasa-csv" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">
+        </div>
+        <div id="m-csv-status" style="display:none; font-size:11.5px; padding:7px 10px; margin-bottom:12px; border-radius:6px; background:rgba(16, 185, 129, 0.16); border:1px solid #10b981; color:#34d399; line-height:1.4;"></div>
+
         <div class="modal-grid-2">
           <div class="field-block">
             <label data-i18n="lblSiteNameVi">Tên địa điểm (Tiếng Việt)</label>
@@ -1774,6 +1864,125 @@
       { collapsed: true, position: 'bottomright' }
     ).addTo(planetMap);
 
+    // --- Krông Nô Volcanic Cave Network Data & Layer ---
+    const krongNoCaves = [
+      {
+        code: "Hang C7",
+        label: "🌋 Hang C7 (1,266.5 m)",
+        coords: [12.5185, 107.9045],
+        length: "1,266.5 m (Dài nhất ĐNA)",
+        morphology: "Ống chính + Giếng trời sụp trần (Skylight)",
+        role: "Mô phỏng Căn cứ Ngầm Mặt Trăng",
+        desc: "Hang C7 là hang núi lửa dài nhất Đông Nam Á, trần vòm bazan kiên cố và có giếng trời sụp đổ tương đồng giếng Marius Hills trên Mặt Trăng. Lý tưởng thử nghiệm trạm cư trú bơm phồng và che chắn bức xạ vũ trụ."
+      },
+      {
+        code: "Hang A1",
+        label: "🕳️ Hang A1 (456.7 m)",
+        coords: [12.5095, 107.9012],
+        length: "456.7 m (Độ sâu hố ~15–20 m)",
+        morphology: "Hố sụt thẳng đứng + Nhánh kép",
+        role: "Thử nghiệm Thả Rover bằng Dây cáp",
+        desc: "Hang A1 mở ra bằng hố sụt thẳng đứng sâu 15–20m chia làm 2 nhánh bazan, tương đồng cấu trúc để kiểm thử hệ thống cẩu/dây tời thả robot tự hành (như rover Axel của NASA) xuống lòng hang Mặt Trăng."
+      },
+      {
+        code: "Hang C3",
+        label: "🧭 Hang C3 (594.4 m)",
+        coords: [12.5260, 107.9080],
+        length: "594.4 m (Ống liên tục)",
+        morphology: "Thềm dung nham phẳng (Pahoehoe)",
+        role: "Định vị Tự hành LiDAR SLAM không GPS",
+        desc: "Hang C3 bảo tồn thềm dung nham nguyên sơ, nền đá phẳng, là hành lang lý tưởng để huấn luyện thuật toán xe tự hành LiDAR/Visual SLAM và mạng truyền thông không dây ngầm dưới lòng đất."
+      },
+      {
+        code: "Hang C8",
+        label: "🪜 Hang C8 (~320 m)",
+        coords: [12.5140, 107.9095],
+        length: "~320.0 m (Ống nhiều tầng)",
+        morphology: "Ống dung nham phân nhánh đa tầng",
+        role: "Đo vẽ Radar Xuyên Đất (GPR)",
+        desc: "Hang C8 có các tầng dung nham thoát nước phức tạp, thích hợp hiệu chuẩn radar xuyên đất (GPR) phát hiện các mạng lưới khoang rỗng ngầm từ bề mặt Mặt Trăng."
+      },
+      {
+        code: "Núi lửa Chư Bluk",
+        label: "⛰️ Núi lửa Chư Bluk (Nguồn)",
+        coords: [12.4850, 107.8820],
+        length: "Cao 601 m (Miệng rộng ~400 m, sâu ~60 m)",
+        morphology: "Nón xỉ & Nguồn phun dung nham bazan",
+        role: "Mô phỏng Vòm Núi lửa Mặt Trăng",
+        desc: "Chư Bluk (Buôn Choáh) là nón núi lửa trẻ Pleistocen cao 601m, nguồn phun trào dòng dung nham bazan tạo nên hệ thống hang >25km Krông Nô về phía sông Sêrêpốk, tương đồng các vòm núi lửa Marius Hills trên Mặt Trăng."
+      }
+    ];
+
+    let krongNoLayerGroup = null;
+    let caveMarkers = [];
+
+    function setupKrongNoCavesOnMap() {
+      if (!earthMap) return;
+      krongNoLayerGroup = L.layerGroup();
+
+      const flowPathCoords = [
+        [12.4850, 107.8820],
+        [12.5095, 107.9012],
+        [12.5140, 107.9095],
+        [12.5185, 107.9045],
+        [12.5260, 107.9080]
+      ];
+      const flowLine = L.polyline(flowPathCoords, {
+        color: '#f43f5e',
+        weight: 3.5,
+        opacity: 0.85,
+        dashArray: '6, 8'
+      });
+      krongNoLayerGroup.addLayer(flowLine);
+
+      krongNoCaves.forEach((cave, idx) => {
+        const marker = L.circleMarker(cave.coords, {
+          radius: idx === 4 ? 9 : 7.5,
+          fillColor: idx === 4 ? '#e11d48' : '#f43f5e',
+          color: '#ffffff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.95
+        }).bindPopup(`<b>${cave.label}</b><br>📏 ${cave.length}<br><i>${cave.role}</i>`);
+        marker.on('click', () => focusSingleCave(idx));
+        krongNoLayerGroup.addLayer(marker);
+        caveMarkers.push(marker);
+      });
+    }
+
+    function focusAllCaves() {
+      if (!earthMap || !krongNoLayerGroup) return;
+      if (!earthMap.hasLayer(krongNoLayerGroup)) krongNoLayerGroup.addTo(earthMap);
+      const bounds = L.latLngBounds(krongNoCaves.map(c => c.coords));
+      earthMap.flyToBounds(bounds.pad(0.25), { duration: 1.2 });
+      setCaveSubbarActive('cave-btn-all');
+
+      document.getElementById('cave-card-title').innerText = "🌋 Krông Nô Volcanic Cave Network (C7, A1, C3, C8)";
+      document.getElementById('cave-spec-len').innerText = ">25 km (50+ hang)";
+      document.getElementById('cave-spec-morph').innerText = "Ống dung nham bazan";
+      document.getElementById('cave-card-desc').innerText = "Hệ thống hang ống dung nham núi lửa dài nhất Đông Nam Á, tương đồng cấu trúc giếng sập và ống dung nham Marius Hills trên Mặt Trăng. Nhấp chọn từng hang ở trên để khám phá.";
+    }
+
+    function focusSingleCave(cIdx) {
+      if (!earthMap || !krongNoLayerGroup) return;
+      if (!earthMap.hasLayer(krongNoLayerGroup)) krongNoLayerGroup.addTo(earthMap);
+      const cave = krongNoCaves[cIdx];
+      earthMap.flyTo(cave.coords, 15, { duration: 1.1 });
+      if (caveMarkers[cIdx]) caveMarkers[cIdx].openPopup();
+      setCaveSubbarActive(`cave-btn-${cIdx}`);
+
+      document.getElementById('cave-card-title').innerText = cave.label;
+      document.getElementById('cave-spec-len').innerText = cave.length;
+      document.getElementById('cave-spec-morph').innerText = cave.morphology;
+      document.getElementById('cave-card-desc').innerText = cave.desc;
+    }
+
+    function setCaveSubbarActive(activeId) {
+      document.querySelectorAll('.cave-pill-btn').forEach(btn => btn.classList.remove('active'));
+      const b = document.getElementById(activeId);
+      if (b) b.classList.add('active');
+    }
+
     // 6. Initialize 7-Axis Radar Chart
     const ctx = document.getElementById('radarChart').getContext('2d');
     const radarChart = new Chart(ctx, {
@@ -1794,6 +2003,9 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: { top: 12, right: 32, bottom: 12, left: 32 }
+        },
         scales: {
           r: {
             min: 0,
@@ -2064,6 +2276,24 @@
 
       renderSiteDropdown();
       updateAll();
+
+      // Check if current site is Krông Nô / Chư Bluk
+      const isKrongNo = site.id === 'chubluk' || (site.nameVi && site.nameVi.includes('Chư Bluk'));
+      const caveBar = document.getElementById('cave-hud-bar');
+      const caveCard = document.getElementById('cave-detail-card');
+      if (isKrongNo) {
+        if (caveBar) caveBar.style.display = 'flex';
+        if (caveCard) caveCard.style.display = 'block';
+        if (earthMap && krongNoLayerGroup && !earthMap.hasLayer(krongNoLayerGroup)) {
+          krongNoLayerGroup.addTo(earthMap);
+        }
+      } else {
+        if (caveBar) caveBar.style.display = 'none';
+        if (caveCard) caveCard.style.display = 'none';
+        if (earthMap && krongNoLayerGroup && earthMap.hasLayer(krongNoLayerGroup)) {
+          earthMap.removeLayer(krongNoLayerGroup);
+        }
+      }
     }
 
     // 10. Language Switcher
@@ -2111,10 +2341,170 @@
       });
     }
 
+    const studentSampleTemplates = {
+      chudangya: {
+        nameVi: "8. Núi lửa Chư Đăng Ya (Việt Nam)",
+        nameEn: "8. Chu Dang Ya Volcano (Vietnam)",
+        body: "moon",
+        planetName: "Hadley Rille - Apollo 15 (Moon)",
+        earthCoords: "14.113, 108.027",
+        planetCoords: "26.1, 3.6",
+        earth: { c_sio2: 49.5, c_feo: 11.8, c_tio2: 1.8, c_density: 2.85, c_thermal: 75, c_roof: 0, c_gravity: 9.81 },
+        planet: { c_sio2: 46.0, c_feo: 17.0, c_tio2: 4.2, c_density: 3.10, c_thermal: 90, c_roof: 18, c_gravity: 1.62 },
+        geologyVi: "Miệng núi lửa kép bazan Pleistocen lòng chảo tròn tại Gia Lai, đất đỏ bazan phì nhiêu giàu sắt, tương đồng họng phun núi lửa và rãnh sụt dung nham Hadley Rille trên Mặt Trăng.",
+        geologyEn: "Pleistocene basaltic cinder cone caldera in Gia Lai with iron-rich weathered basalt, directly analogous to lunar volcanic vents and Hadley Rille rille sinuous collapse.",
+        limitsVi: "Khí quyển Trái Đất, thảm thực vật che phủ bề mặt và trọng lực 1g.",
+        limitsEn: "Dense terrestrial atmosphere, agricultural vegetation cover, and 1g gravitational baseline."
+      },
+      muine: {
+        nameVi: "8. Đồi cát đỏ Mũi Né (Việt Nam)",
+        nameEn: "8. Mui Ne Red Sand Dunes (Vietnam)",
+        body: "mars",
+        planetName: "Olympia Undae (Mars)",
+        earthCoords: "10.952, 108.287",
+        planetCoords: "81.0, 175.0",
+        earth: { c_sio2: 62.0, c_feo: 8.5, c_tio2: 0.8, c_density: 2.30, c_thermal: 40, c_roof: 0, c_gravity: 9.81 },
+        planet: { c_sio2: 45.0, c_feo: 18.0, c_tio2: 1.2, c_density: 2.90, c_thermal: 80, c_roof: 0, c_gravity: 3.72 },
+        geologyVi: "Địa hình cồn cát đỏ ven biển giàu oxit sắt tại Bình Thuận do gió mùa bồi tụ, lý tưởng để thử nghiệm độ bám bánh xe tự hành rover và chống trượt cát Sao Hỏa.",
+        geologyEn: "Coastal iron-oxide-rich aeolian sand dune field in Binh Thuan, ideal for benchmark testing rover wheel traction mechanics against Martian dunes.",
+        limitsVi: "Độ ẩm cát cao hơn do gần biển, trọng trường 1g và mật độ khí quyển lớn.",
+        limitsEn: "Higher moisture cohesion from coastal air, 1g gravity, and high terrestrial air density."
+      },
+      lyson: {
+        nameVi: "8. Đảo núi lửa Lý Sơn (Việt Nam)",
+        nameEn: "8. Ly Son Volcanic Island (Vietnam)",
+        body: "moon",
+        planetName: "Aristarchus Plateau (Moon)",
+        earthCoords: "15.381, 109.118",
+        planetCoords: "23.7, -47.4",
+        earth: { c_sio2: 51.0, c_feo: 12.0, c_tio2: 1.6, c_density: 2.82, c_thermal: 80, c_roof: 10, c_gravity: 9.81 },
+        planet: { c_sio2: 47.0, c_feo: 16.5, c_tio2: 4.0, c_density: 3.05, c_thermal: 92, c_roof: 15, c_gravity: 1.62 },
+        geologyVi: "Đảo núi lửa Đệ Tứ với miệng Thới Lới và các vách đá bazan dạng cột tương đồng trầm tích dung nham cao nguyên Aristarchus trên Mặt Trăng.",
+        geologyEn: "Quaternary volcanic island with Thoi Loi crater and columnar basalt cliffs analogous to Aristarchus Plateau lunar pyroclastic vents.",
+        limitsVi: "Xâm thực sóng biển, hơi ẩm muối và áp suất khí quyển 101.3 kPa.",
+        limitsEn: "Marine erosion, saline air moisture, and 101.3 kPa sea-level air pressure."
+      }
+    };
+
+    function applyStudentTemplate(key) {
+      const t = studentSampleTemplates[key];
+      if (!t) return;
+      const nextNum = analogs.length + 1;
+      document.getElementById('m-name-vi').value = t.nameVi.replace(/^8\./, `${nextNum}.`);
+      document.getElementById('m-name-en').value = t.nameEn.replace(/^8\./, `${nextNum}.`);
+      document.getElementById('m-body').value = t.body;
+      document.getElementById('m-planet-name').value = t.planetName;
+      document.getElementById('m-earth-coords').value = t.earthCoords;
+      document.getElementById('m-planet-coords').value = t.planetCoords;
+
+      criteriaKeys.forEach((k) => {
+        const inpE = document.getElementById(`mi-e-${k}`);
+        const inpP = document.getElementById(`mi-p-${k}`);
+        if (inpE && t.earth[k] !== undefined) inpE.value = t.earth[k];
+        if (inpP && t.planet[k] !== undefined) inpP.value = t.planet[k];
+      });
+
+      document.getElementById('m-geology').value = currentLang === 'vi' ? t.geologyVi : t.geologyEn;
+      document.getElementById('m-limits').value = currentLang === 'vi' ? t.limitsVi : t.limitsEn;
+
+      const statusBox = document.getElementById('m-csv-status');
+      if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.innerHTML = `⚡ <b>Đã nạp mẫu dữ liệu:</b> ${currentLang === 'vi' ? t.nameVi : t.nameEn}. Bạn có thể chỉnh sửa các thông số hoặc bấm Lưu thay đổi.`;
+      }
+    }
+
+    function handleModalNasaCsv(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        const latMatch = text.match(/latitude\s+([-\d.]+)/i);
+        const lonMatch = text.match(/longitude\s+([-\d.]+)/i);
+        if (latMatch && lonMatch) {
+          document.getElementById('m-earth-coords').value = `${parseFloat(latMatch[1]).toFixed(4)}, ${parseFloat(lonMatch[1]).toFixed(4)}`;
+        }
+
+        const lines = text.split(/\r?\n/);
+        let headerIdx = -1;
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes('YEAR') && lines[i].includes('T2M')) {
+            headerIdx = i;
+            break;
+          }
+        }
+
+        if (headerIdx !== -1) {
+          const headers = lines[headerIdx].split(',').map(s => s.trim());
+          const t2mIdx = headers.indexOf('T2M');
+          const psIdx = headers.indexOf('PS');
+          const rangeIdx = headers.indexOf('T2M_RANGE');
+
+          let t2mSum = 0, t2mCnt = 0;
+          let psSum = 0, psCnt = 0;
+          let rangeSum = 0, rangeCnt = 0;
+
+          for (let i = headerIdx + 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const cols = line.split(',');
+            if (t2mIdx !== -1 && cols[t2mIdx] !== undefined) {
+              const val = parseFloat(cols[t2mIdx]);
+              if (!isNaN(val) && val > -900) { t2mSum += val; t2mCnt++; }
+            }
+            if (psIdx !== -1 && cols[psIdx] !== undefined) {
+              const val = parseFloat(cols[psIdx]);
+              if (!isNaN(val) && val > -900) { psSum += val; psCnt++; }
+            }
+            if (rangeIdx !== -1 && cols[rangeIdx] !== undefined) {
+              const val = parseFloat(cols[rangeIdx]);
+              if (!isNaN(val) && val > -900) { rangeSum += val; rangeCnt++; }
+            }
+          }
+
+          let meanT2m = 25, meanPs = 100, meanRange = 10;
+          if (t2mCnt > 0) meanT2m = t2mSum / t2mCnt;
+          if (psCnt > 0) meanPs = psSum / psCnt;
+          if (rangeCnt > 0) meanRange = rangeSum / rangeCnt;
+
+          const thermalBuffering = Math.min(98, Math.max(20, Math.round((1 - (1.0 / Math.max(1, meanRange))) * 100)));
+
+          const nextNum = analogs.length + 1;
+          const latVal = latMatch ? latMatch[1] : 'VN';
+          const lonVal = lonMatch ? lonMatch[1] : '';
+          document.getElementById('m-name-vi').value = `${nextNum}. Điểm đo NASA POWER (${latVal}, ${lonVal})`;
+          document.getElementById('m-name-en').value = `${nextNum}. NASA POWER Station (${latVal}, ${lonVal})`;
+
+          const inpThermal = document.getElementById('mi-e-c_thermal');
+          if (inpThermal) inpThermal.value = thermalBuffering;
+          const inpDensity = document.getElementById('mi-e-c_density');
+          if (inpDensity) inpDensity.value = 2.80;
+          const inpRoof = document.getElementById('mi-e-c_roof');
+          if (inpRoof) inpRoof.value = 15.0;
+          const inpGrav = document.getElementById('mi-e-c_gravity');
+          if (inpGrav) inpGrav.value = 9.81;
+
+          const statusBox = document.getElementById('m-csv-status');
+          if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.innerHTML = `🎉 <b>Đã tự động đọc tệp NASA POWER:</b><br>` +
+              `• Tọa độ: <b>${latVal}°N, ${lonVal}°E</b> (${t2mCnt} ngày hợp lệ)<br>` +
+              `• Nhiệt độ TB: <b>${meanT2m.toFixed(2)}°C</b> | Áp suất: <b>${meanPs.toFixed(2)} kPa</b><br>` +
+              `• Hiệu suất đệm nhiệt ước tính: <b>${thermalBuffering}%</b> (Biên độ dao động ${meanRange.toFixed(2)}°C)<br>` +
+              `<i>👉 Toàn bộ các thông số đã được nạp tự động vào form!</i>`;
+          }
+        }
+      };
+      reader.readAsText(file);
+    }
+
     function openModal(mode) {
       editMode = mode;
       const t = i18n[currentLang];
       renderModalInputs();
+      const statusBox = document.getElementById('m-csv-status');
+      if (statusBox) statusBox.style.display = 'none';
       document.getElementById('edit-modal').style.display = 'flex';
       document.getElementById('modal-title').innerText = mode === 'add' ? t.modalAddTitle : t.modalEditTitle;
       document.getElementById('delete-site-btn').style.display = mode === 'edit' && analogs.length > 1 ? 'inline-block' : 'none';
@@ -2459,6 +2849,7 @@
       renderSliders();
       renderModalInputs();
       refreshEarthMarkers();
+      setupKrongNoCavesOnMap();
       selectSite(0);
 
       // Connect and sync with Supabase Cloud Database
