@@ -1,41 +1,65 @@
-# 🚀 Dual-Planet Analog Explorer
-### Quantitative Terrestrial Planetary Analog Similarity Framework for the Moon and Mars
+# 🚀 KRONOS-SIM: Krông Nô Lunar Analog Mission Control & Dual-Planet Explorer
+### Quantitative Planetary Analog Similarity Engine & Mission Simulation Platform
 **NASA Space Apps Challenge 2024**
 
-An interactive web platform and planetary analog similarity engine that quantitatively evaluates how closely 5 under-explored terrestrial analog environments and 2 gold-standard NASA baselines mimic conditions on the Moon and Mars using multi-source satellite and rover data.
+[![GitHub Pages](https://img.shields.io/badge/Live_Demo-GitHub_Pages-38bdf8?style=for-the-badge&logo=github)](https://quocbinh2708.github.io/dual-planet-analog-explorer/)
+[![Streamlit App](https://img.shields.io/badge/Python_App-Streamlit_Cloud-FF4B4B?style=for-the-badge&logo=streamlit)](https://mpxbhmbdmjtdaypluadtus.streamlit.app/)
+
+**KRONOS-SIM** is an interactive, quantitative planetary analog mission control platform that evaluates terrestrial environments on Earth against targets on the **Moon** and **Mars** using the **Earth Similarity Index (ESI)** (*Schulze-Makuch et al., 2011*) powered by multi-source NASA satellite and rover datasets.
 
 ---
 
-## 🌟 Overview & Key Innovations
+## 🌟 Key Capabilities & Architecture
 
-Instead of selecting analog testing grounds based purely on qualitative or visual resemblance, **Dual-Planet Analog Explorer** applies the mathematically rigorous **Earth Similarity Index (ESI)** (*Schulze-Makuch et al., 2011*) adapted for planetary exploration.
+### 1. 🇻🇳 Krông Nô Volcanic Cave Network (Vietnam Primary Focus)
+* **The Longest Lava Tube System in Southeast Asia:** Over 25 km of subterranean tubes in the Dak Nong UNESCO Global Geopark erupted from the Chư Bluk volcano.
+* **Specialized Cave Explorer Mode:**
+  * **Hang C7 (1,266.5 m):** Longest volcanic cave in SE Asia; massive basalt ceiling and collapsed skylight directly analogous to the Marius Hills pit on the Moon. Tested for inflatable habitat deployment and radiation shielding.
+  * **Hang A1 (456.7 m):** High vertical skylight drop; ideal for testing autonomous drone descent and tethered robotic rappelling.
+  * **Hang C3 (594.4 m):** Complex multi-level lava branching; tests multi-agent swarm exploration in GPS-denied environments.
+  * **Hang C8 (~320 m):** Thick ceiling insulation maintaining steady microclimate temperatures (~24°C year-round).
+  * **Chư Bluk Volcano (Source):** Vent morphology analogous to lunar volcanic domes and rilles.
 
-### 7 Key Analog Pairs in the System:
-1. **Chư Bluk (Vietnam) ⟷ Marius Hills (Moon):** Southeast Asia's longest lava tube system (>25 km) hosted in young Pleistocene basalts — modeling subsurface radiation-shielded lunar habitats and GPS-denied SLAM navigation.
-2. **Lonar Crater (India) ⟷ Jezero Crater (Mars):** Hypervelocity impact crater excavated into Deccan flood basalts with shock-metamorphosed maskelynite glass and smectite clays matching MRO CRISM data.
-3. **Qaidam Basin (China) ⟷ Gale Crater (Mars):** High-altitude (2,800 m) hyper-arid evaporite desert (halite, gypsum, MgSO₄) featuring Earth's largest aerodynamic yardang field for aeolian erosion and rover mobility testing.
-4. **Dallol Geothermal (Ethiopia) ⟷ Columbia Hills - Gusev (Mars):** Polyextreme hyper-acidic (pH 0.25) and hypersaline volcanic hydrothermal system modeling Noachian Mars (~3.5 Ga) hot springs.
-5. **Boulby Mine (United Kingdom) ⟷ Arsia Mons Skylights (Mars):** 1.1 km deep subsurface Permian salt mine hosting the NASA/ESA MINAR facility for deep drilling and dark-zone robotic operations.
-6. **⭐ NASA Mars Baseline — Atacama Desert (Chile) ⟷ Elysium Planitia (Mars):** Gold-standard benchmark for hyper-aridity (<1 mm/yr rainfall) and perchlorate chemistry.
-7. **⭐ NASA Moon Baseline — Krafla Volcanic Field (Iceland) ⟷ Taurus-Littrow / Apollo 17 (Moon):** Gold-standard benchmark for young tholeiitic basalt terrain, used for Apollo and Artemis EVA training.
+### 2. 🌐 Global Dual-Planet Benchmark (7 Scientific Pairs)
+1. **Krông Nô – Chư Bluk (Vietnam) ⟷ Marius Hills (Moon):** [ESI: **93.3%**] Lava tube network for subsurface radiation shielding and GPS-denied SLAM navigation.
+2. **Lonar Crater (India) ⟷ Jezero Crater (Mars):** [ESI: **91.0%**] Impact crater in flood basalt matching Perseverance clays and maskelynite shock-glass.
+3. **Qaidam Basin (China) ⟷ Gale Crater (Mars):** [ESI: **87.9%**] Hyper-arid salt desert and yardangs for Curiosity rover mobility and wind erosion tests.
+4. **Dallol Geothermal (Ethiopia) ⟷ Columbia Hills - Gusev (Mars):** [ESI: **84.9%**] Hyper-acidic (pH 0.25) hydrothermal brines mimicking Noachian Mars (~3.5 Ga) hot springs.
+5. **Boulby Mine (United Kingdom) ⟷ Arsia Mons Caves (Mars):** [ESI: **84.1%**] 1.1 km deep salt mine hosting the NASA/ESA MINAR facility for deep drilling without GPS.
+6. **⭐ NASA Mars Baseline — Atacama Desert (Chile) ⟷ Elysium Planitia (Mars):** [ESI: **85.1%**] Hyper-arid gold standard with perchlorate-rich soil chemistry.
+7. **⭐ NASA Moon Baseline — Krafla Volcanic Field (Iceland) ⟷ Taurus-Littrow / Apollo 17 (Moon):** [ESI: **94.4%**] Young basalt flows used for Apollo astronaut and Artemis EVA suit training.
+
+### 3. 🧑‍🎓 Student Research Sandbox (Custom Analog Site Builder)
+Students, researchers, and citizen scientists can add their own analog sites directly into the engine:
+* **Interactive Modal Form:** Input Earth coordinates, target planet (Moon/Mars), mineralogy score ($S_1$), slope ($S_2$), temperature ($S_3$), and pressure ($S_4$).
+* **3 Quick Vietnam Research Presets:**
+  * **Chư Đăng Ya Volcano (Gia Lai):** Cinder cone and scoria tephra matching Hadley Rille (Apollo 15).
+  * **Mũi Né Red Sand Dunes (Bình Thuận):** Shifting iron-oxide coastal dunes matching Bagnold Dunes on Mars.
+  * **Lý Sơn Volcanic Island (Quảng Ngãi):** Coastal basalt cliffs and tuff cone matching Aristarchus Plateau on the Moon.
+* **Persistent Storage:** Custom sites are stored locally via `localStorage` and plotted dynamically with purple map flags.
 
 ---
 
 ## 📐 Mathematical Framework: ESI Formulation
 
-Each physical parameter $i$ is mapped to a dimensionless component similarity score $S_i \in [0, 1]$:
+Each physical parameter $i$ is converted into a dimensionless component score $S_i \in [0, 1]$:
 
 $$S_i = 1 - \left| \frac{X_{\text{Earth}, i} - X_{\text{Target}, i}}{X_{\text{Earth}, i} + X_{\text{Target}, i}} \right|$$
 
-The composite **Weighted Analog ESI** is calculated via a weighted geometric mean across 4 mission-specific weights $w_i \in [0, 1]$:
+The composite **Weighted Planetary Analog ESI** is calculated via weighted geometric mean:
 
 $$ESI_{\text{Analog}} = \left( \prod_{i=1}^{4} \max(\epsilon, S_i)^{w_i} \right)^{\frac{1}{\sum_{i=1}^{4} w_i}} \times 100\%$$
 
-* **Input Parameters:**
-  * $S_1$ — **Mineralogy & Lithology:** Indicator mineral assemblages from near-infrared reflectance spectroscopy.
-  * $S_2$ — **Topographic Slope (°):** Surface roughness and steepness from DEMs.
-  * $S_3$ — **Mean Surface Temperature (K):** Absolute thermodynamic temperature in Kelvin.
-  * $S_4$ — **Atmospheric Pressure (kPa):** Boundary control variable with floor threshold $\epsilon = 0.01$ for lunar vacuum comparisons.
+* **Component Parameters:**
+  * $S_1$ — **Mineralogy & Lithology:** Indicator mineral assemblages from infrared reflectance spectra.
+  * $S_2$ — **Topographic Slope (°):** Mean slope and ruggedness from digital elevation models (DEMs).
+  * $S_3$ — **Mean Surface Temperature (K):** Thermodynamic temperature in Kelvin ($T_K = T_{^\circ\text{C}} + 273.15$).
+  * $S_4$ — **Atmospheric Pressure (kPa):** Controlled via boundary floor $\epsilon = 0.01$ to avoid zero-product collapse in lunar vacuum.
+
+### Mission Weight Presets ($w_1, w_2, w_3, w_4$):
+* **Surface & Geology (Default):** $w = [1.0, 1.0, 0.5, 0.0]$
+* **Rover Mobility Test:** $w = [1.0, 0.9, 0.1, 0.0]$ (Prioritizes wheel traction & terrain slopes)
+* **Full Environmental:** $w = [1.0, 0.3, 0.6, 0.2]$ (Incorporates atmospheric differences)
 
 ---
 
@@ -45,7 +69,7 @@ $$ESI_{\text{Analog}} = \left( \prod_{i=1}^{4} \max(\epsilon, S_i)^{w_i} \right)
   * NASA POWER Climatology (T2M 2-meter air temperature & surface pressure PS)
   * NASA/METI ASTER GDEM v3 (Elevation and digital slope models)
   * NASA MODIS Terra Land Surface Temperature (LST) Day
-  * USGS Macrostrat & EarthExplorer (Lithology and mineral assemblages)
+  * USGS Macrostrat Geological Database
 * **Lunar Data:**
   * NASA Lunar Reconnaissance Orbiter (LRO) LOLA Altimeter & LROC WAC Global Mosaic
   * NASA Moon Trek WMTS Web Tile Services
@@ -58,31 +82,21 @@ $$ESI_{\text{Analog}} = \left( \prod_{i=1}^{4} \max(\epsilon, S_i)^{w_i} \right)
 
 ---
 
-## 💻 Deployment & How to Run
+## 💻 How to Run Locally
 
-### Method 1: Instant Local Browser Run (No installation required)
-Just open `index.html` directly in any web browser (Chrome, Edge, Firefox, Safari).
+### Method 1: Web Version (`index.html`) — No installation required
+Simply double-click `index.html` or open it with any web browser (Chrome, Edge, Safari, Firefox).
 
-### Method 2: Deploy to GitHub Pages (Recommended for Submission)
-1. Create a public repository on GitHub (e.g. `dual-planet-analog-explorer`).
-2. Upload `index.html` and `README.md`.
-3. In repository **Settings** → **Pages** → Source: **Deploy from a branch** → Branch: `main` → Save.
-4. Your site will be live at: `https://[your-username].github.io/dual-planet-analog-explorer/`
-
-### Method 3: Netlify Drop
-Drag and drop this project folder into [app.netlify.com/drop](https://app.netlify.com/drop) for instant global deployment.
+### Method 2: Python Dashboard (`app.py`)
+```powershell
+pip install -r requirements.txt
+python -m streamlit run app.py
+```
+Open **http://localhost:8501** in your browser.
 
 ---
 
-## 📊 Summary of Baseline Scores
+## 🌐 Live Deployments
 
-| Analog Site (Earth ⟷ Target) | Mineralogy ($S_1$) | Slope ($S_2$) | Temp ($S_3$) | Pressure ($S_4$) | Default ESI |
-|---|:---:|:---:|:---:|:---:|:---:|
-| **1. Chư Bluk (VN) ⟷ Marius Hills (Moon)** | 90.0% | 97.3% | 92.1% | 0.0% | **93.3%** |
-| **2. Lonar Crater (IN) ⟷ Jezero (Mars)** | 95.0% | 90.7% | 84.2% | 1.4% | **91.0%** |
-| **3. Qaidam Basin (CN) ⟷ Gale (Mars)** | 92.0% | 83.3% | 89.4% | 2.1% | **87.9%** |
-| **4. Dallol (ET) ⟷ Columbia Hills (Mars)** | 88.0% | 83.3% | 81.8% | 1.2% | **84.9%** |
-| **5. Boulby Mine (UK) ⟷ Arsia Mons (Mars)** | 89.0% | 77.8% | 87.6% | 0.9% | **84.1%** |
-| **⭐ 6. Atacama (CL) ⟷ Elysium (Mars)** | 94.0% | 76.9% | 85.2% | 1.4% | **85.1%** |
-| **⭐ 7. Krafla (IS) ⟷ Taurus-Littrow (Moon)**| 93.0% | 95.2% | 95.5% | 0.0% | **94.4%** |
-
+* **Web Mission Control (GitHub Pages):** [https://quocbinh2708.github.io/dual-planet-analog-explorer/](https://quocbinh2708.github.io/dual-planet-analog-explorer/)
+* **Python Analytical Engine (Streamlit Cloud):** [https://mpxbhmbdmjtdaypluadtus.streamlit.app/](https://mpxbhmbdmjtdaypluadtus.streamlit.app/)
