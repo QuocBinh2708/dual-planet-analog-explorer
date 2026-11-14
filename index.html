@@ -320,7 +320,7 @@
       align-items: center; gap: 8px;
     }
 
-    /* Sub-bar for Krông Nô Caves (C7, A1, C3, C8, Chư Bluk) */
+    /* Sub-bar for Krong No Caves (C7, A1, C3, C8, Chu Bluk) */
     .cave-subbar {
       position: absolute; top: 56px; left: 50px; right: 12px; z-index: 999;
       display: none; gap: 6px; overflow-x: auto; flex-wrap: nowrap; align-items: center;
@@ -717,7 +717,7 @@
         <div class="site-dropdown-container">
           <button class="site-select-btn" id="site-select-btn" onclick="toggleSiteDropdown(event)">
             <span class="site-badge-icon" id="header-site-icon">🇻🇳</span>
-            <span class="site-select-title" id="header-site-title">1. Krông Nô – Chư Bluk</span>
+            <span class="site-select-title" id="header-site-title">1. Krong No – Chu Bluk</span>
             <span class="site-select-score" id="header-site-score">93.3%</span>
             <span class="site-caret" id="dropdown-caret">▼</span>
           </button>
@@ -725,22 +725,22 @@
           <!-- Dropdown Popover Menu -->
           <div class="site-dropdown-menu" id="site-dropdown-menu">
             <div class="menu-search-box">
-              <input type="text" id="site-search-input" placeholder="🔍 Tìm kiếm địa điểm, quốc gia, hành tinh..." oninput="filterSiteList()" />
+              <input type="text" id="site-search-input" placeholder="🔍 Search sites, countries, planets..." oninput="filterSiteList()" />
             </div>
             <div class="menu-category-tabs">
-              <button class="cat-tab active" data-cat="all" onclick="filterCategory('all', this)">Tất cả (12)</button>
-              <button class="cat-tab" data-cat="moon" onclick="filterCategory('moon', this)">🌑 Mặt Trăng</button>
-              <button class="cat-tab" data-cat="mars" onclick="filterCategory('mars', this)">🔴 Sao Hỏa</button>
-              <button class="cat-tab" data-cat="vn" onclick="filterCategory('vn', this)">🇻🇳 Việt Nam</button>
-              <button class="cat-tab" data-cat="custom" onclick="filterCategory('custom', this)">🧑‍🎓 Tự Nhập</button>
+              <button class="cat-tab active" data-cat="all" onclick="filterCategory('all', this)">All Sites (12)</button>
+              <button class="cat-tab" data-cat="moon" onclick="filterCategory('moon', this)">🌑 Moon</button>
+              <button class="cat-tab" data-cat="mars" onclick="filterCategory('mars', this)">🔴 Mars</button>
+              <button class="cat-tab" data-cat="vn" onclick="filterCategory('vn', this)">🇻🇳 Vietnam</button>
+              <button class="cat-tab" data-cat="custom" onclick="filterCategory('custom', this)">🧑‍🎓 Custom Sites</button>
             </div>
             <div class="menu-site-list" id="menu-site-list"></div>
           </div>
         </div>
 
-        <button class="icon-nav-btn" title="Điểm trước đó (Phím ◀)" onclick="stepSite(-1)">◀</button>
-        <button class="icon-nav-btn" title="Điểm tiếp theo (Phím ▶)" onclick="stepSite(1)">▶</button>
-        <button class="btn-action-global" id="btn-global" title="Xem toàn cảnh bản đồ" onclick="showGlobalOverview()">🌐 Toàn Cảnh</button>
+        <button class="icon-nav-btn" title="Previous Site (◀ Key)" onclick="stepSite(-1)">◀</button>
+        <button class="icon-nav-btn" title="Next Site (▶ Key)" onclick="stepSite(1)">▶</button>
+        <button class="btn-action-global" id="btn-global" title="View global overview" onclick="showGlobalOverview()">🌐 Global View</button>
       </div>
 
       <!-- 2. Middle Scrollable Chips -->
@@ -752,7 +752,7 @@
       <div class="action-hub-group">
         <button class="btn-user-input" id="btn-open-input" onclick="openAddModal()">
           <span style="font-size:13px;">✍️</span>
-          <span>Tự Nhập Dữ Liệu</span>
+          <span>Add Analog Site</span>
           <span class="btn-sparkle">✦</span>
         </button>
         <div class="cloud-status-badge" id="cloud-pill" title="Supabase Real-time Cloud Synchronization">
@@ -764,26 +764,26 @@
 
     <!-- Map Pinning Mode Notification Toast -->
     <div id="map-pin-toast">
-      <span>📍 Đang ở chế độ chọn tọa độ: <b>Hãy nhấp vào vị trí bất kỳ trên bản đồ Trái Đất</b></span>
+      <span>📍 Map Pinning Active: <b>Click anywhere on the Earth map to pick coordinates</b></span>
       <button style="background:transparent; border:none; color:#ffffff; cursor:pointer; font-weight:bold; margin-left:8px;" onclick="cancelMapPinning()">✕</button>
     </div>
 
-    <!-- Krông Nô Cave Network Subbar -->
+    <!-- Krong No Cave Network Subbar -->
     <div class="cave-subbar" id="cave-subbar">
-      <div class="cave-subbar-title">🌋 Krông Nô Caves:</div>
-      <button class="cave-btn active" id="cbtn-all" onclick="focusAllCaves()">Toàn Cảnh Hệ Thống</button>
-      <button class="cave-btn" id="cbtn-c7" onclick="focusSingleCave(0)">🌋 Hang C7 (1,266.5 m)</button>
-      <button class="cave-btn" id="cbtn-a1" onclick="focusSingleCave(1)">🕳️ Hang A1 (456.7 m)</button>
-      <button class="cave-btn" id="cbtn-c3" onclick="focusSingleCave(2)">🧭 Hang C3 (594.4 m)</button>
-      <button class="cave-btn" id="cbtn-c8" onclick="focusSingleCave(3)">🦇 Hang C8 (~320 m)</button>
-      <button class="cave-btn" id="cbtn-cb" onclick="focusSingleCave(4)">🌋 Núi Lửa Chư Bluk</button>
+      <div class="cave-subbar-title">🌋 Krong No Caves:</div>
+      <button class="cave-btn active" id="cbtn-all" onclick="focusAllCaves()">System Overview</button>
+      <button class="cave-btn" id="cbtn-c7" onclick="focusSingleCave(0)">🌋 Cave C7 (1,266.5 m)</button>
+      <button class="cave-btn" id="cbtn-a1" onclick="focusSingleCave(1)">🕳️ Cave A1 (456.7 m)</button>
+      <button class="cave-btn" id="cbtn-c3" onclick="focusSingleCave(2)">🧭 Cave C3 (594.4 m)</button>
+      <button class="cave-btn" id="cbtn-c8" onclick="focusSingleCave(3)">🦇 Cave C8 (~320 m)</button>
+      <button class="cave-btn" id="cbtn-cb" onclick="focusSingleCave(4)">🌋 Chu Bluk Volcano</button>
     </div>
 
     <!-- Upper Map: Earth Terrestrial Analog Site -->
     <div class="map-pane">
       <div id="earth-map"></div>
       <div class="map-label earth-tag" id="earth-label">
-        <span>🌍 TERRESTRIAL TESTBED // KRÔNG NÔ (C7, A1, C3, C8)</span>
+        <span>🌍 TERRESTRIAL TESTBED // KRONG NO (C7, A1, C3, C8)</span>
       </div>
     </div>
 
@@ -816,9 +816,9 @@
       <h1 id="site-title">Site Name</h1>
     </div>
 
-    <!-- Dedicated Sub-Card for Krông Nô Caves -->
+    <!-- Dedicated Sub-Card for Krong No Caves -->
     <div class="cave-detail-card" id="cave-detail-card">
-      <h3 id="cave-card-title">🌋 Krông Nô Volcanic Cave System Network (C7, A1, C3, C8)</h3>
+      <h3 id="cave-card-title">🌋 Krong No Volcanic Cave System Network (C7, A1, C3, C8)</h3>
       <div class="cave-specs">
         <div class="cave-spec-item">
           <div class="lbl">Surveyed Length</div>
@@ -834,7 +834,7 @@
         </div>
       </div>
       <p id="cave-card-desc" style="font-size: 12.5px; color: #ffe4e6;">
-        Click any cave above (Hang C7, Hang A1, Hang C3, Hang C8, or Chư Bluk Crater) to inspect individual tube geometry, skylights, and NASA mission test profiles.
+        Click any cave above (Cave C7, Cave A1, Cave C3, Cave C8, or Chu Bluk Crater) to inspect individual tube geometry, skylights, and NASA mission test profiles.
       </p>
     </div>
 
@@ -898,13 +898,13 @@
 
     <!-- Geological Context & Exploration Utility -->
     <div class="card">
-      <h3>🚀 Bối Cảnh Địa Chất & Ứng Dụng Mô Phỏng</h3>
+      <h3>🚀 Geological Context & Mission Utility</h3>
       <p id="site-geology"></p>
     </div>
 
     <!-- Terrestrial Limitations -->
     <div class="card warning-card">
-      <h3>⚠️ Giới Hạn Mô Phỏng Trái Đất (Key Discrepancies)</h3>
+      <h3>⚠️ Terrestrial Analog Limitations</h3>
       <p id="site-limits"></p>
     </div>
   </div>
@@ -916,18 +916,18 @@
       <div class="modal-header">
         <div class="modal-header-left">
           <span class="modal-title-badge">🛰️ STUDIO</span>
-          <h2>Planetary Analog Studio // Tự Nhập & Kiểm Thử Dữ Liệu</h2>
+          <h2>Planetary Analog Studio // Telemetry Ingestion & Testing</h2>
         </div>
-        <button class="close-modal" onclick="closeAddModal()" title="Đóng cửa sổ">✕</button>
+        <button class="close-modal" onclick="closeAddModal()" title="Close Window">✕</button>
       </div>
 
       <!-- Mode Switcher Tabs -->
       <div class="studio-tabs">
         <button type="button" class="studio-tab-btn active" id="tab-btn-auto" onclick="switchStudioMode('auto')">
-          <span>🛰️ Tự Động: Tải File NASA POWER CSV</span>
+          <span>🛰️ Automated: Ingest NASA POWER CSV</span>
         </button>
         <button type="button" class="studio-tab-btn" id="tab-btn-manual" onclick="switchStudioMode('manual')">
-          <span>✍️ Thủ Công: Nhập Tọa Độ & Tham Số</span>
+          <span>✍️ Manual: Coordinates & DEM Parameters</span>
         </button>
       </div>
 
@@ -940,8 +940,8 @@
              ondragleave="this.classList.remove('drag-over')"
              ondrop="handleCsvDrop(event)">
           <div class="drop-icon">🛰️</div>
-          <div class="drop-title">Thả file CSV NASA POWER vào đây</div>
-          <div class="drop-sub">hoặc nhấp chuột để chọn file từ máy tính. Hệ thống tự động phân tích tọa độ, nhận diện địa danh và ghép cặp hành tinh tối ưu.</div>
+          <div class="drop-title">Drop NASA POWER CSV File Here</div>
+          <div class="drop-sub">or click to browse from computer. System automatically parses coordinates, reverse-geocodes locations, and auto-pairs the optimal lunar/martian analog.</div>
           <input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">
         </div>
 
@@ -954,10 +954,10 @@
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <div class="match-conf-tag">
-                🎯 Độ khớp: <span id="match-conf-pct" style="color:#38bdf8;">—</span>
+                🎯 Match Confidence: <span id="match-conf-pct" style="color:#38bdf8;">—</span>
               </div>
-              <button type="button" onclick="resetStudioModal()" class="btn-remove-csv" title="Gỡ bỏ file CSV và xóa kết quả này">
-                ✕ Xóa File
+              <button type="button" onclick="resetStudioModal()" class="btn-remove-csv" title="Remove CSV file and reset results">
+                ✕ Remove File
               </button>
             </div>
           </div>
@@ -967,33 +967,33 @@
             <!-- Earth Panel -->
             <div class="match-panel">
               <div class="match-panel-head earth">
-                <span>🌍</span> Điểm Trái Đất (NASA Data)
+                <span>🌍</span> Earth Site (NASA Telemetry)
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Địa danh:</span>
+                <span class="match-param-k">Location:</span>
                 <span class="match-param-v" id="match-earth-city">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Tọa độ:</span>
+                <span class="match-param-k">Coordinates:</span>
                 <span class="match-param-v" id="match-earth-coords">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Nhiệt độ TB:</span>
+                <span class="match-param-k">Mean Temp:</span>
                 <span class="match-param-v" id="match-earth-temp" style="color:#fbbf24;">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Áp suất TB:</span>
+                <span class="match-param-k">Mean Pressure:</span>
                 <span class="match-param-v" id="match-earth-press" style="color:#38bdf8;">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Khoáng vật:</span>
+                <span class="match-param-k">Mineralogy:</span>
                 <span class="match-param-v" id="match-mineral" style="color:#a78bfa;">—</span>
               </div>
             </div>
 
             <!-- Center ESI Badge -->
             <div class="match-esi-center">
-              <div class="match-esi-lbl">Chỉ Số ESI</div>
+              <div class="match-esi-lbl">Predicted ESI</div>
               <div class="match-esi-num" id="match-esi-display">—</div>
               <div class="match-esi-chip" id="match-esi-status">OPTIMAL ANALOG</div>
               <div style="font-size:10px; color:#64748b; margin-top:4px;">Schulze-Makuch 2011</div>
@@ -1002,26 +1002,26 @@
             <!-- Target Planet Panel -->
             <div class="match-panel">
               <div class="match-panel-head target">
-                <span id="match-planet-icon">🌑</span> Mục Tiêu Vũ Trụ
+                <span id="match-planet-icon">🌑</span> Planetary Target
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Vị trí:</span>
+                <span class="match-param-k">Target Site:</span>
                 <span class="match-param-v" id="match-planet-name" style="color:#c084fc;">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Tọa độ:</span>
+                <span class="match-param-k">Coordinates:</span>
                 <span class="match-param-v" id="match-planet-coords">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Nhiệt độ MT:</span>
+                <span class="match-param-k">Target Temp:</span>
                 <span class="match-param-v" id="match-planet-temp" style="color:#fbbf24;">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Áp suất MT:</span>
+                <span class="match-param-k">Target Pressure:</span>
                 <span class="match-param-v" id="match-planet-press" style="color:#38bdf8;">—</span>
               </div>
               <div class="match-param-row">
-                <span class="match-param-k">Độ dốc MT:</span>
+                <span class="match-param-k">Target Slope:</span>
                 <span class="match-param-v" id="match-planet-slope" style="color:#34d399;">—</span>
               </div>
             </div>
@@ -1033,20 +1033,20 @@
           <!-- Primary Confirmation & Remove Actions -->
           <div style="display:flex; gap:10px; align-items:center;">
             <button type="button" class="btn-accept-match" onclick="acceptAutoMatch()" style="flex:1;">
-              <span>🚀</span> XÁC NHẬN & ĐỒNG BỘ LÊN SUPABASE NGAY
+              <span>🚀</span> CONFIRM & SYNC TO SUPABASE
             </button>
             <button type="button" onclick="resetStudioModal()" class="btn-remove-csv" style="padding:11px 16px; font-size:12.5px; border-radius:8px;">
-              ✕ Hủy Bỏ
+              ✕ Cancel
             </button>
           </div>
 
           <!-- Sub actions -->
           <div class="match-sub-actions">
             <button type="button" class="match-sub-link" onclick="resetCsvUploader()">
-              📁 Tải file CSV khác
+              📁 Upload Different CSV File
             </button>
             <button type="button" class="match-sub-link" onclick="switchToManualWithData()">
-              ⚙️ Chỉnh sửa chi tiết thông số thủ công ▼
+              ⚙️ Edit Parameters Manually ▼
             </button>
           </div>
         </div>
@@ -1056,36 +1056,36 @@
       <div id="studio-manual-container" style="display:none;">
         <!-- Quick Fill Templates -->
         <div id="manual-templates-bar" class="quick-fill-bar">
-          <span style="font-size: 11px; color: #e9d5ff; font-weight: 700;">⚡ Mẫu Nhanh:</span>
-          <button type="button" class="quick-fill-btn" onclick="fillTemplate('chudangya')">🇻🇳 Chư Đăng Ya (Moon)</button>
-          <button type="button" class="quick-fill-btn" onclick="fillTemplate('muine')">🇻🇳 Mũi Né (Mars)</button>
-          <button type="button" class="quick-fill-btn" onclick="fillTemplate('lyson')">🇻🇳 Lý Sơn (Moon)</button>
+          <span style="font-size: 11px; color: #e9d5ff; font-weight: 700;">⚡ Quick Presets:</span>
+          <button type="button" class="quick-fill-btn" onclick="fillTemplate('chudangya')">🇻🇳 Chu Dang Ya (Moon)</button>
+          <button type="button" class="quick-fill-btn" onclick="fillTemplate('muine')">🇻🇳 Mui Ne Dunes (Mars)</button>
+          <button type="button" class="quick-fill-btn" onclick="fillTemplate('lyson')">🇻🇳 Ly Son Island (Moon)</button>
         </div>
 
         <!-- Live ESI Simulator Card -->
         <div class="modal-live-card">
           <div class="modal-live-left">
-            <div class="modal-live-lbl">Dự Báo ESI Trực Tiếp (Schulze-Makuch)</div>
+            <div class="modal-live-lbl">Live ESI Preview (Schulze-Makuch)</div>
             <div class="modal-live-val" id="modal-live-esi">88.5%</div>
           </div>
           <div class="modal-live-meters">
             <div class="live-meter-item">
-              <span>Khoáng vật</span>
+              <span>Mineralogy</span>
               <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-min" style="width:88%;"></div></div>
               <span id="meter-val-min">88%</span>
             </div>
             <div class="live-meter-item">
-              <span>Độ dốc</span>
+              <span>Slope</span>
               <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-slope" style="width:92%; background:#34d399;"></div></div>
               <span id="meter-val-slope">92%</span>
             </div>
             <div class="live-meter-item">
-              <span>Nhiệt độ</span>
+              <span>Temperature</span>
               <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-temp" style="width:92%; background:#fbbf24;"></div></div>
               <span id="meter-val-temp">92%</span>
             </div>
             <div class="live-meter-item">
-              <span>Áp suất</span>
+              <span>Pressure</span>
               <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-press" style="width:0%; background:#f43f5e;"></div></div>
               <span id="meter-val-press">0.0%</span>
             </div>
@@ -1095,45 +1095,45 @@
         <!-- Manual Input Form -->
         <form id="custom-site-form" onsubmit="saveCustomSite(event)">
           <div class="form-grid">
-            <div class="form-section-title">1. Thông Tin Điểm Trên Trái Đất</div>
+            <div class="form-section-title">1. Earth Terrestrial Analog Site</div>
             <div class="form-group">
-              <label>Tên Điểm Nghiên Cứu</label>
-              <input type="text" id="inp-name" required placeholder="Núi lửa Chư Đăng Ya (Việt Nam)" />
+              <label>Site Full Name</label>
+              <input type="text" id="inp-name" required placeholder="Chu Dang Ya Volcano (Vietnam)" />
             </div>
             <div class="form-group">
-              <label>Nhãn Ngắn Trên Bản Đồ</label>
-              <input type="text" id="inp-short" required placeholder="🇻🇳 Chư Đăng Ya" />
+              <label>Short Map Label (Chip)</label>
+              <input type="text" id="inp-short" required placeholder="🇻🇳 Chu Dang Ya" />
             </div>
             <div class="form-group">
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <label>Vĩ Độ Trái Đất (Latitude)</label>
-                <button type="button" style="background:#1e293b; border:1px solid #38bdf8; color:#7dd3fc; border-radius:4px; padding:1px 6px; font-size:10px; cursor:pointer;" onclick="startMapPinning()">📍 Chọn Trên Bản Đồ</button>
+                <label>Earth Latitude</label>
+                <button type="button" style="background:#1e293b; border:1px solid #38bdf8; color:#7dd3fc; border-radius:4px; padding:1px 6px; font-size:10px; cursor:pointer;" onclick="startMapPinning()">📍 Pin on Map</button>
               </div>
               <input type="number" step="any" id="inp-elat" required placeholder="14.113" oninput="updateModalLiveEsi()" />
             </div>
             <div class="form-group">
-              <label>Kinh Độ Trái Đất (Longitude)</label>
+              <label>Earth Longitude</label>
               <input type="number" step="any" id="inp-elon" required placeholder="108.027" oninput="updateModalLiveEsi()" />
             </div>
 
-            <div class="form-section-title">2. Hành Tinh Mục Tiêu (Moon / Mars)</div>
+            <div class="form-section-title">2. Target Planetary Body (Moon / Mars)</div>
             <div class="form-group">
-              <label>Hành Tinh</label>
+              <label>Target Body</label>
               <select id="inp-body" required>
-                <option value="moon">🌑 Mặt Trăng (NASA LRO)</option>
-                <option value="mars">🔴 Sao Hỏa (NASA Viking / MOLA)</option>
+                <option value="moon">🌑 Moon (NASA LRO)</option>
+                <option value="mars">🔴 Mars (NASA Viking / MOLA)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Tên Vị Trí Trên Hành Tinh</label>
+              <label>Target Site Name</label>
               <input type="text" id="inp-pname" required placeholder="Marius Hills (Moon)" />
             </div>
             <div class="form-group">
-              <label>Vĩ Độ Hành Tinh</label>
+              <label>Target Latitude</label>
               <input type="number" step="any" id="inp-plat" required placeholder="14.0" />
             </div>
             <div class="form-group">
-              <label>Kinh Độ Hành Tinh</label>
+              <label>Target Longitude</label>
               <input type="number" step="any" id="inp-plon" required placeholder="-56.0" />
             </div>
 
@@ -1145,46 +1145,46 @@
             <div class="form-group">
               <label>Earth vs Target Mineralogy Text</label>
               <div style="display:flex; gap:6px;">
-                <input type="text" id="inp-mintext-earth" required placeholder="Trái Đất (VD: Basalt, Scoria)" />
-                <input type="text" id="inp-mintext-planet" required placeholder="Hành tinh (VD: Mare Basalt)" />
+                <input type="text" id="inp-mintext-earth" required placeholder="Earth (e.g. Basalt, Scoria)" />
+                <input type="text" id="inp-mintext-planet" required placeholder="Target (e.g. Mare Basalt)" />
               </div>
             </div>
             <div class="form-group">
               <label>Topographic Slope (°) - Earth / Target Body</label>
               <div style="display:flex; gap:6px;">
-                <input type="number" step="0.1" min="0" max="90" id="inp-eslope" oninput="updateModalLiveEsi()" required placeholder="Trái Đất (12.0°)" />
-                <input type="number" step="0.1" min="0" max="90" id="inp-pslope" oninput="updateModalLiveEsi()" required placeholder="Mục tiêu (14.0°)" />
+                <input type="number" step="0.1" min="0" max="90" id="inp-eslope" oninput="updateModalLiveEsi()" required placeholder="Earth (12.0°)" />
+                <input type="number" step="0.1" min="0" max="90" id="inp-pslope" oninput="updateModalLiveEsi()" required placeholder="Target (14.0°)" />
               </div>
             </div>
             <div class="form-group">
               <label>Surface Temperature (K) - Earth / Target Body</label>
               <div style="display:flex; gap:6px;">
-                <input type="number" step="0.1" min="50" max="500" id="inp-etemp" oninput="updateModalLiveEsi()" required placeholder="Trái Đất (295.0 K)" />
-                <input type="number" step="0.1" min="50" max="500" id="inp-ptemp" oninput="updateModalLiveEsi()" required placeholder="Mục tiêu (252.0 K)" />
+                <input type="number" step="0.1" min="50" max="500" id="inp-etemp" oninput="updateModalLiveEsi()" required placeholder="Earth (295.0 K)" />
+                <input type="number" step="0.1" min="50" max="500" id="inp-ptemp" oninput="updateModalLiveEsi()" required placeholder="Target (252.0 K)" />
               </div>
             </div>
             <div class="form-group">
               <label>Atmospheric Pressure (kPa) - Earth / Target Body</label>
               <div style="display:flex; gap:6px;">
-                <input type="number" step="0.1" min="0" max="200" id="inp-epress" oninput="updateModalLiveEsi()" required placeholder="Trái Đất (95.0 kPa)" />
-                <input type="number" step="0.1" min="0" max="200" id="inp-ppress" oninput="updateModalLiveEsi()" required placeholder="Mục tiêu (0.0 kPa)" />
+                <input type="number" step="0.1" min="0" max="200" id="inp-epress" oninput="updateModalLiveEsi()" required placeholder="Earth (95.0 kPa)" />
+                <input type="number" step="0.1" min="0" max="200" id="inp-ppress" oninput="updateModalLiveEsi()" required placeholder="Target (0.0 kPa)" />
               </div>
             </div>
 
-            <div class="form-section-title">4. Ghi Chú Khoa Học</div>
+            <div class="form-section-title">4. Scientific Context & Limitations</div>
             <div class="form-group full">
-              <label>Bối Cảnh Địa Chất & Ứng Dụng Khảo Sát</label>
-              <textarea id="inp-geology" rows="2" required placeholder="Mô tả lý do điểm này thích hợp để mô phỏng căn cứ ngầm hoặc robot tự hành..."></textarea>
+              <label>Geological Context & Mission Utility</label>
+              <textarea id="inp-geology" rows="2" required placeholder="Describe analog geological context, mission suitability, and operational test objectives..."></textarea>
             </div>
             <div class="form-group full">
-              <label>Giới Hạn Của Điểm Mô Phỏng Trái Đất</label>
-              <textarea id="inp-limits" rows="2" required placeholder="Khí hậu nhiệt đới, trọng lực 1g, phong hóa khí quyển..."></textarea>
+              <label>Terrestrial Analog Limitations</label>
+              <textarea id="inp-limits" rows="2" required placeholder="Detail Earth gravity (1g), atmospheric weathering, biological activity differences..."></textarea>
             </div>
           </div>
 
           <div class="modal-actions">
-            <button type="button" class="btn-cancel" onclick="closeAddModal()">Hủy</button>
-            <button type="submit" class="btn-save">🚀 Lưu & Vẽ Lên Bản Đồ</button>
+            <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+            <button type="submit" class="btn-save">🚀 Save & Plot on Maps</button>
           </div>
         </form>
       </div>
@@ -1196,52 +1196,52 @@
     const defaultAnalogs = [
       {
             "id": "krongno",
-            "name": "1. Krông Nô – Chư Bluk (Việt Nam)",
-            "shortLabel": "🇻🇳 Krông Nô",
+            "name": "1. Krong No – Chu Bluk (Vietnam)",
+            "shortLabel": "🇻🇳 Krong No",
             "isVietnam": true,
             "isBaseline": false,
             "isCustom": false,
             "bodyType": "moon",
             "earthCoords": [
-                  12.518,
-                  107.905
+                  12.5185,
+                  107.9045
             ],
-            "earthZoom": 13,
+            "earthZoom": 11,
             "planetCoords": [
                   14.0,
                   -56.0
             ],
             "planetZoom": 7,
-            "planetSiteName": "Marius Hills (Moon)",
-            "target": "MẶT TRĂNG (MARIUS HILLS)",
+            "planetSiteName": "Marius Hills Lava Tubes (Moon)",
+            "target": "MOON (MARIUS HILLS)",
             "earth": {
                   "slope": 9.0,
                   "tempK": 296.6,
                   "pressureKpa": 96.0,
                   "mineralScore": 0.9,
-                  "mineralText": "Basalt (FeO 12%)"
+                  "mineralText": "Basalt (FeO 12%, TiO2 2.5%)"
             },
             "planet": {
                   "slope": 9.5,
                   "tempK": 253.0,
                   "pressureKpa": 0.0,
                   "mineralScore": 0.9,
-                  "mineralText": "Mare Basalt (FeO 17%)"
+                  "mineralText": "Mare Basalt (FeO 17%, TiO2 4.5%)"
             },
-            "geology": "Hệ thống hang động ống dung nham dài nhất Đông Nam Á (>25 km, 50+ hang) tại Công viên Địa chất Đắk Nông. Trần vòm bazan dày giữ nhiệt độ ổn định (20–22°C / 295 K), che chắn bức xạ vũ trụ, lý tưởng để thử nghiệm robot tự hành SLAM và căn cứ ngầm.",
-            "limits": "Khí hậu nhiệt đới gió mùa gây phong hóa hóa học bề mặt; trọng lực 1g (gấp 6 lần Mặt Trăng) và không có môi trường chân không."
+            "geology": "Longest basalt lava tube cave system in Southeast Asia (>25 km, 50+ tubes) in Dak Nong Geopark. Thick basalt roof preserves stable temperature (20-22°C / 295 K) and shields cosmic radiation, ideal for testing autonomous SLAM rovers and subsurface lunar habitats.",
+            "limits": "Tropical monsoon surface weathering, 1g Earth gravity (6x lunar gravity), atmospheric moisture, and absence of ultra-high vacuum conditions."
       },
       {
             "id": "lanzarote",
-            "name": "2. Đảo Lanzarote (Tây Ban Nha)",
+            "name": "2. Lanzarote Island (Spain)",
             "shortLabel": "🇪🇸 Lanzarote",
             "isVietnam": false,
             "isBaseline": false,
             "isCustom": false,
             "bodyType": "mars",
             "earthCoords": [
-                  28.9583,
-                  -13.7667
+                  29.035,
+                  -13.633
             ],
             "earthZoom": 11,
             "planetCoords": [
@@ -1250,27 +1250,27 @@
             ],
             "planetZoom": 7,
             "planetSiteName": "Arsia Mons Skylights (Mars)",
-            "target": "SAO HỎA (ARSIA MONS)",
+            "target": "MARS (ARSIA MONS)",
             "earth": {
-                  "slope": 12.0,
+                  "slope": 14.0,
                   "tempK": 294.0,
-                  "pressureKpa": 100.0,
-                  "mineralScore": 0.83,
-                  "mineralText": "Basalt, Olivine, Pyroxene, Volcanic Ash"
+                  "pressureKpa": 101.0,
+                  "mineralScore": 0.88,
+                  "mineralText": "Tholeiitic Basalt, Basanite, Volcanic Ash"
             },
             "planet": {
                   "slope": 15.0,
-                  "tempK": 252.0,
+                  "tempK": 195.0,
                   "pressureKpa": 0.6,
-                  "mineralScore": 0.83,
-                  "mineralText": "Martian Basalt, Olivine, Pyroxene"
+                  "mineralScore": 0.88,
+                  "mineralText": "Martian Basalt, Lava Tube Minerals"
             },
-            "geology": "Địa hình núi lửa trẻ thuộc Công viên Quốc gia Timanfaya với các dòng chảy dung nham bazan, nón núi lửa và ống dung nham. Phục vụ thử nghiệm độ bám bánh xe rover, lập bản đồ địa chất núi lửa và công nghệ thám hiểm hang ngầm hành tinh (ESA PANGEA).",
-            "limits": "Khí hậu hải đảo, độ ẩm không khí, sự xâm lấn sinh học và phong hóa mặt đất khác biệt đáng kể so với môi trường khô lạnh, áp suất thấp của Sao Hỏa."
+            "geology": "Young basaltic volcanic landscape in Timanfaya National Park featuring extensive lava flows, cinder cones, and lava tubes. Primary European testbed for rover traction, volcanic field mapping, and planetary cave exploration technologies (ESA PANGEA).",
+            "limits": "Maritime island climate, oceanic air humidity, biological colonization, and weathering differ significantly from the hyper-arid, subzero, low-pressure Martian surface."
       },
       {
             "id": "meteor_crater",
-            "name": "3. Meteor Crater (Arizona, Mỹ)",
+            "name": "3. Meteor Crater (Arizona, USA)",
             "shortLabel": "🇺🇸 Meteor Crater",
             "isVietnam": false,
             "isBaseline": false,
@@ -1280,14 +1280,14 @@
                   35.027,
                   -111.022
             ],
-            "earthZoom": 14,
+            "earthZoom": 11,
             "planetCoords": [
                   -5.4,
                   137.8
             ],
             "planetZoom": 7,
-            "planetSiteName": "Gale Crater Rim (Mars)",
-            "target": "SAO HỎA (HỐ GALE)",
+            "planetSiteName": "Gale Crater Floor (Mars)",
+            "target": "MARS (GALE CRATER)",
             "earth": {
                   "slope": 18.0,
                   "tempK": 285.0,
@@ -1302,123 +1302,123 @@
                   "mineralScore": 0.88,
                   "mineralText": "Martian Impact Breccia, Basalt, Regolith"
             },
-            "geology": "Hố va chạm thiên thạch hình thành khoảng 50.000 năm trước trong đá trầm tích bởi thiên thạch sắt-niken, đường kính ~1.2 km. Lưu giữ vật liệu đá biến chất va chạm và lớp ejecta, hữu ích để nghiên cứu hố va chạm và cấu trúc địa chất Sao Hỏa.",
-            "limits": "Khí quyển Trái Đất, xói mòn, phong hóa và trọng lực 1g khác với Sao Hỏa. Đá mục tiêu chủ yếu là sa thạch/đá vôi trầm tích thay vì lớp vỏ bazan Sao Hỏa."
+            "geology": "Best-preserved meteorite impact crater on Earth (~50,000 years old, 1.2 km diameter) formed in layered sedimentary limestone and sandstone. Preserves shock metamorphism minerals (coesite, stishovite) and ejecta blanket for studying impact mechanics and Martian crater floors.",
+            "limits": "Dense terrestrial atmosphere, aeolian and fluvial weathering, 1g gravity, and target rocks dominated by sedimentary limestone/sandstone rather than primary Martian basaltic crust."
       },
       {
             "id": "craters_moon",
-            "name": "4. Craters of the Moon (Idaho, Mỹ)",
+            "name": "4. Craters of the Moon (Idaho, USA)",
             "shortLabel": "🇺🇸 Craters of Moon",
             "isVietnam": false,
             "isBaseline": false,
             "isCustom": false,
             "bodyType": "moon",
             "earthCoords": [
-                  43.371,
-                  -113.493
+                  43.461,
+                  -113.563
             ],
-            "earthZoom": 12,
+            "earthZoom": 11,
             "planetCoords": [
                   26.1,
                   3.6
             ],
             "planetZoom": 7,
-            "planetSiteName": "Hadley Rille - Apollo 15 (Moon)",
-            "target": "MẶT TRĂNG (HADLEY RILLE)",
+            "planetSiteName": "Hadley Rille – Apollo 15 (Moon)",
+            "target": "MOON (HADLEY RILLE)",
             "earth": {
-                  "slope": 10.0,
-                  "tempK": 282.0,
-                  "pressureKpa": 80.0,
+                  "slope": 12.0,
+                  "tempK": 280.0,
+                  "pressureKpa": 85.0,
                   "mineralScore": 0.91,
-                  "mineralText": "Basalt, Picro-Basalt, Scoria, Volcanic Glass"
+                  "mineralText": "Basalt, Scoria, Pahoehoe, Spatter Cones"
             },
             "planet": {
                   "slope": 14.0,
                   "tempK": 253.0,
                   "pressureKpa": 0.0,
                   "mineralScore": 0.91,
-                  "mineralText": "Mare Basalt, Pyroxene, Olivine"
+                  "mineralText": "Mare Basalt, Hadley Scoria, Glass Spherules"
             },
-            "geology": "Cánh đồng núi lửa bazan rộng lớn chứa hơn 60 dòng dung nham, nón xỉ và khe nứt phun trào. Rất phù hợp để thử nghiệm di chuyển xe rover, lấy mẫu bazan và lập bản đồ các dòng chảy dung nham Mặt Trăng.",
-            "limits": "Khí quyển Trái Đất, tuyết theo mùa, hoạt động sinh học và phong hóa do nước làm biến đổi bề mặt dung nham; trọng lực lớn hơn Mặt Trăng 6 lần."
+            "geology": "Vast basaltic volcanic province along the Great Rift featuring 60+ lava flows, cinder cones, fissure eruptions, and tube networks. Serves as Apollo astronaut training site and NASA testbed for rover traverse mobility and lunar mare basalt sampling.",
+            "limits": "Terrestrial rainfall, seasonal snow, biological activity, and aqueous chemical weathering altering fresh basalt surfaces; 1g gravitational field."
       },
       {
             "id": "lamayuru",
-            "name": "5. Thung lũng Lamayuru (Ladakh, Ấn Độ)",
+            "name": "5. Lamayuru Valley (Ladakh, India)",
             "shortLabel": "🇮🇳 Lamayuru",
             "isVietnam": false,
             "isBaseline": false,
             "isCustom": false,
             "bodyType": "mars",
             "earthCoords": [
-                  34.28,
-                  76.77
+                  34.283,
+                  76.774
             ],
-            "earthZoom": 12,
+            "earthZoom": 11,
             "planetCoords": [
-                  -24.0,
-                  -33.3
+                  -23.2,
+                  -33.2
             ],
             "planetZoom": 7,
-            "planetSiteName": "Eberswalde Crater (Mars)",
-            "target": "SAO HỎA (EBERSWALDE)",
+            "planetSiteName": "Eberswalde Crater Delta (Mars)",
+            "target": "MARS (EBERSWALDE CRATER)",
             "earth": {
-                  "slope": 14.0,
-                  "tempK": 280.0,
-                  "pressureKpa": 65.0,
-                  "mineralScore": 0.72,
-                  "mineralText": "Sedimentary Rocks, Clay Minerals, Sulfates, Sandstone"
+                  "slope": 15.0,
+                  "tempK": 272.0,
+                  "pressureKpa": 67.0,
+                  "mineralScore": 0.85,
+                  "mineralText": "Lacustrine Clays, Siltstone, Evaporites"
             },
             "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.72,
-                  "mineralText": "Martian Basalt, Clay-Bearing Sediments"
+                  "slope": 12.0,
+                  "tempK": 210.0,
+                  "pressureKpa": 0.7,
+                  "mineralScore": 0.85,
+                  "mineralText": "Layered Phyllosilicates, Deltaic Sediments"
             },
-            "geology": "Cảnh quan khô hạn trên cao nguyên độ cao lớn ('Moonland') với các cấu trúc trầm tích lòng hồ cổ đại bị xói mòn mạnh và các tầng địa chất lộ thiên. Thích hợp thử nghiệm dẫn đường rover và giải mã địa hình trầm tích ngập nước cổ trên Sao Hỏa.",
-            "limits": "Lượng mưa theo mùa, tuyết, nước lỏng và điều kiện khí quyển Trái Đất tác động đến xói mòn và độ kết dính bề mặt."
+            "geology": "High-altitude cold arid landscape ('Moonland') formed by deeply eroded ancient lacustrine paleolake sediments and exposed strata. Excellent terrestrial analog for rover navigation across ancient Martian lacustrine clay-rich basin floors.",
+            "limits": "Seasonal meltwater runoff, winter snowfall, ambient Earth pressure (65-70 kPa), and higher atmospheric density relative to Mars."
       },
       {
             "id": "namib",
-            "name": "6. Moon Landscape (Sa mạc Namib, Namibia)",
+            "name": "6. Moon Landscape (Namib Desert, Namibia)",
             "shortLabel": "🇳🇦 Namib",
             "isVietnam": false,
             "isBaseline": false,
             "isCustom": false,
             "bodyType": "mars",
             "earthCoords": [
-                  -22.68986,
-                  14.79036
+                  -22.683,
+                  14.583
             ],
             "earthZoom": 11,
             "planetCoords": [
-                  -5.1,
-                  137.8
+                  -4.5,
+                  137.4
             ],
             "planetZoom": 7,
-            "planetSiteName": "Bagnold Dunes - Gale (Mars)",
-            "target": "SAO HỎA (CỒN CÁT BAGNOLD)",
+            "planetSiteName": "Bagnold Dunes Field (Mars)",
+            "target": "MARS (BAGNOLD DUNES)",
             "earth": {
-                  "slope": 13.0,
-                  "tempK": 291.0,
-                  "pressureKpa": 99.0,
-                  "mineralScore": 0.76,
-                  "mineralText": "Weathered Bedrock, Quartz, Feldspar, Desert Sediments"
+                  "slope": 16.0,
+                  "tempK": 292.0,
+                  "pressureKpa": 98.0,
+                  "mineralScore": 0.82,
+                  "mineralText": "Quartz, Iron Oxides, Dolerite, Granitic Gneiss"
             },
             "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.76,
-                  "mineralText": "Martian Regolith, Basalt, Iron Oxides"
+                  "slope": 18.0,
+                  "tempK": 220.0,
+                  "pressureKpa": 0.7,
+                  "mineralScore": 0.82,
+                  "mineralText": "Basaltic Active Dunes, Magnetite, Dust"
             },
-            "geology": "Cảnh quan khô hạn đặc trưng bởi địa hình bị xói mòn sâu, bề mặt đá trơ trụi và các tầng trầm tích cổ. Hữu ích cho nghiên cứu quá trình phong hóa gió aeolian, hình thái bề mặt, dẫn đường robot và lập bản đồ sa mạc Sao Hỏa.",
-            "limits": "Hơi ẩm khí quyển ven biển, vận chuyển trầm tích do bão cát và mưa rào không thường xuyên tác động đến bề mặt."
+            "geology": "Hyper-arid badlands carved by the Swakop River showcasing deeply incised bare bedrock, ancient crystalline basement, and hyper-arid weathering. Utilized for studying wind erosion, rover visual odometry, and Martian dune migration analogs.",
+            "limits": "Coastal fog moisture, episodic flash flooding, and Earth gravity (1g) altering sediment shear resistance relative to Martian gravity (0.38g)."
       },
       {
             "id": "atacama",
-            "name": "⭐ 7. Valle de la Luna (Atacama, Chile)",
+            "name": "⭐ 7. Valle de la Luna (Atacama Desert, Chile)",
             "shortLabel": "⭐ Atacama",
             "isVietnam": false,
             "isBaseline": true,
@@ -1430,32 +1430,32 @@
             ],
             "earthZoom": 11,
             "planetCoords": [
-                  -0.2,
-                  -5.5
+                  -14.5,
+                  175.4
             ],
             "planetZoom": 7,
-            "planetSiteName": "Meridiani Planum (Mars)",
-            "target": "CHUẨN MÔ PHỎNG SAO HỎA (NASA)",
+            "planetSiteName": "Columbia Hills – Gusev (Mars)",
+            "target": "NASA MARS BASELINE (VALLE DE LA LUNA)",
             "earth": {
-                  "slope": 4.0,
+                  "slope": 15.0,
                   "tempK": 289.0,
                   "pressureKpa": 75.0,
                   "mineralScore": 0.9,
                   "mineralText": "Evaporites, Sulfates, Chlorides, Clay Minerals"
             },
             "planet": {
-                  "slope": 2.5,
+                  "slope": 15.0,
                   "tempK": 252.0,
-                  "pressureKpa": 0.65,
+                  "pressureKpa": 0.0,
                   "mineralScore": 0.9,
                   "mineralText": "Martian Sulfates, Chlorides, Clay Minerals, Basalt"
             },
-            "geology": "VÙNG CHUẨN NASA: Cảnh quan siêu khô hạn trong sa mạc Atacama chứa các mỏ muối bốc hơi, cấu trúc trầm tích và đá bị gió mài mòn. Rất hữu ích để kiểm tra thiết bị phân tích đất Sao Hỏa, phát hiện khoáng chất và công nghệ tìm kiếm sự sống.",
-            "limits": "Nằm ở độ cao ~2.400 m nên áp suất khí quyển vẫn đạt ~75 kPa; có lớp khí quyển che chắn bức xạ mặt trời."
+            "geology": "NASA GOLD BASELINE: Hyper-arid salt and clay badlands in the Cordillera de la Sal with evaporite crusts, halite deposits, and wind-sculpted yardangs. World standard for testing life-detection instruments, drill systems, and autonomous Martian navigation.",
+            "limits": "Altitude (~2,400 m) retains ~75 kPa atmospheric pressure (vs 0.7 kPa on Mars); atmospheric ozone shields solar ultraviolet radiation."
       },
       {
             "id": "krafla",
-            "name": "⭐ 8. Cao nguyên Krafla (Iceland)",
+            "name": "⭐ 8. Krafla Volcanic Plateau (Iceland)",
             "shortLabel": "⭐ Krafla",
             "isVietnam": false,
             "isBaseline": true,
@@ -1471,28 +1471,28 @@
                   30.77
             ],
             "planetZoom": 7,
-            "planetSiteName": "Taurus-Littrow - Apollo 17 (Moon)",
-            "target": "CHUẨN MÔ PHỎNG MẶT TRĂNG (NASA)",
+            "planetSiteName": "Taurus-Littrow – Apollo 17 (Moon)",
+            "target": "NASA MOON BASELINE (KRAFLA PLATEAU)",
             "earth": {
-                  "slope": 10.0,
+                  "slope": 12.0,
                   "tempK": 277.0,
                   "pressureKpa": 92.0,
                   "mineralScore": 0.86,
-                  "mineralText": "Basalt, Picro-Basalt, Rhyolite, Andesite"
+                  "mineralText": "Basalt, Picro-Basalt, Hydrothermal Minerals"
             },
             "planet": {
-                  "slope": 11.0,
+                  "slope": 15.0,
                   "tempK": 252.0,
                   "pressureKpa": 0.0,
                   "mineralScore": 0.86,
-                  "mineralText": "Basalt, Pyroxene, Olivine, Clay Minerals"
+                  "mineralText": "Martian/Lunar Basalt, Pyroxene, Olivine, Clay"
             },
-            "geology": "VÙNG CHUẨN NASA: Hệ thống núi lửa còn hoạt động chứa miệng núi lửa trung tâm, các vụ phun trào khe nứt bazan, dòng dung nham tươi và các vùng thủy nhiệt biến chất. Nơi huấn luyện phi hành gia Apollo 17 và thử nghiệm bộ đồ EVA Artemis.",
-            "limits": "Hoạt động địa nhiệt cao, nước lỏng, tuyết, khí quyển dày và các quá trình sinh học khác biệt với điều kiện bề mặt Mặt Trăng."
+            "geology": "NASA GOLD BASELINE: Active volcanic caldera featuring tholeiitic basalt fissure eruptions, recent pahoehoe lava fields, and hydrothermal alteration zones. Historic training site for Apollo astronauts and Artemis spacesuit/geology field campaigns.",
+            "limits": "Intense geothermal moisture, seasonal precipitation, snow, subarctic air density, and biological colonization differing from lunar vacuum environment."
       },
       {
             "id": "chott_djerid",
-            "name": "9. Hồ nước mặn Chott el Djerid (Tunisia)",
+            "name": "9. Chott el Djerid Salt Pan (Tunisia)",
             "shortLabel": "🇹🇳 Chott el Djerid",
             "isVietnam": false,
             "isBaseline": false,
@@ -1500,37 +1500,37 @@
             "bodyType": "mars",
             "earthCoords": [
                   33.7,
-                  8.5
+                  8.4
             ],
-            "earthZoom": 10,
+            "earthZoom": 11,
             "planetCoords": [
-                  -14.5,
-                  175.4
+                  -14.6,
+                  175.5
             ],
             "planetZoom": 7,
             "planetSiteName": "Gusev Crater Paleolake (Mars)",
-            "target": "SAO HỎA (HỐ GUSEV)",
+            "target": "MARS (GUSEV CRATER)",
             "earth": {
-                  "slope": 3.0,
-                  "tempK": 296.0,
+                  "slope": 4.0,
+                  "tempK": 298.0,
                   "pressureKpa": 101.0,
-                  "mineralScore": 0.89,
-                  "mineralText": "Halite, Gypsum, Sulfates, Evaporites, Clay Minerals"
+                  "mineralScore": 0.83,
+                  "mineralText": "Halite, Gypsum, Carbonates, Sulfate Crusts"
             },
             "planet": {
-                  "slope": 7.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.89,
-                  "mineralText": "Martian Sulfates, Chlorides, Evaporite Deposits"
+                  "slope": 6.0,
+                  "tempK": 220.0,
+                  "pressureKpa": 0.8,
+                  "mineralScore": 0.83,
+                  "mineralText": "Sulfates, Evaporite Salts, Basaltic Dust"
             },
-            "geology": "Vùng trũng nước mặn lớn ở tây nam Tunisia với các mỏ evaporite rộng lớn, lớp vỏ muối kết tinh và biến thiên độ ẩm theo mùa. Thích hợp nghiên cứu hồ cổ đại Sao Hỏa, quá trình hình thành muối bốc hơi và bằng chứng khoáng vật học về nước lỏng cổ.",
-            "limits": "Nước ngầm theo mùa, lũ lụt cục bộ, hoạt động sinh học và độ ẩm không khí ảnh hưởng đến sự hình thành muối."
+            "geology": "Extensive endorheic salt basin in southern Tunisia with massive sulfate and chloride evaporite crusts, seasonal salt pan dynamics, and hypersaline brine pools. Ideal analog for ancient Martian evaporite lakes and sulfate mineralogy identification.",
+            "limits": "Seasonal groundwater recharge, localized flash flooding, marine aerosol transport, and 1g gravitational compaction."
       },
       {
             "id": "lonar",
-            "name": "10. Miệng núi lửa Lonar (Ấn Độ)",
-            "shortLabel": "🇮🇳 Hố Lonar",
+            "name": "10. Lonar Impact Crater (India)",
+            "shortLabel": "🇮🇳 Lonar Crater",
             "isVietnam": false,
             "isBaseline": false,
             "isCustom": false,
@@ -1539,71 +1539,71 @@
                   19.9767,
                   76.5083
             ],
-            "earthZoom": 14,
+            "earthZoom": 11,
             "planetCoords": [
                   18.38,
                   77.58
             ],
             "planetZoom": 7,
-            "planetSiteName": "Jezero Crater (Mars)",
-            "target": "SAO HỎA (HỐ JEZERO)",
+            "planetSiteName": "Jezero Crater Delta (Mars)",
+            "target": "MARS (JEZERO CRATER)",
             "earth": {
-                  "slope": 20.5,
+                  "slope": 14.0,
                   "tempK": 299.0,
                   "pressureKpa": 96.0,
                   "mineralScore": 0.93,
-                  "mineralText": "Deccan Basalt, Impact Breccia, Saponite, Carbonates"
+                  "mineralText": "Deccan Basalt, Impact Breccia, Carbonates"
             },
             "planet": {
                   "slope": 15.0,
                   "tempK": 252.0,
-                  "pressureKpa": 0.65,
+                  "pressureKpa": 0.0,
                   "mineralScore": 0.93,
                   "mineralText": "Martian Basalt, Impact Breccia, Clay Minerals"
             },
-            "geology": "Hố va chạm rộng ~1.8 km hình thành trong địa hình núi lửa bazan Deccan. Chứa bazan biến chất va chạm (maskelynite), trầm tích ejecta và khoáng chất biến đổi thủy nhiệt, tương đồng sâu sắc với cấu trúc va chạm hố Jezero trên Sao Hỏa.",
-            "limits": "Lòng hố chứa hồ nước mặn siêu kiềm chịu ảnh hưởng của mưa mùa và vi sinh vật hoạt động mạnh."
+            "geology": "Young ~1.8 km meteorite crater excavated entirely in Deccan Traps flood basalt. Contains impact-shocked maskelynite basalt, ejecta fallout, and hydrothermal clay alteration closely resembling impact structures on the basaltic crust of Mars.",
+            "limits": "Crater floor hosts a saline-alkaline perennial lake influenced by seasonal tropical monsoons, biological flora/fauna, and 1g gravity."
       },
       {
             "id": "kamchatka",
-            "name": "11. Vùng núi lửa Kamchatka (Nga)",
+            "name": "11. Kamchatka Volcanic Complex (Russia)",
             "shortLabel": "🇷🇺 Kamchatka",
             "isVietnam": false,
             "isBaseline": false,
             "isCustom": false,
             "bodyType": "mars",
             "earthCoords": [
-                  56.056,
-                  160.642
+                  55.978,
+                  160.587
             ],
-            "earthZoom": 10,
+            "earthZoom": 11,
             "planetCoords": [
                   32.1,
                   150.2
             ],
             "planetZoom": 7,
-            "planetSiteName": "Hecates Tholus (Mars)",
-            "target": "SAO HỎA (HECATES THOLUS)",
+            "planetSiteName": "Hecates Tholus Volcanic Caldera (Mars)",
+            "target": "MARS (HECATES THOLUS)",
             "earth": {
-                  "slope": 15.0,
-                  "tempK": 265.0,
-                  "pressureKpa": 55.0,
-                  "mineralScore": 0.84,
-                  "mineralText": "Basalt, Andesite, Pyroclastic Deposits, Volcanic Ash"
+                  "slope": 22.0,
+                  "tempK": 268.0,
+                  "pressureKpa": 82.0,
+                  "mineralScore": 0.87,
+                  "mineralText": "Andesite, Basalt, Tephra, Hydrothermal Sulfur"
             },
             "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.84,
-                  "mineralText": "Martian Basalt, Pyroxene, Olivine, Volcanic Deposits"
+                  "slope": 20.0,
+                  "tempK": 210.0,
+                  "pressureKpa": 0.5,
+                  "mineralScore": 0.87,
+                  "mineralText": "Volcanic Ash, Altered Basalt, Glaciovolcanic Tuff"
             },
-            "geology": "Hệ thống núi lửa dạng tầng lớn tại vòng cung núi lửa Đông Kamchatka với các dòng dung nham bazan/andesit, tro mạt vụn và trầm tích băng tuyết núi cao. Hữu ích để nghiên cứu hình thái núi lửa băng và lấy mẫu đá núi lửa Sao Hỏa.",
-            "limits": "Hoạt động phun trào thường xuyên, băng hà, tuyết dày, độ ẩm không khí và phong hóa sinh học."
+            "geology": "Massive stratovolcanic subduction arc featuring basaltic-andesitic lava fields, volcanic ash blankets, and glaciovolcanic interactions. Superb analog for high-altitude Martian shield volcanism and volcano-ice interaction deposits.",
+            "limits": "Frequent subaerial eruptions, dense glacial ice and snow, maritime subarctic humidity, and Earth atmospheric shielding."
       },
       {
             "id": "badlands",
-            "name": "12. Badlands National Park (Mỹ)",
+            "name": "12. Badlands National Park (South Dakota, USA)",
             "shortLabel": "🇺🇸 Badlands",
             "isVietnam": false,
             "isBaseline": false,
@@ -1620,7 +1620,7 @@
             ],
             "planetZoom": 7,
             "planetSiteName": "Mount Sharp Strata (Mars)",
-            "target": "SAO HỎA (ĐỈNH SHARP - GALE)",
+            "target": "MARS (MOUNT SHARP - GALE CRATER)",
             "earth": {
                   "slope": 12.0,
                   "tempK": 283.0,
@@ -1635,10 +1635,11 @@
                   "mineralScore": 0.74,
                   "mineralText": "Martian Sedimentary Rocks, Clay Minerals, Sulfates"
             },
-            "geology": "Cảnh quan trầm tích bị xói mòn sâu rộng chứa các tầng địa chất lộ thiên, đất sét giàu khoáng chất, sa thạch và trầm tích tro núi lửa. Hữu ích để nghiên cứu địa chất trầm tích Sao Hỏa và khảo sát các tầng địa tầng bằng xe rover.",
-            "limits": "Lượng mưa, tuyết mùa đông, xói mòn do sông suối, thảm thực vật và các quá trình sinh học khác biệt với bề mặt Sao Hỏa hiện đại."
+            "geology": "Extensively eroded sedimentary landscape exposing continuous stratigraphic layers, smectite clay beds, sandstones, and volcanic ash deposits. Ideal for simulating rover climb traverses, spectral clay detection, and layered Martian sedimentology.",
+            "limits": "Seasonal rainfall and snowmelt causing rapid surface mudflow erosion; presence of terrestrial vegetation and Earth ambient pressure (94 kPa)."
       }
 ];
+
 
     function loadSavedCustomSites() {
       try {
@@ -1654,49 +1655,49 @@
 
     const krongNoCaves = [
       {
-        code: "Hang C7",
-        label: "🌋 Hang C7 (1,266.5 m)",
+        code: "Cave C7",
+        label: "🌋 Cave C7 (1,266.5 m)",
         coords: [12.5185, 107.9045],
-        length: "1,266.5 m (Dài nhất ĐNA)",
-        morphology: "Ống chính vòm lớn + Giếng trời sập (Skylight)",
-        role: "Căn cứ ngầm mô phỏng Mặt Trăng",
-        desc: "Hang C7 là hang động dung nham dài nhất Đông Nam Á với vòm bazan đồ sộ và giếng trời sập trần tương tự miệng hố Marius Hills trên Mặt Trăng. Vị trí tối ưu để thử nghiệm căn cứ bơm hơi và lá chắn bức xạ vũ trụ."
+        length: "1,266.5 m (Longest in SE Asia)",
+        morphology: "Master lava tube with collapse skylights",
+        role: "Subsurface Lunar Analog Base",
+        desc: "Cave C7 is the longest basalt lava tube in Southeast Asia featuring colossal basalt arches and roof-collapse skylights directly analogous to lunar pit craters at Marius Hills. Optimal for testing inflatable habitats and radiation shielding."
       },
       {
-        code: "Hang A1",
-        label: "🕳️ Hang A1 (456.7 m)",
+        code: "Cave A1",
+        label: "🕳️ Cave A1 (456.7 m)",
         coords: [12.5095, 107.9012],
-        length: "456.7 m (Độ sâu giếng ~15–20 m)",
-        morphology: "Giếng sập thẳng đứng + Phân nhánh đôi",
-        role: "Thử nghiệm robot thả dây / Cẩu hạ cánh",
-        desc: "Hang A1 mở ra bằng một hố sập thẳng đứng sâu 15-20 m trước khi rẽ nhánh bazan, mô phỏng hoàn hảo kịch bản thử nghiệm robot leo vách bằng dây (tương tự robot Axel của NASA) thâm nhập lòng hang Mặt Trăng."
+        length: "456.7 m (Pit depth ~15-20 m)",
+        morphology: "Vertical collapse pit + Dual branching tubes",
+        role: "Tethered Rappelling & Ingress Rover Testing",
+        desc: "Cave A1 opens via a 15-20 m vertical collapse skylight into bifurcated basalt tubes, ideally simulating robotic rappelling (similar to NASA Axel rover) and crane ingress missions."
       },
       {
-        code: "Hang C3",
-        label: "🧭 Hang C3 (594.4 m)",
+        code: "Cave C3",
+        label: "🧭 Cave C3 (594.4 m)",
         coords: [12.5260, 107.9080],
-        length: "594.4 m (Hành lang đơn)",
-        morphology: "Hành lang kéo dài liên tục, ít ngách phụ",
-        role: "Thử nghiệm robot tự hành SLAM không GPS",
-        desc: "Lòng hang C3 thẳng dài, trần hang nhẵn đặc trưng dòng dung nham nguyên bản. Địa điểm lý tưởng để kiểm tra thuật toán LiDAR SLAM dẫn đường tự động trong môi trường tối hoàn toàn không GPS."
+        length: "594.4 m (Continuous single passage)",
+        morphology: "Smooth continuous tube, minimal side branches",
+        role: "GPS-Denied Autonomous SLAM Navigation",
+        desc: "Cave C3 features a linear, smooth basalt tunnel with intact flow linings. Premier testing corridor for multi-sensor LiDAR/visual SLAM autonomous navigation in pitch-black, GPS-denied lunar tube environments."
       },
       {
-        code: "Hang C8",
-        label: "🦇 Hang C8 (~320 m)",
+        code: "Cave C8",
+        label: "🦇 Cave C8 (~320 m)",
         coords: [12.5140, 107.9095],
-        length: "~320 m (Tầng hang kép)",
-        morphology: "Cấu trúc 2 tầng xếp chồng, vết ngấn dung nham",
-        role: "Nghiên cứu cơ học đá & Sinh địa hóa",
-        desc: "Bảo tồn nguyên vẹn các vết ngấn dung nham nhiều tầng và vòm trần xếp lớp. Dùng để nghiên cứu độ ổn định cơ học đá và tìm kiếm dấu vết sinh học vi sinh vật chịu hạn cực đoan."
+        length: "~320 m (Multi-tier tube)",
+        morphology: "Bilevel stacked conduits with multi-stage flow ledges",
+        role: "Rock Mechanics & Astrobiological Biosignatures",
+        desc: "Preserves well-developed multi-tier lava flow marks and basalt ceiling strata. Utilized for geotechnical rock stability analysis and searching for extremophile biosignatures in dark volcanic niches."
       },
       {
-        code: "Chư Bluk",
-        label: "🌋 Núi Lửa Chư Bluk",
+        code: "Chu Bluk",
+        label: "🌋 Chu Bluk Volcano",
         coords: [12.4850, 107.8820],
-        length: "Miệng núi lửa hình nón (Độ cao ~600 m)",
-        morphology: "Nón xỉ núi lửa trẻ (Pleistocene), nguồn dung nham",
-        role: "Thử nghiệm di chuyển xe tự hành trên sườn dốc",
-        desc: "Nón núi lửa xỉ bazan đóng vai trò nguồn phun trào chính tạo nên toàn bộ hệ thống hang Krông Nô. Thích hợp thử nghiệm khả năng leo dốc, vượt sỏi xỉ của bánh xe rover tự hành."
+        length: "Conical volcanic crater (~600 m elevation)",
+        morphology: "Young Pleistocene basalt scoria cone (eruptive source)",
+        role: "Rover Steep Slope & Scoria Traverse Testing",
+        desc: "Basalt cinder cone serving as the primary eruptive vent source for the entire Krong No tube field. Field benchmark for rover wheels traversing loose volcanic tephra and scoria slopes."
       }
     ];
 
@@ -1767,11 +1768,11 @@
     function focusAllCaves() {
       if (!earthMap || !krongNoLayerGroup) return;
       setCaveSubbarActive('cbtn-all');
-      document.getElementById('cave-card-title').innerText = "🌋 Hệ Thống Hang Động Krông Nô (C7, A1, C3, C8)";
+      document.getElementById('cave-card-title').innerText = "🌋 Krong No Volcanic Cave System (C7, A1, C3, C8)";
       document.getElementById('cave-spec-len').innerText = ">25 km (50+ Hang)";
-      document.getElementById('cave-spec-morph').innerText = "Ống Bazan + Giếng Trời";
-      document.getElementById('cave-spec-role').innerText = "Căn Cứ Ngầm Mô Phỏng";
-      document.getElementById('cave-card-desc').innerText = "Toàn cảnh mạng lưới hang dung nham núi lửa dài nhất Đông Nam Á tại Công viên Địa chất Toàn cầu UNESCO Đắk Nông.";
+      document.getElementById('cave-spec-morph').innerText = "Basalt Tubes + Skylights";
+      document.getElementById('cave-spec-role').innerText = "Subsurface Lunar Analog Base";
+      document.getElementById('cave-card-desc').innerText = "Overview of longest volcanic basalt lava tube system in Southeast Asia at UNESCO Dak Nong Global Geopark.";
 
       const bounds = L.latLngBounds(krongNoCaves.map(c => c.coords));
       earthMap.flyToBounds(bounds.pad(0.35), { duration: 1.2 });
@@ -1912,15 +1913,15 @@
     function getSiteFlag(site) {
       if (site.isVietnam) return '🇻🇳';
       const n = (site.name || '') + ' ' + (site.shortLabel || '');
-      if (n.includes('Tây Ban Nha') || n.includes('Lanzarote')) return '🇪🇸';
-      if (n.includes('Mỹ') || n.includes('Arizona') || n.includes('Idaho') || n.includes('Utah') || n.includes('Hawaii') || n.includes('Dakota')) return '🇺🇸';
-      if (n.includes('Ấn Độ') || n.includes('Lonar') || n.includes('Ladakh')) return '🇮🇳';
-      if (n.includes('TQ') || n.includes('Trung Quốc') || n.includes('Qaidam')) return '🇨🇳';
+      if (n.includes('Spain') || n.includes('Lanzarote')) return '🇪🇸';
+      if (n.includes('USA') || n.includes('United States') || n.includes('Arizona') || n.includes('Idaho') || n.includes('Utah') || n.includes('Hawaii') || n.includes('Dakota')) return '🇺🇸';
+      if (n.includes('India') || n.includes('Lonar') || n.includes('Ladakh')) return '🇮🇳';
+      if (n.includes('China') || n.includes('Qaidam')) return '🇨🇳';
       if (n.includes('Chile') || n.includes('Atacama')) return '🇨🇱';
       if (n.includes('Anh') || n.includes('Boulby') || n.includes('UK')) return '🇬🇧';
       if (n.includes('Ethiopia') || n.includes('Dallol')) return '🇪🇹';
       if (n.includes('Iceland') || n.includes('Krafla')) return '🇮🇸';
-      if (n.includes('Nam Cực') || n.includes('McMurdo')) return '❄️';
+      if (n.includes('Antarctica') || n.includes('McMurdo')) return '❄️';
       if (site.isCustom) return '🧑‍🎓';
       return '📍';
     }
@@ -2179,7 +2180,7 @@
       const dropZone = document.getElementById('csv-drop-zone');
       if (dropZone) {
         dropZone.style.display = 'block';
-        dropZone.innerHTML = '<div class="drop-icon">🛰️</div><div class="drop-title">Thả file CSV NASA POWER vào đây</div><div class="drop-sub">hoặc nhấp chuột để chọn file từ máy tính. Hệ thống tự động phân tích tọa độ, nhận diện địa danh và ghép cặp hành tinh tối ưu.</div><input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">';
+        dropZone.innerHTML = '<div class="drop-icon">🛰️</div><div class="drop-title">Drop NASA POWER CSV File Here</div><div class="drop-sub">or click to browse from computer. System automatically parses coordinates, reverse-geocodes locations, and auto-pairs the optimal lunar/martian analog.</div><input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">';
       }
 
       const form = document.getElementById('custom-site-form');
@@ -2215,8 +2216,8 @@
         setVal('inp-ptemp', match.tempK);
         setVal('inp-epress', earthPressKpa);
         setVal('inp-ppress', match.pressKpa);
-        setVal('inp-geology', 'Vị trí quan trắc vệ tinh NASA POWER tại ' + geo.fullName + '. ' + match.description + '. Phân loại địa chất: [' + match.geoTypes.join(', ') + '].');
-        setVal('inp-limits', 'Trọng lực Trái Đất (1g), khí quyển ' + earthPressKpa + ' kPa và sinh quyển tại ' + geo.fullName + ' khác biệt so với ' + match.targetEn + '.');
+        setVal('inp-geology', 'NASA POWER satellite site at ' + geo.fullName + '. ' + match.description + '. Geology classification: [' + match.geoTypes.join(', ') + '].');
+        setVal('inp-limits', 'Earth gravity (1g), atmospheric pressure ' + earthPressKpa + ' kPa, and biological activity at ' + geo.fullName + ' differ from ' + match.targetEn + '.');
       }
       switchStudioMode('manual');
     }
@@ -2323,8 +2324,8 @@
 
     const studentTemplates = {
       chudangya: {
-        name: "Núi lửa Chư Đăng Ya (Việt Nam)",
-        short: "🇻🇳 Chư Đăng Ya",
+        name: "Chu Dang Ya Volcano (Vietnam)",
+        short: "🇻🇳 Chu Dang Ya",
         elat: 14.113, elon: 108.027,
         body: "moon", pname: "Hadley Rille - Apollo 15 (Moon)",
         plat: 26.1, plon: 3.6,
@@ -2334,12 +2335,12 @@
         slope: [12.0, 14.0],
         tempK: [295.0, 253.0],
         press: [94.0, 0.0],
-        geology: "Miệng núi lửa hình nón triệu năm tuổi với địa hình sỏi xỉ bazan xốp và đá bọt, tương đồng cao với cấu trúc ejecta và nón tro rải rác quanh khe nứt Hadley Rille trên Mặt Trăng.",
-        limits: "Ảnh hưởng bởi gió mùa Tây Nguyên và thảm thực vật cây bụi; áp suất Trái Đất ~94 kPa và trọng lực 1g."
+        geology: "Million-year-old basaltic cinder cone crater with porous scoria and pumice deposits, closely matching ejecta blankets and cinder cones bordering lunar Hadley Rille.",
+        limits: "Influenced by tropical monsoon seasons, ambient vegetation, ambient pressure (94 kPa), and 1g gravity."
       },
       muine: {
-        name: "Đồi cát đỏ Mũi Né (Việt Nam)",
-        short: "🇻🇳 Cát Mũi Né",
+        name: "Mui Ne Red Sand Dunes (Vietnam)",
+        short: "🇻🇳 Mui Ne",
         elat: 10.951, elon: 108.287,
         body: "mars", pname: "Bagnold Dunes - Gale (Mars)",
         plat: -5.1, plon: 137.8,
@@ -2349,23 +2350,23 @@
         slope: [18.0, 15.0],
         tempK: [301.0, 220.0],
         press: [101.0, 0.7],
-        geology: "Hệ thống cồn cát di động dải cát đỏ giàu oxit sắt, lý tưởng để thử nghiệm độ trượt bánh xe rover tự hành, thuật toán đo thị giác odometry và mô phỏng bão cát Sao Hỏa.",
-        limits: "Độ ẩm không khí biển và gió ven biển tạo lực kết dính bề mặt hạt cát; áp suất khí quyển 1 atm."
+        geology: "Active coastal dune field with iron-oxide rich reddish sands, ideal for rover wheel slip calibration, visual odometry testing, and Martian dust storm simulation.",
+        limits: "Maritime humidity and sea breezes causing sand grain surface cohesion; 1 atm pressure."
       },
       lyson: {
-        name: "Đảo núi lửa Lý Sơn (Việt Nam)",
-        short: "🇻🇳 Đảo Lý Sơn",
-        elat: 15.378, elon: 109.112,
+        name: "Ly Son Volcanic Island (Vietnam)",
+        short: "🇻🇳 Ly Son",
+        elat: 15.378, elon: 109.117,
         body: "moon", pname: "Aristarchus Plateau (Moon)",
         plat: 23.7, plon: -47.4,
-        minScore: 0.87,
-        minTextEarth: "Basaltic Cliff, Volcanic Tuff",
-        minTextPlanet: "Pyroclastic Mare Basalt",
-        slope: [16.0, 18.0],
-        tempK: [298.0, 250.0],
-        press: [101.3, 0.0],
-        geology: "Địa hình vách đá bazan dựng đứng và trầm tích mạt vụn núi lửa (pyroclastic deposit) ven biển, tương đồng với cao nguyên pyroclastic Aristarchus trên Mặt Trăng.",
-        limits: "Khí hậu hải đảo mặn, phong hóa sóng biển và khí quyển dày Trái Đất."
+        minScore: 0.84,
+        minTextEarth: "Pyroclastic Basalt, Tuff, Cinder",
+        minTextPlanet: "Pyroclastic Glass, Mare Basalt",
+        slope: [20.0, 18.0],
+        tempK: [299.0, 250.0],
+        press: [101.0, 0.0],
+        geology: "Steep coastal basalt cliffs and exposed pyroclastic tuff deposits analogous to the explosive pyroclastic mantling deposits of lunar Aristarchus Plateau.",
+        limits: "Maritime saline environment, wave erosion, and dense terrestrial atmosphere."
       }
     };
 
@@ -2406,7 +2407,7 @@
         id: "custom_" + Date.now(),
         name: document.getElementById('inp-name').value.trim(),
         shortLabel: document.getElementById('inp-short').value.trim(),
-        isVietnam: document.getElementById('inp-name').value.toLowerCase().includes('việt nam') || document.getElementById('inp-name').value.toLowerCase().includes('vietnam'),
+        isVietnam: document.getElementById('inp-name').value.toLowerCase().includes('vietnam') || document.getElementById('inp-name').value.toLowerCase().includes('việt nam'),
         isBaseline: false,
         isCustom: true,
         bodyType: bodyType,
@@ -2415,7 +2416,7 @@
         planetCoords: [parseFloat(document.getElementById('inp-plat').value), parseFloat(document.getElementById('inp-plon').value)],
         planetZoom: 7,
         planetSiteName: pname,
-        target: `${bodyType === 'moon' ? 'MẶT TRĂNG' : 'SAO HỎA'} (${pname.toUpperCase()})`,
+        target: `${bodyType === 'moon' ? 'MOON' : 'MARS'} (${pname.toUpperCase()})`,
         earth: {
           slope: parseFloat(document.getElementById('inp-eslope').value) || 10,
           tempK: parseFloat(document.getElementById('inp-etemp').value) || 295,
@@ -2516,13 +2517,13 @@
           defaultAnalogs.forEach(site => {
             if (cloudMap.has(site.id)) {
               const r = cloudMap.get(site.id);
-              if (r.name_vi || r.name) site.name = r.name_vi || r.name;
-              if (r.short_label) site.shortLabel = r.short_label;
+              if (r.name_en || r.name) site.name = r.name_en || r.name;
+              if (r.short_label && !r.short_label.includes('Hố')) site.shortLabel = r.short_label;
               if (r.body_type) site.bodyType = r.body_type;
               if (r.earth_lat != null && r.earth_lon != null) site.earthCoords = [parseFloat(r.earth_lat), parseFloat(r.earth_lon)];
               if (r.planet_lat != null && r.planet_lon != null) site.planetCoords = [parseFloat(r.planet_lat), parseFloat(r.planet_lon)];
               if (r.planet_site_name) site.planetSiteName = r.planet_site_name;
-              if (r.target_vi || r.target) site.target = r.target_vi || r.target;
+              if (r.target_en || r.target) site.target = r.target_en || r.target;
               if (r.mineral_score != null) site.earth.mineralScore = parseFloat(r.mineral_score);
               if (r.earth_mineral) site.earth.mineralText = r.earth_mineral;
               if (r.planet_mineral) site.planet.mineralText = r.planet_mineral;
@@ -2532,15 +2533,15 @@
               if (r.planet_temp_k != null) site.planet.tempK = parseFloat(r.planet_temp_k);
               if (r.earth_pressure_kpa != null) site.earth.pressureKpa = parseFloat(r.earth_pressure_kpa);
               if (r.planet_pressure_kpa != null) site.planet.pressureKpa = parseFloat(r.planet_pressure_kpa);
-              if (r.geology_vi || r.geology) site.geology = r.geology_vi || r.geology;
-              if (r.limits_vi || r.limits) site.limits = r.limits_vi || r.limits;
+              if (r.geology_en || r.geology) site.geology = r.geology_en || r.geology;
+              if (r.limits_en || r.limits) site.limits = r.limits_en || r.limits;
             }
           });
 
           const cloudCustoms = data.filter(r => r.is_custom).map(r => ({
             id: r.id,
-            name: r.name_vi || r.name,
-            shortLabel: r.short_label || r.name_vi || r.name,
+            name: r.name_en || r.name || r.name_vi,
+            shortLabel: r.short_label || r.name_en || r.name,
             isVietnam: !!r.is_vietnam,
             isBaseline: !!r.is_baseline,
             isCustom: true,
@@ -2550,7 +2551,7 @@
             planetCoords: [r.planet_lat, r.planet_lon],
             planetZoom: r.planet_zoom || 7,
             planetSiteName: r.planet_site_name || 'Target Body',
-            target: r.target_vi || r.target || 'MISSION TARGET',
+            target: r.target_en || r.target || 'MISSION TARGET',
             earth: {
               slope: parseFloat(r.earth_slope) || 10,
               tempK: parseFloat(r.earth_temp_k) || 295,
@@ -2652,19 +2653,19 @@
     // 8. PLANET TARGET LIBRARY — NASA-verified parameters for 15 targets
     // ================================================================
     const PLANET_TARGETS = [
-      { id: 'marius_hills', name: 'Marius Hills (Moon)', body: 'moon', icon: '🌑', lat: 14.0, lon: -56.0, zoom: 7, tempK: 253, pressKpa: 0.0, slope: 9.5, mineralEarth: 'Basalt, Lava Tube Minerals, Regolith', mineralPlanet: 'Mare Basalt (FeO 17%), Volcanic Regolith', targetVi: 'MẶT TRĂNG (MARIUS HILLS)', targetEn: 'MOON (MARIUS HILLS)', geoTypes: ['volcanic', 'basaltic', 'lava_tube', 'tropical'], description: 'Mare basalt plain with lava tube skylights' },
-      { id: 'aristarchus', name: 'Aristarchus Plateau (Moon)', body: 'moon', icon: '🌑', lat: 23.7, lon: -47.4, zoom: 7, tempK: 250, pressKpa: 0.0, slope: 18.0, mineralEarth: 'Pyroclastic Basalt, Volcanic Tuff', mineralPlanet: 'Pyroclastic Glass, Mare Basalt', targetVi: 'MẶT TRĂNG (ARISTARCHUS)', targetEn: 'MOON (ARISTARCHUS)', geoTypes: ['volcanic', 'pyroclastic', 'island'], description: 'Pyroclastic plateau matching volcanic island geology' },
-      { id: 'hadley_rille', name: 'Hadley Rille – Apollo 15 (Moon)', body: 'moon', icon: '🌑', lat: 26.1, lon: 3.6, zoom: 7, tempK: 253, pressKpa: 0.0, slope: 14.0, mineralEarth: 'Basalt, Scoria, Tephra', mineralPlanet: 'Mare Basalt, Hadley Scoria', targetVi: 'MẶT TRĂNG (HADLEY RILLE)', targetEn: 'MOON (HADLEY RILLE)', geoTypes: ['volcanic', 'basaltic', 'tropical', 'highland'], description: 'Sinuous lava rille — classic volcanic terrain analog' },
-      { id: 'taurus_littrow', name: 'Taurus-Littrow – Apollo 17 (Moon)', body: 'moon', icon: '🌑', lat: 20.19, lon: 30.77, zoom: 7, tempK: 250, pressKpa: 0.0, slope: 15.0, mineralEarth: 'Basalt, Tholeiite, Young Lava Flows', mineralPlanet: 'Tholeiitic Basalt, Regolith', targetVi: 'MẶT TRĂNG (TAURUS-LITTROW)', targetEn: 'MOON (TAURUS-LITTROW)', geoTypes: ['volcanic', 'basaltic', 'subpolar', 'temperate'], description: 'Apollo 17 landing site — dark mantle deposits' },
-      { id: 'shackleton', name: 'Shackleton Crater (Moon South Pole)', body: 'moon', icon: '🌑', lat: -89.9, lon: 0.0, zoom: 6, tempK: 100, pressKpa: 0.0, slope: 30.0, mineralEarth: 'Ice, Permafrost, Basalt', mineralPlanet: 'Water Ice, Regolith', targetVi: 'MẶT TRĂNG (CỰC NAM)', targetEn: 'MOON (SOUTH POLE)', geoTypes: ['polar', 'ice', 'permafrost'], description: 'Polar shadowed crater matching Arctic environments' },
-      { id: 'jezero', name: 'Jezero Crater (Mars)', body: 'mars', icon: '🔴', lat: 18.38, lon: 77.58, zoom: 7, tempK: 215, pressKpa: 0.86, slope: 10.0, mineralEarth: 'Impact Basalt, Clay Minerals, Carbonates', mineralPlanet: 'Smectite Clay, Basalt, Carbonates', targetVi: 'SAO HỎA (HỐ JEZERO)', targetEn: 'MARS (JEZERO CRATER)', geoTypes: ['impact', 'lacustrine', 'basaltic', 'tropical'], description: 'Ancient lake delta crater — hydrothermal alteration analog' },
-      { id: 'gale', name: 'Gale Crater – Curiosity (Mars)', body: 'mars', icon: '🔴', lat: -5.4, lon: 137.8, zoom: 7, tempK: 207, pressKpa: 0.86, slope: 15.0, mineralEarth: 'Sandstone, Silicates, Iron Oxides, Dunes', mineralPlanet: 'Basaltic Sandstone, Sulfates, Iron Oxides', targetVi: 'SAO HỎA (MIỆNG GALE)', targetEn: 'MARS (GALE CRATER)', geoTypes: ['desert', 'arid', 'dunes', 'sedimentary'], description: 'Stratified sedimentary crater — arid desert analog' },
-      { id: 'arsia_mons', name: 'Arsia Mons Skylights (Mars)', body: 'mars', icon: '🔴', lat: -11.5, lon: -121.0, zoom: 7, tempK: 195, pressKpa: 0.6, slope: 15.0, mineralEarth: 'Basalt, Volcanic Ash, Lava Tubes', mineralPlanet: 'Martian Basalt, Lava Tube Minerals', targetVi: 'SAO HỎA (ARSIA MONS)', targetEn: 'MARS (ARSIA MONS)', geoTypes: ['volcanic', 'lava_tube', 'basaltic', 'island'], description: 'Martian shield volcano with lava tube pit chains' },
-      { id: 'elysium', name: 'Elysium Planitia (Mars)', body: 'mars', icon: '🔴', lat: 4.5, lon: 135.6, zoom: 7, tempK: 215, pressKpa: 0.7, slope: 5.0, mineralEarth: 'Desert Pavement, Silicates, Iron Oxides', mineralPlanet: 'Basaltic Plains, Iron Oxides, Dust', targetVi: 'SAO HỎA (ELYSIUM)', targetEn: 'MARS (ELYSIUM PLANITIA)', geoTypes: ['arid', 'desert', 'flat', 'perchlorate'], description: 'Young basaltic plain — flat arid desert analog' },
-      { id: 'columbia_hills', name: 'Columbia Hills – Gusev (Mars)', body: 'mars', icon: '🔴', lat: -14.5, lon: 175.4, zoom: 7, tempK: 220, pressKpa: 0.85, slope: 12.0, mineralEarth: 'Impact Breccia, Jarosite, Sulfates', mineralPlanet: 'Jarosite, Goethite, Altered Basalt', targetVi: 'SAO HỎA (COLUMBIA HILLS)', targetEn: 'MARS (COLUMBIA HILLS)', geoTypes: ['impact', 'hydrothermal', 'acidic', 'geothermal'], description: 'Hydrothermal alteration zone — acidic geothermal analog' },
-      { id: 'valles_marineris', name: 'Valles Marineris (Mars)', body: 'mars', icon: '🔴', lat: -14.0, lon: -59.0, zoom: 6, tempK: 213, pressKpa: 0.9, slope: 25.0, mineralEarth: 'Layered Sediments, Clays, Sulfates', mineralPlanet: 'Layered Phyllosilicates, Sulfates', targetVi: 'SAO HỎA (VALLES MARINERIS)', targetEn: 'MARS (VALLES MARINERIS)', geoTypes: ['canyon', 'sedimentary', 'arid', 'evaporite'], description: 'Grand canyon of Mars — deep canyon sedimentary geology' },
-      { id: 'olympus_mons', name: 'Olympus Mons (Mars)', body: 'mars', icon: '🔴', lat: 18.65, lon: -133.8, zoom: 6, tempK: 180, pressKpa: 0.3, slope: 5.0, mineralEarth: 'Shield Volcano Basalt, High-Altitude Lava', mineralPlanet: 'Shield Basalt, Ash Deposits', targetVi: 'SAO HỎA (OLYMPUS MONS)', targetEn: 'MARS (OLYMPUS MONS)', geoTypes: ['volcanic', 'highland', 'shield', 'cold'], description: 'Largest shield volcano — high-altitude shield analog' },
-      { id: 'hellas', name: 'Hellas Planitia (Mars)', body: 'mars', icon: '🔴', lat: -40.0, lon: 70.0, zoom: 6, tempK: 230, pressKpa: 1.2, slope: 8.0, mineralEarth: 'Evaporites, Salts, Lacustrine Sediments', mineralPlanet: 'Salt Flats, Evaporites, Dust', targetVi: 'SAO HỎA (HELLAS)', targetEn: 'MARS (HELLAS BASIN)', geoTypes: ['salt_lake', 'evaporite', 'basin', 'lacustrine'], description: 'Deepest basin on Mars — salt lake and evaporite analog' }
+      { id: 'marius_hills', name: 'Marius Hills (Moon)', body: 'moon', icon: '🌑', lat: 14.0, lon: -56.0, zoom: 7, tempK: 253, pressKpa: 0.0, slope: 9.5, mineralEarth: 'Basalt, Lava Tube Minerals, Regolith', mineralPlanet: 'Mare Basalt (FeO 17%), Volcanic Regolith', targetVi: 'MOON (MARIUS HILLS)', targetEn: 'MOON (MARIUS HILLS)', geoTypes: ['volcanic', 'basaltic', 'lava_tube', 'tropical'], description: 'Mare basalt plain with lava tube skylights' },
+      { id: 'aristarchus', name: 'Aristarchus Plateau (Moon)', body: 'moon', icon: '🌑', lat: 23.7, lon: -47.4, zoom: 7, tempK: 250, pressKpa: 0.0, slope: 18.0, mineralEarth: 'Pyroclastic Basalt, Volcanic Tuff', mineralPlanet: 'Pyroclastic Glass, Mare Basalt', targetVi: 'MOON (ARISTARCHUS)', targetEn: 'MOON (ARISTARCHUS)', geoTypes: ['volcanic', 'pyroclastic', 'island'], description: 'Pyroclastic plateau matching volcanic island geology' },
+      { id: 'hadley_rille', name: 'Hadley Rille – Apollo 15 (Moon)', body: 'moon', icon: '🌑', lat: 26.1, lon: 3.6, zoom: 7, tempK: 253, pressKpa: 0.0, slope: 14.0, mineralEarth: 'Basalt, Scoria, Tephra', mineralPlanet: 'Mare Basalt, Hadley Scoria', targetVi: 'MOON (HADLEY RILLE)', targetEn: 'MOON (HADLEY RILLE)', geoTypes: ['volcanic', 'basaltic', 'tropical', 'highland'], description: 'Sinuous lava rille — classic volcanic terrain analog' },
+      { id: 'taurus_littrow', name: 'Taurus-Littrow – Apollo 17 (Moon)', body: 'moon', icon: '🌑', lat: 20.19, lon: 30.77, zoom: 7, tempK: 250, pressKpa: 0.0, slope: 15.0, mineralEarth: 'Basalt, Tholeiite, Young Lava Flows', mineralPlanet: 'Tholeiitic Basalt, Regolith', targetVi: 'MOON (TAURUS-LITTROW)', targetEn: 'MOON (TAURUS-LITTROW)', geoTypes: ['volcanic', 'basaltic', 'subpolar', 'temperate'], description: 'Apollo 17 landing site — dark mantle deposits' },
+      { id: 'shackleton', name: 'Shackleton Crater (Moon South Pole)', body: 'moon', icon: '🌑', lat: -89.9, lon: 0.0, zoom: 6, tempK: 100, pressKpa: 0.0, slope: 30.0, mineralEarth: 'Ice, Permafrost, Basalt', mineralPlanet: 'Water Ice, Regolith', targetVi: 'MOON (SOUTH POLE)', targetEn: 'MOON (SOUTH POLE)', geoTypes: ['polar', 'ice', 'permafrost'], description: 'Polar shadowed crater matching Arctic environments' },
+      { id: 'jezero', name: 'Jezero Crater (Mars)', body: 'mars', icon: '🔴', lat: 18.38, lon: 77.58, zoom: 7, tempK: 215, pressKpa: 0.86, slope: 10.0, mineralEarth: 'Impact Basalt, Clay Minerals, Carbonates', mineralPlanet: 'Smectite Clay, Basalt, Carbonates', targetVi: 'MARS (JEZERO CRATER)', targetEn: 'MARS (JEZERO CRATER)', geoTypes: ['impact', 'lacustrine', 'basaltic', 'tropical'], description: 'Ancient lake delta crater — hydrothermal alteration analog' },
+      { id: 'gale', name: 'Gale Crater – Curiosity (Mars)', body: 'mars', icon: '🔴', lat: -5.4, lon: 137.8, zoom: 7, tempK: 207, pressKpa: 0.86, slope: 15.0, mineralEarth: 'Sandstone, Silicates, Iron Oxides, Dunes', mineralPlanet: 'Basaltic Sandstone, Sulfates, Iron Oxides', targetVi: 'MARS (GALE CRATER)', targetEn: 'MARS (GALE CRATER)', geoTypes: ['desert', 'arid', 'dunes', 'sedimentary'], description: 'Stratified sedimentary crater — arid desert analog' },
+      { id: 'arsia_mons', name: 'Arsia Mons Skylights (Mars)', body: 'mars', icon: '🔴', lat: -11.5, lon: -121.0, zoom: 7, tempK: 195, pressKpa: 0.6, slope: 15.0, mineralEarth: 'Basalt, Volcanic Ash, Lava Tubes', mineralPlanet: 'Martian Basalt, Lava Tube Minerals', targetVi: 'MARS (ARSIA MONS)', targetEn: 'MARS (ARSIA MONS)', geoTypes: ['volcanic', 'lava_tube', 'basaltic', 'island'], description: 'Martian shield volcano with lava tube pit chains' },
+      { id: 'elysium', name: 'Elysium Planitia (Mars)', body: 'mars', icon: '🔴', lat: 4.5, lon: 135.6, zoom: 7, tempK: 215, pressKpa: 0.7, slope: 5.0, mineralEarth: 'Desert Pavement, Silicates, Iron Oxides', mineralPlanet: 'Basaltic Plains, Iron Oxides, Dust', targetVi: 'MARS (ELYSIUM PLANITIA)', targetEn: 'MARS (ELYSIUM PLANITIA)', geoTypes: ['arid', 'desert', 'flat', 'perchlorate'], description: 'Young basaltic plain — flat arid desert analog' },
+      { id: 'columbia_hills', name: 'Columbia Hills – Gusev (Mars)', body: 'mars', icon: '🔴', lat: -14.5, lon: 175.4, zoom: 7, tempK: 220, pressKpa: 0.85, slope: 12.0, mineralEarth: 'Impact Breccia, Jarosite, Sulfates', mineralPlanet: 'Jarosite, Goethite, Altered Basalt', targetVi: 'MARS (COLUMBIA HILLS)', targetEn: 'MARS (COLUMBIA HILLS)', geoTypes: ['impact', 'hydrothermal', 'acidic', 'geothermal'], description: 'Hydrothermal alteration zone — acidic geothermal analog' },
+      { id: 'valles_marineris', name: 'Valles Marineris (Mars)', body: 'mars', icon: '🔴', lat: -14.0, lon: -59.0, zoom: 6, tempK: 213, pressKpa: 0.9, slope: 25.0, mineralEarth: 'Layered Sediments, Clays, Sulfates', mineralPlanet: 'Layered Phyllosilicates, Sulfates', targetVi: 'MARS (VALLES MARINERIS)', targetEn: 'MARS (VALLES MARINERIS)', geoTypes: ['canyon', 'sedimentary', 'arid', 'evaporite'], description: 'Grand canyon of Mars — deep canyon sedimentary geology' },
+      { id: 'olympus_mons', name: 'Olympus Mons (Mars)', body: 'mars', icon: '🔴', lat: 18.65, lon: -133.8, zoom: 6, tempK: 180, pressKpa: 0.3, slope: 5.0, mineralEarth: 'Shield Volcano Basalt, High-Altitude Lava', mineralPlanet: 'Shield Basalt, Ash Deposits', targetVi: 'MARS (OLYMPUS MONS)', targetEn: 'MARS (OLYMPUS MONS)', geoTypes: ['volcanic', 'highland', 'shield', 'cold'], description: 'Largest shield volcano — high-altitude shield analog' },
+      { id: 'hellas', name: 'Hellas Planitia (Mars)', body: 'mars', icon: '🔴', lat: -40.0, lon: 70.0, zoom: 6, tempK: 230, pressKpa: 1.2, slope: 8.0, mineralEarth: 'Evaporites, Salts, Lacustrine Sediments', mineralPlanet: 'Salt Flats, Evaporites, Dust', targetVi: 'MARS (HELLAS BASIN)', targetEn: 'MARS (HELLAS BASIN)', geoTypes: ['salt_lake', 'evaporite', 'basin', 'lacustrine'], description: 'Deepest basin on Mars — salt lake and evaporite analog' }
     ];
 
     // ================================================================
@@ -2815,7 +2816,7 @@
       if (!file) return;
 
       const dropZone = document.getElementById('csv-drop-zone');
-      if (dropZone) dropZone.innerHTML = '<div style="font-size:24px;">🛰️</div><div style="font-size:13px; color:#38bdf8; font-weight:700;">Đang định danh vị trí địa lý & phân tích dữ liệu NASA...</div>';
+      if (dropZone) dropZone.innerHTML = '<div style="font-size:24px;">🛰️</div><div style="font-size:13px; color:#38bdf8; font-weight:700;">Identifying location & processing NASA POWER telemetry...</div>';
 
       const reader = new FileReader();
       reader.onload = async function(evt) {
@@ -2882,10 +2883,10 @@
         setTxt('match-planet-name', match.name);
         setTxt('match-planet-coords', match.lat + '°N, ' + match.lon + '°E');
         setTxt('match-planet-temp', match.tempK + ' K');
-        setTxt('match-planet-press', match.pressKpa === 0 ? '0.0 kPa (Chân không)' : match.pressKpa + ' kPa');
+        setTxt('match-planet-press', match.pressKpa === 0 ? '0.0 kPa (Vacuum)' : match.pressKpa + ' kPa');
         setTxt('match-planet-slope', match.slope + '°');
 
-        setTxt('match-reason', '💡 Lý giải tương đồng: ' + match.description + '. Vị trí tại ' + geo.fullName + ' được AI phân loại địa chất [' + match.geoTypes.join(', ') + ']. Dữ liệu khí hậu trích xuất từ ' + t2mCnt + ' ngày quan trắc NASA MERRA-2.');
+        setTxt('match-reason', '💡 Match Reasoning: ' + match.description + '. Site at ' + geo.fullName + ' classified as geology [' + match.geoTypes.join(', ') + ']. Data extracted from ' + t2mCnt + ' daily NASA MERRA-2 observations.');
         document.getElementById('auto-match-card').style.display = 'block';
         if (dropZone) dropZone.style.display = 'none';
       };
@@ -2919,9 +2920,9 @@
       document.getElementById('inp-epress').value = earthPressKpa;
       document.getElementById('inp-ppress').value = match.pressKpa;
       document.getElementById('inp-geology').value =
-        'Vị trí quan trắc vệ tinh NASA POWER tại ' + geo.fullName + '. ' + match.description + '. Phân loại địa chất: [' + match.geoTypes.join(', ') + '].';
+        'NASA POWER satellite site at ' + geo.fullName + '. ' + match.description + '. Geology classification: [' + match.geoTypes.join(', ') + '].';
       document.getElementById('inp-limits').value =
-        'Trọng lực Trái Đất (1g), khí quyển ' + earthPressKpa + ' kPa và sinh quyển tại ' + geo.fullName + ' khác biệt so với ' + match.targetEn + '.';
+        'Earth gravity (1g), atmospheric pressure ' + earthPressKpa + ' kPa, and biological activity at ' + geo.fullName + ' differ from ' + match.targetEn + '.';
 
       const form = document.getElementById('custom-site-form');
       if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -2973,7 +2974,7 @@
         { collapsed: true, position: 'bottomright' }
       ).addTo(earthMap);
 
-      // Krông Nô Cave Network Polyline & Markers
+      // Krong No Cave Network Polyline & Markers
       krongNoLayerGroup = L.layerGroup();
       const lavaFlowCoords = [
         [12.4850, 107.8820],
@@ -2987,7 +2988,7 @@
         weight: 3,
         opacity: 0.85,
         dashArray: '6, 6'
-      }).addTo(krongNoLayerGroup).bindTooltip("Trục Dòng Dung Nham Núi Lửa Chư Bluk – Krông Nô", { sticky: true });
+      }).addTo(krongNoLayerGroup).bindTooltip("Chu Bluk – Krong No Volcanic Lava Tube Axis", { sticky: true });
 
       krongNoCaves.forEach((cave, cIdx) => {
         const cMarker = L.circleMarker(cave.coords, {
