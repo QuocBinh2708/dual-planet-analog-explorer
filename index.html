@@ -661,6 +661,17 @@
     }
 
     /* Actions */
+    .btn-remove-csv {
+      background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171; border-radius: 6px; padding: 4px 10px; font-size: 11.5px;
+      font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: inline-flex;
+      align-items: center; gap: 4px;
+    }
+    .btn-remove-csv:hover {
+      background: rgba(239, 68, 68, 0.35); border-color: #f87171; color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
+
     .btn-accept-match {
       width: 100%; background: linear-gradient(135deg, #059669 0%, #0284c7 100%);
       color: #ffffff; border: none; padding: 12px 18px; border-radius: 8px;
@@ -941,8 +952,13 @@
               <span class="match-ai-badge">🤖 AI AUTO-MATCH</span>
               <span class="match-pair-title" id="match-site-name">—</span>
             </div>
-            <div class="match-conf-tag">
-              🎯 Độ khớp: <span id="match-conf-pct" style="color:#38bdf8;">—</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="match-conf-tag">
+                🎯 Độ khớp: <span id="match-conf-pct" style="color:#38bdf8;">—</span>
+              </div>
+              <button type="button" onclick="resetStudioModal()" class="btn-remove-csv" title="Gỡ bỏ file CSV và xóa kết quả này">
+                ✕ Xóa File
+              </button>
             </div>
           </div>
 
@@ -1014,10 +1030,15 @@
           <!-- Scientific Reasoning -->
           <div class="match-reason-box" id="match-reason">—</div>
 
-          <!-- Primary Confirmation Action -->
-          <button type="button" class="btn-accept-match" onclick="acceptAutoMatch()">
-            <span>🚀</span> XÁC NHẬN & ĐỒNG BỘ LÊN SUPABASE NGAY
-          </button>
+          <!-- Primary Confirmation & Remove Actions -->
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button type="button" class="btn-accept-match" onclick="acceptAutoMatch()" style="flex:1;">
+              <span>🚀</span> XÁC NHẬN & ĐỒNG BỘ LÊN SUPABASE NGAY
+            </button>
+            <button type="button" onclick="resetStudioModal()" class="btn-remove-csv" style="padding:11px 16px; font-size:12.5px; border-radius:8px;">
+              ✕ Hủy Bỏ
+            </button>
+          </div>
 
           <!-- Sub actions -->
           <div class="match-sub-actions">
@@ -2145,16 +2166,30 @@
       }
     }
 
-    function resetCsvUploader() {
-      const dropZone = document.getElementById('csv-drop-zone');
-      const autoCard = document.getElementById('auto-match-card');
+    // Cleanly and completely wipe CSV and modal state
+    function resetStudioModal() {
+      _pendingAutoMatch = null;
+      
       const fileInput = document.getElementById('nasa-csv-input');
       if (fileInput) fileInput.value = '';
+
+      const autoCard = document.getElementById('auto-match-card');
       if (autoCard) autoCard.style.display = 'none';
+
+      const dropZone = document.getElementById('csv-drop-zone');
       if (dropZone) {
         dropZone.style.display = 'block';
         dropZone.innerHTML = '<div class="drop-icon">🛰️</div><div class="drop-title">Thả file CSV NASA POWER vào đây</div><div class="drop-sub">hoặc nhấp chuột để chọn file từ máy tính. Hệ thống tự động phân tích tọa độ, nhận diện địa danh và ghép cặp hành tinh tối ưu.</div><input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">';
       }
+
+      const form = document.getElementById('custom-site-form');
+      if (form) form.reset();
+
+      switchStudioMode('auto');
+    }
+
+    function resetCsvUploader() {
+      resetStudioModal();
     }
 
     function switchToManualWithData() {
@@ -2194,6 +2229,7 @@
 
     function closeAddModal() {
       document.getElementById('add-modal').style.display = 'none';
+      resetStudioModal();
       if (isMapPinning) cancelMapPinning();
     }
 
@@ -2404,6 +2440,7 @@
 
       renderEarthMarkers();
       renderTopButtons();
+      resetStudioModal();
       closeAddModal();
       selectSite(analogs.length - 1, false);
 
