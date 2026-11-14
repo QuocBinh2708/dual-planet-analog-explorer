@@ -459,6 +459,10 @@
     .site-tooltip.base-tip { border-color: #f59e0b; color: #fde68a; }
 
     /* Planetary Waypoint Tooltips & Active Highlighting */
+    .custom-planet-pin {
+      background: transparent !important;
+      border: none !important;
+    }
     .site-tooltip.moon-tip {
       background: rgba(11, 20, 38, 0.94);
       border-color: #38bdf8;
@@ -2581,24 +2585,34 @@
 
     const planetaryCatalog = {
       moon: [
-        { name: "Descartes Highlands (Apollo 16)", coords: [-8.97, 15.5], tempK: 250, slope: 12.0, minScore: 0.86, minText: "Anorthositic Highland Regolith, Breccia" },
-        { name: "Mare Serenitatis Basin", coords: [28.0, 17.5], tempK: 252, slope: 7.5, minScore: 0.88, minText: "Mare Basalt, Ilmenite, Dark Mantle" },
-        { name: "Oceanus Procellarum Mare", coords: [18.4, -57.4], tempK: 254, slope: 6.0, minScore: 0.85, minText: "High-Ti Basalt Regolith, KREEP" },
-        { name: "Shackleton Crater Polar Ridge", coords: [-89.9, 0.0], tempK: 220, slope: 18.0, minScore: 0.80, minText: "Permanently Shadowed Cryogenic Regolith" },
-        { name: "Copernicus Crater Central Basin", coords: [9.6, -20.1], tempK: 248, slope: 16.0, minScore: 0.84, minText: "Impact-Melt Sheet, Olivine-Rich Basalt" },
-        { name: "Aristarchus Plateau Volcanics", coords: [23.7, -47.4], tempK: 255, slope: 10.0, minScore: 0.89, minText: "Pyroclastic Glass, Silicic Dome Complex" },
-        { name: "Reiner Gamma Swirl Formation", coords: [7.5, -59.0], tempK: 250, slope: 5.5, minScore: 0.82, minText: "Optically Immature Albedo Swirl Regolith" },
-        { name: "Fra Mauro Regolith Plains", coords: [-3.6, -17.5], tempK: 251, slope: 9.0, minScore: 0.87, minText: "Imbrium Ejecta Blanket, Impact Breccia" }
+        { name: "Marius Hills Lava Tube Skylights", coords: [14.0, -56.0], tempK: 253, slope: 9.5, minScore: 0.94, minText: "Mare Basalt (FeO 17%), Volcanic Regolith" },
+        { name: "Descartes Highlands (Apollo 16)", coords: [-8.97, 15.5], tempK: 250, slope: 12.0, minScore: 0.88, minText: "Anorthositic Highland Regolith, Breccia" },
+        { name: "Mare Serenitatis Basin", coords: [28.0, 17.5], tempK: 252, slope: 7.5, minScore: 0.89, minText: "Mare Basalt, Ilmenite, Dark Mantle" },
+        { name: "Taurus-Littrow Valley (Apollo 17)", coords: [20.19, 30.77], tempK: 250, slope: 15.0, minScore: 0.92, minText: "Valley Floor Regolith, Orange Pyroclastic Beads" },
+        { name: "Hadley Rille – Apollo 15", coords: [26.1, 3.6], tempK: 253, slope: 14.0, minScore: 0.91, minText: "Mare Basalt, Sinuous Rille Scoria, Tephra" },
+        { name: "Oceanus Procellarum Mare", coords: [18.4, -57.4], tempK: 254, slope: 6.0, minScore: 0.87, minText: "High-Ti Basalt Regolith, KREEP Terrane" },
+        { name: "Aristarchus Plateau Volcanics", coords: [23.7, -47.4], tempK: 255, slope: 10.0, minScore: 0.90, minText: "Pyroclastic Glass, Silicic Dome Complex" },
+        { name: "Fra Mauro Regolith Plains (Apollo 14)", coords: [-3.6, -17.5], tempK: 251, slope: 9.0, minScore: 0.88, minText: "Imbrium Ejecta Blanket, Impact Breccia" },
+        { name: "Copernicus Crater Central Basin", coords: [9.6, -20.1], tempK: 248, slope: 16.0, minScore: 0.85, minText: "Impact-Melt Sheet, Olivine-Rich Basalt" },
+        { name: "Reiner Gamma Swirl Formation", coords: [7.5, -59.0], tempK: 250, slope: 5.5, minScore: 0.83, minText: "Optically Immature Albedo Swirl Regolith" },
+        { name: "Sinus Iridum Basaltic Bay", coords: [45.1, -31.7], tempK: 246, slope: 7.0, minScore: 0.88, minText: "Bay of Rainbows Ridge Basalt, Mare Imbrium" },
+        { name: "Mare Crisium Impact Basin", coords: [17.0, 59.1], tempK: 250, slope: 6.5, minScore: 0.86, minText: "Multi-ring Mascon Basin Basalt, Mare Floods" },
+        { name: "Shackleton Crater Polar Ridge", coords: [-89.9, 0.0], tempK: 120, slope: 22.0, minScore: 0.80, minText: "Permanently Shadowed Cryogenic Volatiles & Regolith" }
       ],
       mars: [
-        { name: "Jezero Crater Delta Paleolake", coords: [18.38, 77.58], tempK: 210, slope: 8.5, minScore: 0.88, minText: "Clay Minerals, Carbonates, Deltaic Mudstones" },
-        { name: "Mawrth Vallis Layered Clays", coords: [23.9, -18.9], tempK: 212, slope: 9.0, minScore: 0.86, minText: "Phyllosilicates, Smectite, Ancient Crust" },
-        { name: "Hellas Planitia Basin Floor", coords: [-40.0, 70.0], tempK: 205, slope: 8.0, minScore: 0.83, minText: "Glacial Permafrost Sediments, Trap Basalt" },
-        { name: "Valles Marineris Chasma Uplands", coords: [-14.0, -59.2], tempK: 212, slope: 18.5, minScore: 0.85, minText: "Layered Wall Strata, Sulfate Deposits" },
-        { name: "Elysium Planitia Volcanic Fissures", coords: [11.7, 147.2], tempK: 215, slope: 11.0, minScore: 0.89, minText: "Flood Basalt Plates, Cerberus Fossae" },
-        { name: "Eberswalde Crater Delta", coords: [-24.0, -33.3], tempK: 215, slope: 10.0, minScore: 0.85, minText: "Meandering Inverted Siltstone Channels" },
-        { name: "Meridiani Planum Outcrops", coords: [-0.2, -5.5], tempK: 216, slope: 6.0, minScore: 0.88, minText: "Hematite Concretions, Jarosite Sandstone" },
-        { name: "Olympia Undae Polar Erg", coords: [81.0, 170.0], tempK: 195, slope: 12.0, minScore: 0.81, minText: "Gypsum Sand Dunes, Perennial Ice Borders" }
+        { name: "Jezero Crater Delta Paleolake", coords: [18.38, 77.58], tempK: 215, slope: 8.5, minScore: 0.91, minText: "Clay Minerals, Carbonates, Deltaic Mudstones" },
+        { name: "Arsia Mons Volcanic Pit Skylights", coords: [-11.5, -121.0], tempK: 195, slope: 15.0, minScore: 0.92, minText: "Martian Shield Basalt, Pit Crater Chains, Lava Tubes" },
+        { name: "Gale Crater – Mount Sharp Strata", coords: [-5.4, 137.8], tempK: 207, slope: 14.0, minScore: 0.89, minText: "Stratified Mudstones, Sulfates, Hematite Ridge" },
+        { name: "Bagnold Dunes – Gale Crater", coords: [-5.1, 137.8], tempK: 208, slope: 15.0, minScore: 0.90, minText: "Active Basaltic Sand Dunes, Olivine-Enriched Sand" },
+        { name: "Mawrth Vallis Layered Clays", coords: [23.9, -18.9], tempK: 212, slope: 9.0, minScore: 0.89, minText: "Phyllosilicates, Smectite, Ancient Noachian Crust" },
+        { name: "Meridiani Planum Outcrops", coords: [-0.2, -5.5], tempK: 216, slope: 6.0, minScore: 0.90, minText: "Hematite Concretions (Blueberries), Jarosite Sandstone" },
+        { name: "Valles Marineris Chasma Uplands", coords: [-14.0, -59.2], tempK: 212, slope: 22.0, minScore: 0.86, minText: "Layered Wall Strata, Sulfate Deposits, Landslide Slopes" },
+        { name: "Elysium Planitia Volcanic Fissures", coords: [11.7, 147.2], tempK: 215, slope: 8.0, minScore: 0.88, minText: "Flood Basalt Plates, Cerberus Fossae Lava Sheets" },
+        { name: "Eberswalde Crater Delta", coords: [-24.0, -33.3], tempK: 215, slope: 10.0, minScore: 0.87, minText: "Meandering Inverted Siltstone Channels & Lacustrine Beds" },
+        { name: "Columbia Hills – Gusev Crater", coords: [-14.5, 175.4], tempK: 220, slope: 12.0, minScore: 0.87, minText: "Hydrothermal Opaline Silica, Altered Basalt, Jarosite" },
+        { name: "Hellas Planitia Basin Floor", coords: [-40.0, 70.0], tempK: 230, slope: 7.0, minScore: 0.83, minText: "Deep Sedimentary Basin, Evaporite Salts, Permafrost" },
+        { name: "Nili Fossae Carbonate Plains", coords: [22.0, 75.0], tempK: 214, slope: 11.0, minScore: 0.88, minText: "Carbonate-Bearing Olivine Bedrock, Hydrothermal Clay" },
+        { name: "Olympia Undae Polar Erg", coords: [81.0, 170.0], tempK: 185, slope: 12.0, minScore: 0.81, minText: "Gypsum Sand Dunes, Perennial Ice Borders" }
       ]
     };
 
@@ -2640,12 +2654,35 @@
       const baseBody = site.bodyType === 'mars' ? 'mars' : 'moon';
       const otherBody = baseBody === 'moon' ? 'mars' : 'moon';
 
+      // Sanitize legacy corrupt labels (e.g. "Mars Equivalent" on Moon, or corrupt fallback coordinates)
+      if (site.targets.moon) {
+        const mName = site.targets.moon.planetSiteName || '';
+        const mCoords = site.targets.moon.planetCoords || [];
+        if (mName.includes('Mars Equivalent') || (mCoords[0] === -11.5 && mCoords[1] === -121.0)) {
+          delete site.targets.moon;
+        }
+      }
+      if (site.targets.mars) {
+        const mName = site.targets.mars.planetSiteName || '';
+        if (mName.includes('Moon Equivalent')) {
+          delete site.targets.mars;
+        }
+      }
+
       if (!site.targets[baseBody]) {
+        let pName = site.planetSiteName;
+        let pCoords = site.planetCoords;
+        if (!pName || pName.includes('Equivalent') || (baseBody === 'moon' && pCoords && pCoords[0] === -11.5 && pCoords[1] === -121.0)) {
+          const synth = synthesizeCounterpart(site, baseBody);
+          pName = synth.planetSiteName;
+          pCoords = synth.planetCoords;
+        }
+
         site.targets[baseBody] = {
-          planetSiteName: site.planetSiteName || (baseBody === 'moon' ? 'Marius Hills (Moon)' : 'Arsia Mons (Mars)'),
-          planetCoords: site.planetCoords || (baseBody === 'moon' ? [14.0, -56.0] : [-11.5, -121.0]),
+          planetSiteName: pName || (baseBody === 'moon' ? 'Marius Hills (Moon)' : 'Arsia Mons (Mars)'),
+          planetCoords: pCoords || (baseBody === 'moon' ? [14.0, -56.0] : [-11.5, -121.0]),
           planetZoom: site.planetZoom || 7,
-          target: site.target || (baseBody === 'moon' ? 'MOON (ANALOG)' : 'MARS (ANALOG)'),
+          target: site.target || `${baseBody.toUpperCase()} (${(pName || 'ANALOG').toUpperCase()})`,
           slope: site.planet?.slope ?? (site.earth?.slope ? Math.round(site.earth.slope * 1.05 * 10) / 10 : 12.0),
           tempK: site.planet?.tempK ?? (baseBody === 'moon' ? 250.0 : 215.0),
           pressureKpa: site.planet?.pressureKpa ?? (baseBody === 'moon' ? 0.0 : 0.6),
@@ -2771,25 +2808,53 @@
 
     // 4. Map & Layer Operations
     
+    function createPlanetPinIcon(scoreNum, bodyType, isActive) {
+      const isSub80 = scoreNum < 80;
+      // Sub-80% is cautionary amber/gold, Moon >=80% is blue/cyan, Mars >=80% is red/orange
+      const color = isSub80 ? '#eab308' : (bodyType === 'moon' ? '#0ea5e9' : '#ea580c');
+      const stroke = isActive ? '#ffffff' : 'rgba(255,255,255,0.9)';
+      const scale = isActive ? 1.25 : 1.0;
+      const glow = isActive
+        ? `filter: drop-shadow(0 0 10px ${color}) drop-shadow(0 0 4px #ffffff); transform: scale(${scale});`
+        : `filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transform: scale(${scale});`;
+
+      const svgHtml = `
+        <div style="position:relative; width:26px; height:32px; display:flex; align-items:center; justify-content:center; ${glow} transition: transform 0.2s ease;">
+          <svg width="26" height="32" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 0C5.37258 0 0 5.37258 0 12C0 19.5 12 30 12 30C12 30 24 19.5 24 12C24 5.37258 18.6274 0 12 0Z" fill="${color}" stroke="${stroke}" stroke-width="1.8"/>
+            <circle cx="12" cy="11" r="5" fill="#ffffff" opacity="${isActive ? '1' : '0.92'}"/>
+            <circle cx="12" cy="11" r="2.5" fill="${color}"/>
+          </svg>
+          ${isActive ? `<span style="position:absolute; top:-2px; left:-2px; width:30px; height:30px; border-radius:50%; border:2px solid ${color}; opacity:0.8; pointer-events:none;"></span>` : ''}
+        </div>
+      `;
+      return L.divIcon({
+        html: svgHtml,
+        className: 'custom-planet-pin',
+        iconSize: [26, 32],
+        iconAnchor: [13, 32],
+        popupAnchor: [0, -32]
+      });
+    }
+
     function renderPlanetMarkers() {
       if (!planetMap || typeof L === 'undefined') return;
       planetMarkers.forEach(m => { if (m) planetMap.removeLayer(m); });
       planetMarkers = [];
 
-      // 1. Group targets by coordinate proximity to detect overlaps/stacking
+      // Group targets by coordinate proximity to handle stations at the same physical feature
       const coordGroups = new Map();
       analogs.forEach((site, idx) => {
         ensureDualTargets(site);
         const targetData = site.targets[currentTargetBody] || site.targets.moon;
         if (!targetData || !targetData.planetCoords) return;
 
-        // Key by rounded lat, lon to detect targets sharing the same region
-        const key = `${Math.round(targetData.planetCoords[0] * 5) / 5},${Math.round(targetData.planetCoords[1] * 5) / 5}`;
+        // Group by 0.1 deg (~3km) feature boundary
+        const key = `${Math.round(targetData.planetCoords[0] * 10) / 10},${Math.round(targetData.planetCoords[1] * 10) / 10}`;
         if (!coordGroups.has(key)) coordGroups.set(key, []);
         coordGroups.get(key).push({ site, idx, targetData });
       });
 
-      // 2. Render each group: if cluster size > 1, apply clean radial spiderfy dispersal
       coordGroups.forEach((group) => {
         const isCluster = group.length > 1;
 
@@ -2801,33 +2866,45 @@
           const isActive = (idx === currentIndex);
           const isMoon = currentTargetBody === 'moon';
 
-          // Disperse coordinates radially so markers never stack
+          // Realistic traverse sub-station offsets within the feature boundary (< 0.12 deg, no artificial circle)
           let renderCoords = [targetData.planetCoords[0], targetData.planetCoords[1]];
           if (isCluster) {
-            const angle = (2 * Math.PI * clusterIdx) / group.length;
-            const rOffset = 1.35; // degrees visual offset
+            const row = Math.floor(clusterIdx / 3);
+            const col = (clusterIdx % 3) - 1;
             const cosLat = Math.max(0.15, Math.cos(targetData.planetCoords[0] * Math.PI / 180));
-            renderCoords[0] += rOffset * Math.sin(angle);
-            renderCoords[1] += (rOffset * Math.cos(angle)) / cosLat;
+            renderCoords[0] += row * 0.10;
+            renderCoords[1] += (col * 0.12) / cosLat;
           }
 
           const cleanTargetName = (targetData.planetSiteName || 'Target').replace(/\s*\((Moon|Mars)\)/i, '');
           const tipClass = `site-tooltip ${isMoon ? 'moon-tip' : 'mars-tip'} ${isSub80 ? 'sub80-tip' : ''} ${isActive ? 'active-target-tip' : ''}`;
 
           const clusterNote = isCluster
-            ? `<div style="font-size:10px; color:#64748b; margin-top:2px;">Station ${clusterIdx + 1} of ${group.length} in this target cluster</div>`
+            ? `<div style="font-size:10px; color:#64748b; margin-top:2px;">Station ${clusterIdx + 1} of ${group.length} at this feature</div>`
             : '';
 
-          const marker = L.marker(renderCoords)
-            .bindTooltip(`${idx + 1}. ${cleanTargetName}`, {
-              permanent: true,
+          let otherSitesHtml = '';
+          if (isCluster) {
+            const others = group.filter(g => g.idx !== idx).map(g => {
+              const om = computeMetrics(g.site, currentTargetBody);
+              return `<a href="javascript:void(0)" onclick="selectSite(${g.idx}, false, '${currentTargetBody}');" style="color:#0284c7; text-decoration:none; font-size:11px; display:inline-block; margin-right:6px;">• ${g.site.name} (${om.esi}%)</a>`;
+            }).join(' ');
+            otherSitesHtml = `<div style="margin-top:6px; padding-top:4px; border-top:1px dashed #cbd5e1; font-size:10px; color:#64748b;">Other testbeds at this feature:<br/>${others}</div>`;
+          }
+
+          const pinIcon = createPlanetPinIcon(scoreNum, currentTargetBody, isActive);
+
+          const marker = L.marker(renderCoords, { icon: pinIcon, zIndexOffset: isActive ? 1000 : 0 })
+            .bindTooltip(`${idx + 1}. ${cleanTargetName} (${m.esi}%)`, {
+              permanent: isActive, // Only active target is permanent; other pins cleanly show on hover
+              sticky: true,
               direction: 'top',
               className: tipClass,
-              offset: [0, -10]
+              offset: [0, -14]
             })
             .bindPopup(`
-              <div style="font-family:'Segoe UI',system-ui,sans-serif; min-width:200px; color:#0f172a; padding:2px;">
-                <div style="font-size:10px; font-weight:800; color:${isMoon ? '#0284c7' : '#ea580c'}; text-transform:uppercase; letter-spacing:0.5px;">
+              <div style="font-family:'Segoe UI',system-ui,sans-serif; min-width:210px; color:#0f172a; padding:2px;">
+                <div style="font-size:10px; font-weight:800; color:${isSub80 ? '#b45309' : (isMoon ? '#0284c7' : '#ea580c')}; text-transform:uppercase; letter-spacing:0.5px;">
                   ${isMoon ? '🌑 NASA LUNAR WAYPOINT' : '🔴 NASA MARTIAN WAYPOINT'}
                 </div>
                 <div style="font-size:13px; font-weight:700; margin:2px 0 2px 0;">
@@ -2838,8 +2915,9 @@
                 </div>
                 ${clusterNote}
                 <div style="font-size:11px; margin-top:4px; font-weight:700; color:${isSub80 ? '#b45309' : '#047857'}; background:${isSub80 ? '#fef3c7' : '#d1fae5'}; padding:2px 6px; border-radius:4px; display:inline-block;">
-                  Similarity: ${m.esi}% ${isSub80 ? '(Caution: <80%)' : '✓'}
+                  Similarity: ${m.esi}% ${isSub80 ? '(Caution: <80%)' : '✓ High Match'}
                 </div>
+                ${otherSitesHtml}
               </div>
             `)
             .on('click', () => {
@@ -3869,6 +3947,9 @@
       if (!supabaseClient) return;
       try {
         setCloudStatus('syncing', 'Saving to Cloud...');
+        const bType = site.bodyType || 'moon';
+        ensureDualTargets(site);
+        const primaryT = (site.targets && site.targets[bType]) ? site.targets[bType] : (site.targets?.moon || site.planet || {});
         const row = {
           id: site.id,
           name_vi: site.name,
@@ -3877,16 +3958,16 @@
           is_vietnam: !!site.isVietnam,
           is_baseline: !!site.isBaseline,
           is_custom: true,
-          body_type: site.bodyType || 'moon',
+          body_type: bType,
           earth_lat: site.earthCoords[0],
           earth_lon: site.earthCoords[1],
           earth_zoom: site.earthZoom || 11,
-          planet_lat: site.planetCoords[0],
-          planet_lon: site.planetCoords[1],
-          planet_zoom: site.planetZoom || 7,
-          planet_site_name: site.planetSiteName || site.target,
-          target_vi: site.target,
-          target_en: site.target,
+          planet_lat: primaryT.planetCoords ? primaryT.planetCoords[0] : (site.planetCoords ? site.planetCoords[0] : 14.0),
+          planet_lon: primaryT.planetCoords ? primaryT.planetCoords[1] : (site.planetCoords ? site.planetCoords[1] : -56.0),
+          planet_zoom: primaryT.planetZoom || site.planetZoom || 7,
+          planet_site_name: primaryT.planetSiteName || site.planetSiteName || 'Target Body',
+          target_vi: primaryT.target || site.target,
+          target_en: primaryT.target || site.target,
           mineral_score: site.earth.mineralScore || 0.85,
           earth_mineral: site.earth.mineralText || '',
           planet_mineral: site.planet.mineralText || '',
