@@ -743,16 +743,79 @@
         <button class="close-modal" onclick="closeAddModal()">✕</button>
       </div>
 
-      <!-- Quick Sample Templates for Students & NASA CSV -->
-      <div class="quick-fill-bar">
-        <span style="font-size: 11px; color: #e9d5ff; font-weight: 700;">⚡ Mẫu Nhanh:</span>
-        <button type="button" class="quick-fill-btn" onclick="fillTemplate('chudangya')">🇻🇳 Núi lửa Chư Đăng Ya (Moon)</button>
-        <button type="button" class="quick-fill-btn" onclick="fillTemplate('muine')">🇻🇳 Đồi cát Mũi Né (Mars)</button>
-        <button type="button" class="quick-fill-btn" onclick="fillTemplate('lyson')">🇻🇳 Đảo Lý Sơn (Moon)</button>
-        <button type="button" class="quick-fill-btn" style="border-color: #0284c7; color: #7dd3fc; background: rgba(14, 165, 233, 0.15);" onclick="document.getElementById('nasa-csv-input').click()">📂 Tải file CSV NASA POWER</button>
+      <!-- NASA POWER CSV DROP ZONE — Primary entry point -->
+      <div class="modal-csv-drop-zone" id="csv-drop-zone"
+           onclick="document.getElementById('nasa-csv-input').click()"
+           ondragover="event.preventDefault(); this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleCsvDrop(event)">
+        <div class="drop-icon">🛰️</div>
+        <div class="drop-title">Thả file CSV NASA POWER vào đây</div>
+        <div class="drop-sub">hoặc bấm để chọn file — Tất cả còn lại sẽ tự động điền</div>
         <input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">
       </div>
-      <div id="m-csv-status" style="display:none; font-size:11.5px; padding:7px 10px; margin-bottom:12px; border-radius:6px; background:rgba(16, 185, 129, 0.16); border:1px solid #10b981; color:#34d399; line-height:1.4;"></div>
+
+      <!-- Auto-Match Result Card (shown after CSV parsed) -->
+      <div id="auto-match-card">
+        <div class="match-header">
+          <span class="match-badge">🤖 AI Auto-Match</span>
+          <span class="match-title" id="match-site-name">—</span>
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">Điểm ESI Dự Báo</div>
+            <div class="match-esi-big" id="match-esi-display">—</div>
+          </div>
+          <div class="match-planet-row" style="flex:1;">
+            <div class="match-planet-icon" id="match-planet-icon">🌑</div>
+            <div class="match-planet-info">
+              <div class="match-planet-name" id="match-planet-name">—</div>
+              <div class="match-planet-params" id="match-planet-params">—</div>
+            </div>
+            <div class="match-confidence">
+              <div style="font-size:9.5px; color:#64748b; font-weight:700;">Độ Khớp</div>
+              <div style="font-size:14px; font-weight:800; color:#38bdf8;" id="match-conf-pct">—</div>
+              <div class="match-confidence-bar"><div class="match-confidence-fill" id="match-conf-bar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="match-grid">
+          <div class="match-cell">
+            <div class="match-cell-label">📍 Tọa Độ Trái Đất</div>
+            <div class="match-cell-value highlight" id="match-earth-coords">—</div>
+          </div>
+          <div class="match-cell">
+            <div class="match-cell-label">🌡️ Nhiệt Độ TB (Kelvin)</div>
+            <div class="match-cell-value highlight" id="match-earth-temp">—</div>
+          </div>
+          <div class="match-cell">
+            <div class="match-cell-label">🌬️ Áp Suất TB (kPa)</div>
+            <div class="match-cell-value highlight" id="match-earth-press">—</div>
+          </div>
+          <div class="match-cell">
+            <div class="match-cell-label">🧪 Điểm Khoáng Vật (Auto)</div>
+            <div class="match-cell-value highlight" id="match-mineral">—</div>
+          </div>
+        </div>
+        <div class="match-reason" id="match-reason">—</div>
+        <button class="btn-accept-match" onclick="acceptAutoMatch()">
+          ✅ Xác Nhận &amp; Lưu Lên Supabase Ngay
+        </button>
+        <div style="text-align:center; margin-top:6px;">
+          <button type="button" onclick="showManualForm()" style="background:none; border:none; color:#64748b; font-size:11px; cursor:pointer; text-decoration:underline;">
+            Chỉnh sửa thủ công thay thế ▼
+          </button>
+        </div>
+      </div>
+
+      <!-- Legacy Quick Fill (collapsed by default after redesign) -->
+      <div id="manual-templates-bar" style="display:none;" class="quick-fill-bar">
+        <span style="font-size: 11px; color: #e9d5ff; font-weight: 700;">⚡ Mẫu Nhanh:</span>
+        <button type="button" class="quick-fill-btn" onclick="fillTemplate('chudangya')">🇻🇳 Chư Đăng Ya (Moon)</button>
+        <button type="button" class="quick-fill-btn" onclick="fillTemplate('muine')">🇻🇳 Mũi Né (Mars)</button>
+        <button type="button" class="quick-fill-btn" onclick="fillTemplate('lyson')">🇻🇳 Lý Sơn (Moon)</button>
+      </div>
+      <div id="m-csv-status" style="display:none;"></div>
 
             <!-- Live ESI Preview Card in Studio Modal -->
       <div class="modal-live-card">
@@ -2258,85 +2321,234 @@
       } catch (e) {}
     }
 
-    // 8. NASA POWER CSV Auto-Uploader & Auto-Fill
+    // ================================================================
+    // 8. PLANET TARGET LIBRARY — NASA-verified parameters for 15 targets
+    // ================================================================
+    const PLANET_TARGETS = [
+      { id: 'marius_hills', name: 'Marius Hills (Moon)', body: 'moon', icon: '🌑', lat: 14.0, lon: -56.0, zoom: 7, tempK: 253, pressKpa: 0.0, slope: 9.5, mineralEarth: 'Basalt, Lava Tube Minerals, Regolith', mineralPlanet: 'Mare Basalt (FeO 17%), Volcanic Regolith', targetVi: 'MẶT TRĂNG (MARIUS HILLS)', targetEn: 'MOON (MARIUS HILLS)', geoTypes: ['volcanic', 'basaltic', 'lava_tube', 'tropical'], description: 'Mare basalt plain with lava tube skylights' },
+      { id: 'aristarchus', name: 'Aristarchus Plateau (Moon)', body: 'moon', icon: '🌑', lat: 23.7, lon: -47.4, zoom: 7, tempK: 250, pressKpa: 0.0, slope: 18.0, mineralEarth: 'Pyroclastic Basalt, Volcanic Tuff', mineralPlanet: 'Pyroclastic Glass, Mare Basalt', targetVi: 'MẶT TRĂNG (ARISTARCHUS)', targetEn: 'MOON (ARISTARCHUS)', geoTypes: ['volcanic', 'pyroclastic', 'island'], description: 'Pyroclastic plateau matching volcanic island geology' },
+      { id: 'hadley_rille', name: 'Hadley Rille – Apollo 15 (Moon)', body: 'moon', icon: '🌑', lat: 26.1, lon: 3.6, zoom: 7, tempK: 253, pressKpa: 0.0, slope: 14.0, mineralEarth: 'Basalt, Scoria, Tephra', mineralPlanet: 'Mare Basalt, Hadley Scoria', targetVi: 'MẶT TRĂNG (HADLEY RILLE)', targetEn: 'MOON (HADLEY RILLE)', geoTypes: ['volcanic', 'basaltic', 'tropical', 'highland'], description: 'Sinuous lava rille — classic volcanic terrain analog' },
+      { id: 'taurus_littrow', name: 'Taurus-Littrow – Apollo 17 (Moon)', body: 'moon', icon: '🌑', lat: 20.19, lon: 30.77, zoom: 7, tempK: 250, pressKpa: 0.0, slope: 15.0, mineralEarth: 'Basalt, Tholeiite, Young Lava Flows', mineralPlanet: 'Tholeiitic Basalt, Regolith', targetVi: 'MẶT TRĂNG (TAURUS-LITTROW)', targetEn: 'MOON (TAURUS-LITTROW)', geoTypes: ['volcanic', 'basaltic', 'subpolar', 'temperate'], description: 'Apollo 17 landing site — dark mantle deposits' },
+      { id: 'shackleton', name: 'Shackleton Crater (Moon South Pole)', body: 'moon', icon: '🌑', lat: -89.9, lon: 0.0, zoom: 6, tempK: 100, pressKpa: 0.0, slope: 30.0, mineralEarth: 'Ice, Permafrost, Basalt', mineralPlanet: 'Water Ice, Regolith', targetVi: 'MẶT TRĂNG (CỰC NAM)', targetEn: 'MOON (SOUTH POLE)', geoTypes: ['polar', 'ice', 'permafrost'], description: 'Polar shadowed crater matching Arctic environments' },
+      { id: 'jezero', name: 'Jezero Crater (Mars)', body: 'mars', icon: '🔴', lat: 18.38, lon: 77.58, zoom: 7, tempK: 215, pressKpa: 0.86, slope: 10.0, mineralEarth: 'Impact Basalt, Clay Minerals, Carbonates', mineralPlanet: 'Smectite Clay, Basalt, Carbonates', targetVi: 'SAO HỎA (HỐ JEZERO)', targetEn: 'MARS (JEZERO CRATER)', geoTypes: ['impact', 'lacustrine', 'basaltic', 'tropical'], description: 'Ancient lake delta crater — hydrothermal alteration analog' },
+      { id: 'gale', name: 'Gale Crater – Curiosity (Mars)', body: 'mars', icon: '🔴', lat: -5.4, lon: 137.8, zoom: 7, tempK: 207, pressKpa: 0.86, slope: 15.0, mineralEarth: 'Sandstone, Silicates, Iron Oxides, Dunes', mineralPlanet: 'Basaltic Sandstone, Sulfates, Iron Oxides', targetVi: 'SAO HỎA (MIỆNG GALE)', targetEn: 'MARS (GALE CRATER)', geoTypes: ['desert', 'arid', 'dunes', 'sedimentary'], description: 'Stratified sedimentary crater — arid desert analog' },
+      { id: 'arsia_mons', name: 'Arsia Mons Skylights (Mars)', body: 'mars', icon: '🔴', lat: -11.5, lon: -121.0, zoom: 7, tempK: 195, pressKpa: 0.6, slope: 15.0, mineralEarth: 'Basalt, Volcanic Ash, Lava Tubes', mineralPlanet: 'Martian Basalt, Lava Tube Minerals', targetVi: 'SAO HỎA (ARSIA MONS)', targetEn: 'MARS (ARSIA MONS)', geoTypes: ['volcanic', 'lava_tube', 'basaltic', 'island'], description: 'Martian shield volcano with lava tube pit chains' },
+      { id: 'elysium', name: 'Elysium Planitia (Mars)', body: 'mars', icon: '🔴', lat: 4.5, lon: 135.6, zoom: 7, tempK: 215, pressKpa: 0.7, slope: 5.0, mineralEarth: 'Desert Pavement, Silicates, Iron Oxides', mineralPlanet: 'Basaltic Plains, Iron Oxides, Dust', targetVi: 'SAO HỎA (ELYSIUM)', targetEn: 'MARS (ELYSIUM PLANITIA)', geoTypes: ['arid', 'desert', 'flat', 'perchlorate'], description: 'Young basaltic plain — flat arid desert analog' },
+      { id: 'columbia_hills', name: 'Columbia Hills – Gusev (Mars)', body: 'mars', icon: '🔴', lat: -14.5, lon: 175.4, zoom: 7, tempK: 220, pressKpa: 0.85, slope: 12.0, mineralEarth: 'Impact Breccia, Jarosite, Sulfates', mineralPlanet: 'Jarosite, Goethite, Altered Basalt', targetVi: 'SAO HỎA (COLUMBIA HILLS)', targetEn: 'MARS (COLUMBIA HILLS)', geoTypes: ['impact', 'hydrothermal', 'acidic', 'geothermal'], description: 'Hydrothermal alteration zone — acidic geothermal analog' },
+      { id: 'valles_marineris', name: 'Valles Marineris (Mars)', body: 'mars', icon: '🔴', lat: -14.0, lon: -59.0, zoom: 6, tempK: 213, pressKpa: 0.9, slope: 25.0, mineralEarth: 'Layered Sediments, Clays, Sulfates', mineralPlanet: 'Layered Phyllosilicates, Sulfates', targetVi: 'SAO HỎA (VALLES MARINERIS)', targetEn: 'MARS (VALLES MARINERIS)', geoTypes: ['canyon', 'sedimentary', 'arid', 'evaporite'], description: 'Grand canyon of Mars — deep canyon sedimentary geology' },
+      { id: 'olympus_mons', name: 'Olympus Mons (Mars)', body: 'mars', icon: '🔴', lat: 18.65, lon: -133.8, zoom: 6, tempK: 180, pressKpa: 0.3, slope: 5.0, mineralEarth: 'Shield Volcano Basalt, High-Altitude Lava', mineralPlanet: 'Shield Basalt, Ash Deposits', targetVi: 'SAO HỎA (OLYMPUS MONS)', targetEn: 'MARS (OLYMPUS MONS)', geoTypes: ['volcanic', 'highland', 'shield', 'cold'], description: 'Largest shield volcano — high-altitude shield analog' },
+      { id: 'hellas', name: 'Hellas Planitia (Mars)', body: 'mars', icon: '🔴', lat: -40.0, lon: 70.0, zoom: 6, tempK: 230, pressKpa: 1.2, slope: 8.0, mineralEarth: 'Evaporites, Salts, Lacustrine Sediments', mineralPlanet: 'Salt Flats, Evaporites, Dust', targetVi: 'SAO HỎA (HELLAS)', targetEn: 'MARS (HELLAS BASIN)', geoTypes: ['salt_lake', 'evaporite', 'basin', 'lacustrine'], description: 'Deepest basin on Mars — salt lake and evaporite analog' }
+    ];
+
+    // ================================================================
+    // GEO-CLASSIFIER: Earth lat/lon → geology type tags
+    // ================================================================
+    function geoClassify(lat, lon) {
+      const types = [];
+      if (Math.abs(lat) > 65) types.push('polar', 'ice', 'permafrost');
+      else if (Math.abs(lat) > 55) types.push('subpolar', 'temperate');
+      if (Math.abs(lat) < 25) types.push('tropical');
+      else if (Math.abs(lat) < 45) types.push('temperate');
+
+      const volcZones = [
+        { la: [60, 68], lo: [-25, -12] }, { la: [18, 23], lo: [-160, -154] },
+        { la: [37, 44], lo: [12, 16] },   { la: [12, 16], lo: [107, 109] },
+        { la: [-8, 2], lo: [107, 116] },  { la: [38, 42], lo: [-3, 2] },
+        { la: [25, 32], lo: [-19, -12] }, { la: [51, 58], lo: [157, 163] },
+        { la: [14, 16], lo: [38, 42] }
+      ];
+      for (const z of volcZones) {
+        if (lat >= z.la[0] && lat <= z.la[1] && lon >= z.lo[0] && lon <= z.lo[1]) { types.push('volcanic', 'basaltic'); break; }
+      }
+      const aridZones = [
+        { la: [-35, 25], lo: [-20, 55] }, { la: [-35, -15], lo: [-75, -65] },
+        { la: [35, 42], lo: [88, 100] },  { la: [19, 30], lo: [45, 60] },
+        { la: [32, 38], lo: [-118, -105] }, { la: [-26, -20], lo: [15, 25] }
+      ];
+      for (const z of aridZones) {
+        if (lat >= z.la[0] && lat <= z.la[1] && lon >= z.lo[0] && lon <= z.lo[1]) { types.push('arid', 'desert'); break; }
+      }
+      const impactZones = [{ la: [19, 21], lo: [75, 78] }, { la: [34, 36], lo: [-112, -110] }];
+      for (const z of impactZones) {
+        if (lat >= z.la[0] && lat <= z.la[1] && lon >= z.lo[0] && lon <= z.lo[1]) { types.push('impact', 'basaltic'); break; }
+      }
+      const saltZones = [
+        { la: [-26, -18], lo: [-70, -63] }, { la: [33, 35], lo: [7, 10] }
+      ];
+      for (const z of saltZones) {
+        if (lat >= z.la[0] && lat <= z.la[1] && lon >= z.lo[0] && lon <= z.lo[1]) { types.push('salt_lake', 'evaporite', 'lacustrine'); break; }
+      }
+      if (types.length === 0) types.push('temperate', 'sedimentary');
+      return [...new Set(types)];
+    }
+
+    // ================================================================
+    // AUTO-MATCHER: Run ESI matching across all 13 planet targets
+    // ================================================================
+    function autoMatchPlanet(earthTempK, earthPressKpa, earthLat, earthLon) {
+      const geoTypes = geoClassify(earthLat, earthLon);
+      let bestMatch = null, bestScore = -1;
+
+      PLANET_TARGETS.forEach(target => {
+        const sTemp = Math.max(0, 1 - Math.abs(earthTempK - target.tempK) / (earthTempK + target.tempK));
+        const overlap = geoTypes.filter(t => target.geoTypes.includes(t)).length;
+        const geoScore = Math.min(1.0, 0.65 + overlap * 0.12);
+        const latDiff = Math.abs(Math.abs(earthLat) - Math.abs(target.lat));
+        const latScore = Math.max(0.3, 1 - latDiff / 90);
+        const minScore = Math.min(0.97, geoScore * 0.9 + (overlap > 0 ? 0.05 : 0));
+        const combined = sTemp * 0.45 + geoScore * 0.35 + latScore * 0.20;
+
+        if (combined > bestScore) {
+          bestScore = combined;
+          bestMatch = { ...target, mineralScore: parseFloat(minScore.toFixed(2)), matchScore: parseFloat(combined.toFixed(3)), geoTypes };
+        }
+      });
+      return bestMatch;
+    }
+
+    function getRegionName(lat, lon) {
+      if (Math.abs(lat) > 65) return lat > 0 ? 'Arctic' : 'Antarctic';
+      if (lon > 100 && lon < 150 && lat > 10 && lat < 55) return 'East Asia';
+      if (lon > 95 && lon < 110 && lat > 8 && lat < 23) return 'Southeast Asia';
+      if (lon > 60 && lon < 100 && lat > 8 && lat < 35) return 'South Asia';
+      if (lon > -20 && lon < 55 && lat > -10 && lat < 40) return 'Africa / Mid-East';
+      if (lon > -15 && lon < 45 && lat > 35 && lat < 72) return 'Europe';
+      if (lon > -170 && lon < -50 && lat > 15 && lat < 72) return 'North America';
+      if (lon > -82 && lon < -34 && lat > -55 && lat < 15) return 'South America';
+      if (lon > 110 && lon < 155 && lat > -45 && lat < -10) return 'Australia';
+      return 'Remote Region';
+    }
+
+    let _pendingAutoMatch = null;
+
+    function handleCsvDrop(event) {
+      event.preventDefault();
+      document.getElementById('csv-drop-zone').classList.remove('drag-over');
+      const file = event.dataTransfer?.files?.[0];
+      if (file && file.name.endsWith('.csv')) handleModalNasaCsv({ target: { files: [file] } });
+    }
+
+    // ================================================================
+    // MAIN CSV HANDLER — FULLY AUTOMATIC
+    // ================================================================
     function handleModalNasaCsv(e) {
       const file = e.target.files[0];
       if (!file) return;
+
+      const dropZone = document.getElementById('csv-drop-zone');
+      if (dropZone) dropZone.innerHTML = `<div style="font-size:24px;">⏳</div><div style="font-size:13px; color:#38bdf8; font-weight:700;">Processing NASA POWER file...</div>`;
+
       const reader = new FileReader();
       reader.onload = function(evt) {
         const text = evt.target.result;
-        const latMatch = text.match(/latitude\s+([-\d.]+)/i);
-        const lonMatch = text.match(/longitude\s+([-\d.]+)/i);
-        if (latMatch) document.getElementById('inp-elat').value = parseFloat(latMatch[1]).toFixed(4);
-        if (lonMatch) document.getElementById('inp-elon').value = parseFloat(lonMatch[1]).toFixed(4);
+        const latMatch = text.match(/Latitude[^0-9-]*([0-9.-]+)/i);
+        const lonMatch = text.match(/Longitude[^0-9-]*(-?[0-9.]+)/i);
+        const earthLat = latMatch ? parseFloat(latMatch[1]) : 0;
+        const earthLon = lonMatch ? parseFloat(lonMatch[1]) : 0;
 
-        const lines = text.split(/\r?\n/);
+        const lines = text.split(String.fromCharCode(10));
+
+
         let headerIdx = -1;
         for (let i = 0; i < lines.length; i++) {
-          if (lines[i].includes('YEAR') && lines[i].includes('T2M')) {
-            headerIdx = i;
-            break;
-          }
+          if (lines[i].includes('YEAR') && lines[i].includes('T2M')) { headerIdx = i; break; }
         }
 
+        let meanT2m = 23.5, meanPs = 96.0, t2mCnt = 0, psCnt = 0;
         if (headerIdx !== -1) {
           const headers = lines[headerIdx].split(',').map(s => s.trim());
-          const t2mIdx = headers.indexOf('T2M');
-          const psIdx = headers.indexOf('PS');
-          const rangeIdx = headers.indexOf('T2M_RANGE');
-
-          let t2mSum = 0, t2mCnt = 0;
-          let rangeSum = 0, rangeCnt = 0;
-
-          let psSum = 0, psCnt = 0;
-
+          const t2mIdx = headers.indexOf('T2M'), psIdx = headers.indexOf('PS');
+          let t2mSum = 0, psSum = 0;
           for (let i = headerIdx + 1; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
-            const cols = line.split(',');
-            if (t2mIdx !== -1 && cols[t2mIdx] !== undefined) {
-              const val = parseFloat(cols[t2mIdx]);
-              if (!isNaN(val) && val > -900) { t2mSum += val; t2mCnt++; }
-            }
-            if (psIdx !== -1 && cols[psIdx] !== undefined) {
-              const val = parseFloat(cols[psIdx]);
-              if (!isNaN(val) && val > 0) { psSum += val; psCnt++; }
-            }
+            const cols = lines[i].trim().split(',');
+            if (t2mIdx !== -1 && cols[t2mIdx]) { const v = parseFloat(cols[t2mIdx]); if (!isNaN(v) && v > -900) { t2mSum += v; t2mCnt++; } }
+            if (psIdx !== -1 && cols[psIdx]) { const v = parseFloat(cols[psIdx]); if (!isNaN(v) && v > 0) { psSum += v; psCnt++; } }
           }
-
-          let meanT2m = 23.5, meanPs = 96.0;
           if (t2mCnt > 0) meanT2m = t2mSum / t2mCnt;
           if (psCnt > 0) meanPs = psSum / psCnt;
-
-          const tempKelvin = (meanT2m + 273.15).toFixed(1);
-
-          document.getElementById('inp-minscore').value = "0.88";
-          document.getElementById('inp-mintext-earth').value = "Basalt, Silicates";
-          document.getElementById('inp-mintext-planet').value = "Mare Basalt";
-          document.getElementById('inp-eslope').value = "10.0";
-          document.getElementById('inp-pslope').value = "12.0";
-          document.getElementById('inp-etemp').value = tempKelvin;
-          document.getElementById('inp-ptemp').value = "252.0";
-          document.getElementById('inp-epress').value = meanPs.toFixed(1);
-          document.getElementById('inp-ppress').value = "0.0";
-
-          const nextNum = analogs.length + 1;
-          const latVal = latMatch ? latMatch[1] : 'VN';
-          const lonVal = lonMatch ? lonMatch[1] : '';
-          document.getElementById('inp-name').value = `${nextNum}. Điểm đo NASA POWER (${latVal}, ${lonVal})`;
-          document.getElementById('inp-short').value = `🇻🇳 NASA (${latVal})`;
-
-          const statusBox = document.getElementById('m-csv-status');
-          if (statusBox) {
-            statusBox.style.display = 'block';
-            statusBox.innerHTML = `🎉 <b>Đã tự động đọc tệp NASA POWER:</b><br/>` +
-              `• Tọa độ: <b>${latVal}°N, ${lonVal}°E</b> (${t2mCnt} ngày hợp lệ)<br/>` +
-              `• Nhiệt độ TB: <b>${meanT2m.toFixed(1)}°C (${tempKelvin} K)</b> | Áp suất TB: <b>${meanPs.toFixed(1)} kPa</b><br/>` +
-              `<i>👉 Đã tự động nạp 4 thông số định lượng NASA vào biểu mẫu!</i>`;
-          }
         }
+
+        const earthTempK = parseFloat((meanT2m + 273.15).toFixed(1));
+        const earthPressKpa = parseFloat(meanPs.toFixed(1));
+        const match = autoMatchPlanet(earthTempK, earthPressKpa, earthLat, earthLon);
+        _pendingAutoMatch = { earthLat, earthLon, earthTempK, earthPressKpa, t2mCnt, match };
+
+        // Calculate preview ESI
+        const sMin = match.mineralScore;
+        const sSlope = 1 - Math.abs(10.0 - match.slope) / (10.0 + match.slope);
+        const sTemp = Math.max(0, 1 - Math.abs(earthTempK - match.tempK) / (earthTempK + match.tempK));
+        const esi = Math.pow(
+          Math.pow(Math.max(sMin, 0.0001), 1.0) * Math.pow(Math.max(sSlope, 0.0001), 1.0) * Math.pow(Math.max(sTemp, 0.0001), 0.5),
+          1 / 2.5
+        ) * 100;
+
+        const regionName = getRegionName(earthLat, earthLon);
+        const confidencePct = Math.round(match.matchScore * 100);
+
+        document.getElementById('match-site-name').innerText = `${regionName} → ${match.name}`;
+        document.getElementById('match-esi-display').innerText = `${esi.toFixed(1)}%`;
+        document.getElementById('match-planet-icon').innerText = match.icon;
+        document.getElementById('match-planet-name').innerText = match.name;
+        document.getElementById('match-planet-params').innerText = `Temp: ${match.tempK} K  |  Pressure: ${match.pressKpa} kPa  |  Slope: ${match.slope}°`;
+        document.getElementById('match-earth-coords').innerText = `${earthLat.toFixed(4)}°N, ${earthLon.toFixed(4)}°E`;
+        document.getElementById('match-earth-temp').innerText = `${meanT2m.toFixed(1)} °C → ${earthTempK} K`;
+        document.getElementById('match-earth-press').innerText = `${earthPressKpa} kPa`;
+        document.getElementById('match-mineral').innerText = `${match.mineralScore} (${match.geoTypes.slice(0, 2).join(', ')})`;
+        document.getElementById('match-conf-pct').innerText = `${confidencePct}%`;
+        document.getElementById('match-conf-bar').style.width = `${Math.min(confidencePct, 100)}%`;
+        document.getElementById('match-reason').innerText =
+          `Match reasoning: ${match.description}. Site at (${earthLat.toFixed(2)}°N, ${earthLon.toFixed(2)}°E) classified as [${match.geoTypes.join(', ')}]. Data from ${t2mCnt} daily observations via NASA MERRA-2.`;
+
+        document.getElementById('auto-match-card').style.display = 'block';
+        if (dropZone) dropZone.style.display = 'none';
       };
       reader.readAsText(file);
+    }
+
+    // ================================================================
+    // ACCEPT — Fill form + trigger save + sync to Supabase
+    // ================================================================
+    function acceptAutoMatch() {
+      if (!_pendingAutoMatch) return;
+      const { earthLat, earthLon, earthTempK, earthPressKpa, match } = _pendingAutoMatch;
+      const regionName = getRegionName(earthLat, earthLon);
+      const nextNum = analogs.length + 1;
+
+      document.getElementById('inp-name').value = `${nextNum}. NASA POWER – ${regionName} (${earthLat.toFixed(2)}°N, ${earthLon.toFixed(2)}°E)`;
+      document.getElementById('inp-short').value = `🛰️ ${regionName.split('/')[0].trim()}`;
+      document.getElementById('inp-elat').value = earthLat.toFixed(4);
+      document.getElementById('inp-elon').value = earthLon.toFixed(4);
+      document.getElementById('inp-body').value = match.body;
+      document.getElementById('inp-pname').value = match.name;
+      document.getElementById('inp-plat').value = match.lat;
+      document.getElementById('inp-plon').value = match.lon;
+      document.getElementById('inp-minscore').value = match.mineralScore;
+      document.getElementById('inp-mintext-earth').value = match.mineralEarth;
+      document.getElementById('inp-mintext-planet').value = match.mineralPlanet;
+      document.getElementById('inp-eslope').value = '10.0';
+      document.getElementById('inp-pslope').value = match.slope;
+      document.getElementById('inp-etemp').value = earthTempK;
+      document.getElementById('inp-ptemp').value = match.tempK;
+      document.getElementById('inp-epress').value = earthPressKpa;
+      document.getElementById('inp-ppress').value = match.pressKpa;
+      document.getElementById('inp-geology').value =
+        `NASA POWER satellite site in ${regionName}. ${match.description}. Geology classification: [${match.geoTypes.join(', ')}].`;
+      document.getElementById('inp-limits').value =
+        `Earth gravity (1g), atmospheric pressure ${earthPressKpa} kPa, and biological activity contrast with ${match.targetEn}.`;
+
+      const form = document.getElementById('custom-site-form');
+      if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+
+    function showManualForm() {
+      document.getElementById('auto-match-card').style.display = 'none';
+      document.getElementById('manual-templates-bar').style.display = 'flex';
+      const dropZone = document.getElementById('csv-drop-zone');
+      if (dropZone) {
+        dropZone.style.display = 'block';
+        dropZone.innerHTML = `<div class="drop-icon">🛰️</div><div class="drop-title">Drop NASA POWER CSV here</div><div class="drop-sub">or click to select file</div><input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleModalNasaCsv(event)">`;
+        dropZone.onclick = () => document.getElementById('nasa-csv-input')?.click();
+      }
     }
 
     // 9. App Initialization
