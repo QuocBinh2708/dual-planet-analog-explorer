@@ -2429,17 +2429,69 @@
     }
 
     // ================================================================
-    // MAIN CSV HANDLER — FULLY AUTOMATIC
+    // REVERSE GEOCODING: Lat/Lon -> Real City, Country & Flag
+    // ================================================================
+    async function reverseGeocodeLocation(lat, lon) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=en';
+        const resp = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!resp.ok) throw new Error('Geocoding response not ok');
+        const data = await resp.json();
+
+        const city = data.city || data.locality || data.principalSubdivision || '';
+        const country = data.countryName || '';
+        const countryCode = data.countryCode || '';
+
+        let flag = '🛰️';
+        if (countryCode && countryCode.length === 2) {
+          const chars = countryCode.toUpperCase().split('');
+          flag = String.fromCodePoint(127397 + chars[0].charCodeAt(0), 127397 + chars[1].charCodeAt(0));
+        }
+
+        let fullName = '';
+        if (city && country) fullName = city + ', ' + country;
+        else if (country) fullName = country;
+        else fullName = getRegionName(lat, lon);
+
+        const shortLabel = flag + ' ' + (city || country || getRegionName(lat, lon)).substring(0, 18);
+
+        return {
+          city: city || fullName,
+          country: country,
+          countryCode: countryCode,
+          flag: flag,
+          fullName: fullName,
+          shortLabel: shortLabel
+        };
+      } catch (err) {
+        console.warn('Reverse geocode fallback:', err);
+        const fallback = getRegionName(lat, lon);
+        return {
+          city: fallback,
+          country: '',
+          countryCode: '',
+          flag: '🛰️',
+          fullName: fallback,
+          shortLabel: '🛰️ ' + fallback
+        };
+      }
+    }
+
+    // ================================================================
+    // MAIN CSV HANDLER — FULLY AUTOMATIC WITH REAL LOCATION RECOGNITION
     // ================================================================
     function handleModalNasaCsv(e) {
       const file = e.target.files[0];
       if (!file) return;
 
       const dropZone = document.getElementById('csv-drop-zone');
-      if (dropZone) dropZone.innerHTML = `<div style="font-size:24px;">⏳</div><div style="font-size:13px; color:#38bdf8; font-weight:700;">Processing NASA POWER file...</div>`;
+      if (dropZone) dropZone.innerHTML = '<div style="font-size:24px;">🛰️</div><div style="font-size:13px; color:#38bdf8; font-weight:700;">Đang định danh vị trí địa lý & phân tích dữ liệu NASA...</div>';
 
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = async function(evt) {
         const text = evt.target.result;
         const latMatch = text.match(/Latitude[^0-9-]*([0-9.-]+)/i);
         const lonMatch = text.match(/Longitude[^0-9-]*(-?[0-9.]+)/i);
@@ -2447,7 +2499,6 @@
         const earthLon = lonMatch ? parseFloat(lonMatch[1]) : 0;
 
         const lines = text.split(String.fromCharCode(10));
-
 
         let headerIdx = -1;
         for (let i = 0; i < lines.length; i++) {
@@ -2471,7 +2522,10 @@
         const earthTempK = parseFloat((meanT2m + 273.15).toFixed(1));
         const earthPressKpa = parseFloat(meanPs.toFixed(1));
         const match = autoMatchPlanet(earthTempK, earthPressKpa, earthLat, earthLon);
-        _pendingAutoMatch = { earthLat, earthLon, earthTempK, earthPressKpa, t2mCnt, match };
+
+        // Fetch real geographic location name via reverse geocoding
+        const geo = await reverseGeocodeLocation(earthLat, earthLon);
+        _pendingAutoMatch = { earthLat, earthLon, earthTempK, earthPressKpa, t2mCnt, match, geo };
 
         // Calculate preview ESI
         const sMin = match.mineralScore;
@@ -2482,22 +2536,21 @@
           1 / 2.5
         ) * 100;
 
-        const regionName = getRegionName(earthLat, earthLon);
         const confidencePct = Math.round(match.matchScore * 100);
 
-        document.getElementById('match-site-name').innerText = `${regionName} → ${match.name}`;
-        document.getElementById('match-esi-display').innerText = `${esi.toFixed(1)}%`;
+        document.getElementById('match-site-name').innerText = geo.flag + ' ' + geo.fullName + ' → ' + match.name;
+        document.getElementById('match-esi-display').innerText = esi.toFixed(1) + '%';
         document.getElementById('match-planet-icon').innerText = match.icon;
         document.getElementById('match-planet-name').innerText = match.name;
-        document.getElementById('match-planet-params').innerText = `Temp: ${match.tempK} K  |  Pressure: ${match.pressKpa} kPa  |  Slope: ${match.slope}°`;
-        document.getElementById('match-earth-coords').innerText = `${earthLat.toFixed(4)}°N, ${earthLon.toFixed(4)}°E`;
-        document.getElementById('match-earth-temp').innerText = `${meanT2m.toFixed(1)} °C → ${earthTempK} K`;
-        document.getElementById('match-earth-press').innerText = `${earthPressKpa} kPa`;
-        document.getElementById('match-mineral').innerText = `${match.mineralScore} (${match.geoTypes.slice(0, 2).join(', ')})`;
-        document.getElementById('match-conf-pct').innerText = `${confidencePct}%`;
-        document.getElementById('match-conf-bar').style.width = `${Math.min(confidencePct, 100)}%`;
+        document.getElementById('match-planet-params').innerText = 'Temp: ' + match.tempK + ' K  |  Pressure: ' + match.pressKpa + ' kPa  |  Slope: ' + match.slope + '°';
+        document.getElementById('match-earth-coords').innerText = geo.flag + ' ' + geo.fullName + ' (' + earthLat.toFixed(2) + '°N, ' + earthLon.toFixed(2) + '°E)';
+        document.getElementById('match-earth-temp').innerText = meanT2m.toFixed(1) + ' °C → ' + earthTempK + ' K';
+        document.getElementById('match-earth-press').innerText = earthPressKpa + ' kPa';
+        document.getElementById('match-mineral').innerText = match.mineralScore + ' (' + match.geoTypes.slice(0, 2).join(', ') + ')';
+        document.getElementById('match-conf-pct').innerText = confidencePct + '%';
+        document.getElementById('match-conf-bar').style.width = Math.min(confidencePct, 100) + '%';
         document.getElementById('match-reason').innerText =
-          `Match reasoning: ${match.description}. Site at (${earthLat.toFixed(2)}°N, ${earthLon.toFixed(2)}°E) classified as [${match.geoTypes.join(', ')}]. Data from ${t2mCnt} daily observations via NASA MERRA-2.`;
+          'Match reasoning: ' + match.description + '. Vị trí tại ' + geo.fullName + ' được phân loại địa chất [' + match.geoTypes.join(', ') + ']. Dữ liệu từ ' + t2mCnt + ' ngày quan trắc NASA MERRA-2.';
 
         document.getElementById('auto-match-card').style.display = 'block';
         if (dropZone) dropZone.style.display = 'none';
@@ -2510,12 +2563,12 @@
     // ================================================================
     function acceptAutoMatch() {
       if (!_pendingAutoMatch) return;
-      const { earthLat, earthLon, earthTempK, earthPressKpa, match } = _pendingAutoMatch;
-      const regionName = getRegionName(earthLat, earthLon);
+      const { earthLat, earthLon, earthTempK, earthPressKpa, match, geo } = _pendingAutoMatch;
       const nextNum = analogs.length + 1;
+      const siteDisplayName = geo.city ? (nextNum + '. ' + geo.city + ' (' + (geo.country || geo.fullName) + ')') : (nextNum + '. ' + geo.fullName);
 
-      document.getElementById('inp-name').value = `${nextNum}. NASA POWER – ${regionName} (${earthLat.toFixed(2)}°N, ${earthLon.toFixed(2)}°E)`;
-      document.getElementById('inp-short').value = `🛰️ ${regionName.split('/')[0].trim()}`;
+      document.getElementById('inp-name').value = siteDisplayName;
+      document.getElementById('inp-short').value = geo.shortLabel;
       document.getElementById('inp-elat').value = earthLat.toFixed(4);
       document.getElementById('inp-elon').value = earthLon.toFixed(4);
       document.getElementById('inp-body').value = match.body;
@@ -2532,9 +2585,9 @@
       document.getElementById('inp-epress').value = earthPressKpa;
       document.getElementById('inp-ppress').value = match.pressKpa;
       document.getElementById('inp-geology').value =
-        `NASA POWER satellite site in ${regionName}. ${match.description}. Geology classification: [${match.geoTypes.join(', ')}].`;
+        'Vị trí quan trắc vệ tinh NASA POWER tại ' + geo.fullName + '. ' + match.description + '. Phân loại địa chất: [' + match.geoTypes.join(', ') + '].';
       document.getElementById('inp-limits').value =
-        `Earth gravity (1g), atmospheric pressure ${earthPressKpa} kPa, and biological activity contrast with ${match.targetEn}.`;
+        'Trọng lực Trái Đất (1g), khí quyển ' + earthPressKpa + ' kPa và sinh quyển tại ' + geo.fullName + ' khác biệt so với ' + match.targetEn + '.';
 
       const form = document.getElementById('custom-site-form');
       if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
