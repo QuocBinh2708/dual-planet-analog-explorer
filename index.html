@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KRONOS-SIM: Krông Nô Lunar Analog Mission Control (ESI-7 Multi-Criteria)</title>
+  <title>KRONOS-SIM: Planetary Analog Mission Control (NASA ESI Model)</title>
 
   <!-- Typography: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,48 +30,294 @@
       border-right: 1px solid #1e293b;
     }
 
-    /* Top Site Selection Bar */
-    .location-bar {
+    /* Top Mission Control Header Deck (Redesigned & Uncrowded) */
+    .mission-header-bar {
       position: absolute; top: 10px; left: 50px; right: 12px; z-index: 1000;
-      display: flex; gap: 6px; overflow-x: auto; flex-wrap: nowrap; align-items: center;
-      scrollbar-width: none; -webkit-overflow-scrolling: touch;
+      display: flex; gap: 8px; align-items: center; justify-content: space-between;
+      pointer-events: none;
     }
-    .location-bar::-webkit-scrollbar { display: none; }
-    .loc-btn {
-      flex-shrink: 0; white-space: nowrap;
-      background: rgba(15, 23, 42, 0.92); color: #38bdf8; border: 1px solid #0284c7;
-      padding: 5px 9px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11.5px;
-      transition: all 0.2s; backdrop-filter: blur(4px);
-    }
-    .loc-btn:hover, .loc-btn.active { background: #38bdf8; color: #090d16; border-color: #38bdf8; }
-
-    .loc-btn.global-btn { border-color: #10b981; color: #34d399; }
-    .loc-btn.global-btn:hover, .loc-btn.global-btn.active { background: #10b981; color: #090d16; border-color: #10b981; }
-
-    .loc-btn.vn-highlight { border-color: #f43f5e; color: #fda4af; }
-    .loc-btn.vn-highlight:hover, .loc-btn.vn-highlight.active { background: #f43f5e; color: #ffffff; border-color: #f43f5e; }
-
-    .loc-btn.baseline { border-color: #f59e0b; color: #fbbf24; }
-    .loc-btn.baseline:hover, .loc-btn.baseline.active { background: #f59e0b; color: #090d16; border-color: #f59e0b; }
-
-    .loc-btn.custom-site { border-color: #a855f7; color: #d8b4fe; }
-    .loc-btn.custom-site:hover, .loc-btn.custom-site.active { background: #a855f7; color: #ffffff; border-color: #a855f7; }
-
-    .loc-btn.add-btn {
-      background: linear-gradient(135deg, #7e22ce, #a855f7);
-      color: #ffffff; border: 1px solid #d8b4fe;
-      box-shadow: 0 2px 8px rgba(168, 85, 247, 0.45);
-    }
-    .loc-btn.add-btn:hover { background: #9333ea; transform: translateY(-1px); }
-
-    .loc-btn.cloud-pill {
-      border-color: #3b82f6; color: #93c5fd; cursor: default;
-      background: rgba(15, 23, 42, 0.92); display: inline-flex; align-items: center; gap: 5px;
+    .mission-selector-group, .chips-scroll-area, .action-hub-group {
+      pointer-events: auto;
     }
 
-    .loc-btn span.score-pill {
-      display: inline-block; margin-left: 4px; padding: 1px 5px; border-radius: 10px;
-      background: rgba(0, 0, 0, 0.35); font-size: 10px; font-family: 'JetBrains Mono', monospace;
+    /* Left Group: Dropdown & Navigation */
+    .mission-selector-group {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+
+    /* Site Dropdown Trigger Button */
+    .site-dropdown-container { position: relative; }
+    .site-select-btn {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #0284c7;
+      color: #f8fafc;
+      padding: 5px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 600;
+      font-size: 12px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+    }
+    .site-select-btn:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+    }
+    .site-badge-icon { font-size: 13px; }
+    .site-select-title {
+      font-weight: 700;
+      color: #38bdf8;
+      max-width: 175px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .site-select-score {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #34d399;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: bold;
+    }
+    .site-caret {
+      font-size: 9px;
+      color: #94a3b8;
+      transition: transform 0.2s;
+    }
+
+    /* Dropdown Popover Menu */
+    .site-dropdown-menu {
+      position: absolute; top: calc(100% + 6px); left: 0;
+      width: 370px; max-height: 440px;
+      background: rgba(11, 17, 32, 0.97);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.15);
+      backdrop-filter: blur(12px);
+      display: none;
+      flex-direction: column;
+      z-index: 2000;
+      overflow: hidden;
+    }
+    .site-dropdown-menu.show { display: flex; animation: dropFade 0.2s ease; }
+    @keyframes dropFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .menu-search-box {
+      padding: 8px 10px;
+      border-bottom: 1px solid #1e293b;
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .menu-search-box input {
+      width: 100%;
+      background: #090d16;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #f8fafc;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .menu-search-box input:focus { border-color: #38bdf8; }
+
+    .menu-category-tabs {
+      display: flex; gap: 4px; padding: 6px 8px;
+      border-bottom: 1px solid #1e293b;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .menu-category-tabs::-webkit-scrollbar { display: none; }
+    .cat-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #94a3b8;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .cat-tab:hover { color: #f8fafc; background: #1e293b; }
+    .cat-tab.active {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: #0284c7;
+      color: #38bdf8;
+    }
+
+    .menu-site-list {
+      overflow-y: auto; max-height: 310px;
+      padding: 4px;
+    }
+    .menu-site-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      border: 1px solid transparent;
+      margin-bottom: 2px;
+    }
+    .menu-site-item:hover {
+      background: rgba(30, 41, 59, 0.7);
+      border-color: #38bdf8;
+    }
+    .menu-site-item.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #0284c7;
+    }
+    .site-item-left {
+      display: flex; align-items: center; gap: 8px;
+      overflow: hidden;
+    }
+    .site-item-flag { font-size: 14px; }
+    .site-item-name {
+      font-size: 12px; font-weight: 600; color: #f1f5f9;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px;
+    }
+    .site-item-right {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .site-item-body {
+      font-size: 9.5px; font-weight: 700; padding: 2px 5px; border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .body-moon { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .body-mars { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); }
+
+    .site-item-esi {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+      color: #34d399; background: rgba(16, 185, 129, 0.15);
+      padding: 1px 5px; border-radius: 8px;
+    }
+
+    /* Steppers & Global Button */
+    .icon-nav-btn {
+      background: rgba(15, 23, 42, 0.92); border: 1px solid #334155;
+      color: #94a3b8; width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 10px; transition: all 0.15s;
+    }
+    .icon-nav-btn:hover { border-color: #38bdf8; color: #38bdf8; background: #1e293b; }
+
+    .btn-action-global {
+      background: rgba(15, 23, 42, 0.92); border: 1px solid #10b981;
+      color: #34d399; padding: 5px 9px; border-radius: 6px;
+      font-weight: 600; font-size: 11.5px; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-action-global:hover, .btn-action-global.active {
+      background: #10b981; color: #090d16;
+    }
+
+    /* Center Scrollable Chips */
+    .chips-scroll-area {
+      flex: 1; min-width: 0;
+      overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+      margin: 0 4px;
+    }
+    .chips-scroll-area::-webkit-scrollbar { display: none; }
+    .chips-track {
+      display: flex; gap: 5px; align-items: center; white-space: nowrap;
+    }
+    .chip-btn {
+      flex-shrink: 0;
+      background: rgba(15, 23, 42, 0.9);
+      color: #94a3b8; border: 1px solid #334155;
+      padding: 4px 8px; border-radius: 6px;
+      cursor: pointer; font-weight: 600; font-size: 11px;
+      transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .chip-btn:hover { border-color: #38bdf8; color: #38bdf8; background: #1e293b; }
+    .chip-btn.active {
+      background: #38bdf8; color: #090d16; border-color: #38bdf8; font-weight: 700;
+    }
+    .chip-btn.active .chip-pill {
+      background: rgba(0,0,0,0.3); color: #ffffff;
+    }
+    .chip-btn.vn-chip { border-color: #f43f5e; color: #fda4af; }
+    .chip-btn.vn-chip.active { background: #f43f5e; color: #ffffff; }
+    .chip-btn.base-chip { border-color: #f59e0b; color: #fbbf24; }
+    .chip-btn.base-chip.active { background: #f59e0b; color: #090d16; }
+    .chip-btn.custom-chip { border-color: #a855f7; color: #d8b4fe; }
+    .chip-btn.custom-chip.active { background: #a855f7; color: #ffffff; }
+
+    .chip-pill {
+      font-size: 10px; font-family: 'JetBrains Mono', monospace;
+      padding: 0 4px; border-radius: 8px; background: rgba(0,0,0,0.3);
+    }
+
+    /* Right Action Hub */
+    .action-hub-group {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .btn-user-input {
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #ffffff; border: 1px solid #c084fc;
+      padding: 5px 11px; border-radius: 7px;
+      font-weight: 700; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 2px 10px rgba(124, 58, 237, 0.45);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-user-input:hover {
+      background: linear-gradient(135deg, #9333ea, #3b82f6);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(147, 51, 234, 0.6);
+    }
+    .btn-sparkle { color: #fde047; font-size: 12px; }
+
+    .cloud-status-badge {
+      background: rgba(15, 23, 42, 0.92); border: 1px solid #3b82f6;
+      color: #93c5fd; padding: 5px 8px; border-radius: 6px;
+      font-size: 11px; font-weight: 600; display: inline-flex;
+      align-items: center; gap: 5px; white-space: nowrap;
+    }
+
+    /* Modal Live Calculator Card */
+    .modal-live-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #38bdf8;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .modal-live-left { display: flex; flex-direction: column; gap: 2px; }
+    .modal-live-lbl { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+    .modal-live-val { font-size: 22px; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace; }
+    .modal-live-meters { display: flex; gap: 10px; flex: 1; justify-content: flex-end; }
+    .live-meter-item { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 65px; }
+    .live-meter-item span { font-size: 9.5px; color: #cbd5e1; }
+    .live-meter-bar { width: 100%; height: 4px; background: #334155; border-radius: 2px; overflow: hidden; }
+    .live-meter-fill { height: 100%; background: #38bdf8; width: 0%; transition: width 0.2s; }
+
+    /* Map Pinning Active Toast */
+    #map-pin-toast {
+      position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+      z-index: 2500; display: none;
+      background: rgba(124, 58, 237, 0.95);
+      border: 1px solid #e9d5ff;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      align-items: center; gap: 8px;
     }
 
     /* Sub-bar for Krông Nô Caves (C7, A1, C3, C8, Chư Bluk) */
@@ -290,14 +536,62 @@
   <!-- Left Side: Synchronized Dual Map Display -->
   <div id="maps-wrapper">
     <!-- Top Interactive Location Selector -->
-    <div class="location-bar">
-      <button class="loc-btn global-btn active" id="btn-global" onclick="showGlobalOverview()">🌍 Global Overview</button>
-      <div id="btn-group" style="display: contents;"></div>
-      <button class="loc-btn add-btn" onclick="openAddModal()">➕ Thêm Điểm Mới</button>
-      <div class="loc-btn cloud-pill" id="cloud-pill" title="Supabase Cloud Synchronization">
-        <span id="cloud-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981;"></span>
-        <span id="cloud-text">Cloud Sync</span>
+    <!-- New Mission Control Header Deck -->
+    <div class="mission-header-bar">
+      <!-- 1. Left Group: Dropdown & Navigation -->
+      <div class="mission-selector-group">
+        <div class="site-dropdown-container">
+          <button class="site-select-btn" id="site-select-btn" onclick="toggleSiteDropdown(event)">
+            <span class="site-badge-icon" id="header-site-icon">🇻🇳</span>
+            <span class="site-select-title" id="header-site-title">1. Krông Nô – Chư Bluk</span>
+            <span class="site-select-score" id="header-site-score">93.3%</span>
+            <span class="site-caret" id="dropdown-caret">▼</span>
+          </button>
+
+          <!-- Dropdown Popover Menu -->
+          <div class="site-dropdown-menu" id="site-dropdown-menu">
+            <div class="menu-search-box">
+              <input type="text" id="site-search-input" placeholder="🔍 Tìm kiếm địa điểm, quốc gia, hành tinh..." oninput="filterSiteList()" />
+            </div>
+            <div class="menu-category-tabs">
+              <button class="cat-tab active" data-cat="all" onclick="filterCategory('all', this)">Tất cả (12)</button>
+              <button class="cat-tab" data-cat="moon" onclick="filterCategory('moon', this)">🌑 Mặt Trăng</button>
+              <button class="cat-tab" data-cat="mars" onclick="filterCategory('mars', this)">🔴 Sao Hỏa</button>
+              <button class="cat-tab" data-cat="vn" onclick="filterCategory('vn', this)">🇻🇳 Việt Nam</button>
+              <button class="cat-tab" data-cat="custom" onclick="filterCategory('custom', this)">🧑‍🎓 Tự Nhập</button>
+            </div>
+            <div class="menu-site-list" id="menu-site-list"></div>
+          </div>
+        </div>
+
+        <button class="icon-nav-btn" title="Điểm trước đó (Phím ◀)" onclick="stepSite(-1)">◀</button>
+        <button class="icon-nav-btn" title="Điểm tiếp theo (Phím ▶)" onclick="stepSite(1)">▶</button>
+        <button class="btn-action-global" id="btn-global" title="Xem toàn cảnh bản đồ" onclick="showGlobalOverview()">🌐 Toàn Cảnh</button>
       </div>
+
+      <!-- 2. Middle Scrollable Chips -->
+      <div class="chips-scroll-area">
+        <div id="btn-group" class="chips-track"></div>
+      </div>
+
+      <!-- 3. Fixed Right Action Hub (Always Visible!) -->
+      <div class="action-hub-group">
+        <button class="btn-user-input" id="btn-open-input" onclick="openAddModal()">
+          <span style="font-size:13px;">✍️</span>
+          <span>Tự Nhập Dữ Liệu</span>
+          <span class="btn-sparkle">✦</span>
+        </button>
+        <div class="cloud-status-badge" id="cloud-pill" title="Supabase Real-time Cloud Synchronization">
+          <span id="cloud-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981;"></span>
+          <span id="cloud-text">Cloud Sync</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Pinning Mode Notification Toast -->
+    <div id="map-pin-toast">
+      <span>📍 Đang ở chế độ chọn tọa độ: <b>Hãy nhấp vào vị trí bất kỳ trên bản đồ Trái Đất</b></span>
+      <button style="background:transparent; border:none; color:#ffffff; cursor:pointer; font-weight:bold; margin-left:8px;" onclick="cancelMapPinning()">✕</button>
     </div>
 
     <!-- Krông Nô Cave Network Subbar -->
@@ -331,7 +625,7 @@
   <!-- Right Side: Analytical Scientific Sidebar -->
   <div id="sidebar">
     <div>
-      <div class="project-banner">🚀 KRONOS-SIM: DUAL-PLANET ANALOG EXPLORER (ESI-7)</div>
+      <div class="project-banner">🚀 KRONOS-SIM: DUAL-PLANET ANALOG EXPLORER (NASA ESI MODEL)</div>
       <div class="header-top">
         <div class="badge-group">
           <span class="badge" id="target-tag">TARGET: MOON (MARIUS HILLS)</span>
@@ -445,7 +739,7 @@
   <div class="modal-overlay" id="add-modal">
     <div class="modal-box">
       <div class="modal-header">
-        <h2>🧑‍🎓 Thêm Điểm Nghiên Cứu Mới (7 Tiêu Chí ESI)</h2>
+        <h2>🚀 Planetary Analog Studio // Tự Nhập & Kiểm Thử Dữ Liệu</h2>
         <button class="close-modal" onclick="closeAddModal()">✕</button>
       </div>
 
@@ -460,6 +754,36 @@
       </div>
       <div id="m-csv-status" style="display:none; font-size:11.5px; padding:7px 10px; margin-bottom:12px; border-radius:6px; background:rgba(16, 185, 129, 0.16); border:1px solid #10b981; color:#34d399; line-height:1.4;"></div>
 
+            <!-- Live ESI Preview Card in Studio Modal -->
+      <div class="modal-live-card">
+        <div class="modal-live-left">
+          <div class="modal-live-lbl">Dự Báo ESI Trực Tiếp (Schulze-Makuch)</div>
+          <div class="modal-live-val" id="modal-live-esi">88.5%</div>
+        </div>
+        <div class="modal-live-meters">
+          <div class="live-meter-item">
+            <span>Khoáng vật</span>
+            <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-min" style="width:88%;"></div></div>
+            <span id="meter-val-min">88%</span>
+          </div>
+          <div class="live-meter-item">
+            <span>Độ dốc</span>
+            <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-slope" style="width:92%; background:#34d399;"></div></div>
+            <span id="meter-val-slope">92%</span>
+          </div>
+          <div class="live-meter-item">
+            <span>Nhiệt độ</span>
+            <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-temp" style="width:92%; background:#fbbf24;"></div></div>
+            <span id="meter-val-temp">92%</span>
+          </div>
+          <div class="live-meter-item">
+            <span>Áp suất</span>
+            <div class="live-meter-bar"><div class="live-meter-fill" id="meter-fill-press" style="width:0%; background:#f43f5e;"></div></div>
+            <span id="meter-val-press">0.0%</span>
+          </div>
+        </div>
+      </div>
+
       <form id="custom-site-form" onsubmit="saveCustomSite(event)">
         <div class="form-grid">
           <div class="form-section-title">1. Thông Tin Điểm Trên Trái Đất</div>
@@ -472,12 +796,15 @@
             <input type="text" id="inp-short" required placeholder="🇻🇳 Chư Đăng Ya" />
           </div>
           <div class="form-group">
-            <label>Vĩ Độ Trái Đất (Latitude)</label>
-            <input type="number" step="any" id="inp-elat" required placeholder="14.113" />
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label>Vĩ Độ Trái Đất (Latitude)</label>
+              <button type="button" style="background:#1e293b; border:1px solid #38bdf8; color:#7dd3fc; border-radius:4px; padding:1px 6px; font-size:10px; cursor:pointer;" onclick="startMapPinning()">📍 Chọn Trên Bản Đồ</button>
+            </div>
+            <input type="number" step="any" id="inp-elat" required placeholder="14.113" oninput="updateModalLiveEsi()" />
           </div>
           <div class="form-group">
             <label>Kinh Độ Trái Đất (Longitude)</label>
-            <input type="number" step="any" id="inp-elon" required placeholder="108.027" />
+            <input type="number" step="any" id="inp-elon" required placeholder="108.027" oninput="updateModalLiveEsi()" />
           </div>
 
           <div class="form-section-title">2. Hành Tinh Mục Tiêu (Moon / Mars)</div>
@@ -504,7 +831,7 @@
           <div class="form-section-title">3. Quantitative Parameters (NASA Datasets)</div>
           <div class="form-group">
             <label>Mineralogy Similarity Score (0.0 – 1.0)</label>
-            <input type="number" step="0.01" min="0" max="1" id="inp-minscore" required value="0.88" />
+            <input type="number" step="0.01" min="0" max="1" id="inp-minscore" required value="0.88" oninput="updateModalLiveEsi()" />
           </div>
           <div class="form-group">
             <label>Earth vs Target Mineralogy Text</label>
@@ -516,22 +843,22 @@
           <div class="form-group">
             <label>Topographic Slope (°) - Earth / Target Body</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" min="0" max="90" id="inp-eslope" required placeholder="Trái Đất (12.0°)" />
-              <input type="number" step="0.1" min="0" max="90" id="inp-pslope" required placeholder="Mục tiêu (14.0°)" />
+              <input type="number" step="0.1" min="0" max="90" id="inp-eslope" oninput="updateModalLiveEsi()" required placeholder="Trái Đất (12.0°)" />
+              <input type="number" step="0.1" min="0" max="90" id="inp-pslope" oninput="updateModalLiveEsi()" required placeholder="Mục tiêu (14.0°)" />
             </div>
           </div>
           <div class="form-group">
             <label>Surface Temperature (K) - Earth / Target Body</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" min="50" max="500" id="inp-etemp" required placeholder="Trái Đất (295.0 K)" />
-              <input type="number" step="0.1" min="50" max="500" id="inp-ptemp" required placeholder="Mục tiêu (252.0 K)" />
+              <input type="number" step="0.1" min="50" max="500" id="inp-etemp" oninput="updateModalLiveEsi()" required placeholder="Trái Đất (295.0 K)" />
+              <input type="number" step="0.1" min="50" max="500" id="inp-ptemp" oninput="updateModalLiveEsi()" required placeholder="Mục tiêu (252.0 K)" />
             </div>
           </div>
           <div class="form-group">
             <label>Atmospheric Pressure (kPa) - Earth / Target Body</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" min="0" max="200" id="inp-epress" required placeholder="Trái Đất (95.0 kPa)" />
-              <input type="number" step="0.1" min="0" max="200" id="inp-ppress" required placeholder="Mục tiêu (0.0 kPa)" />
+              <input type="number" step="0.1" min="0" max="200" id="inp-epress" oninput="updateModalLiveEsi()" required placeholder="Trái Đất (95.0 kPa)" />
+              <input type="number" step="0.1" min="0" max="200" id="inp-ppress" oninput="updateModalLiveEsi()" required placeholder="Mục tiêu (0.0 kPa)" />
             </div>
           </div>
 
@@ -1198,7 +1525,23 @@
         const m = computeMetrics(site);
         const pill = document.getElementById(`pill-${idx}`);
         if (pill) pill.innerText = `${m.esi}%`;
+        const ddPill = document.getElementById(`dd-pill-${idx}`);
+        if (ddPill) ddPill.innerText = `${m.esi}%`;
       });
+
+      // Update Header Dropdown Trigger Deck
+      const curSite = analogs[currentIndex];
+      if (curSite) {
+        const hIcon = document.getElementById('header-site-icon');
+        const hTitle = document.getElementById('header-site-title');
+        const hScore = document.getElementById('header-site-score');
+        if (hIcon) hIcon.innerText = getSiteFlag(curSite);
+        if (hTitle) hTitle.innerText = curSite.name;
+        if (hScore) {
+          const curM = computeMetrics(curSite);
+          hScore.innerText = `${curM.esi}%`;
+        }
+      }
 
       const site = analogs[currentIndex];
       if (!site) return;
@@ -1256,14 +1599,56 @@
       }
     }
 
+    function getSiteFlag(site) {
+      if (site.isVietnam) return '🇻🇳';
+      const n = (site.name || '') + ' ' + (site.shortLabel || '');
+      if (n.includes('Tây Ban Nha') || n.includes('Lanzarote')) return '🇪🇸';
+      if (n.includes('Mỹ') || n.includes('Arizona') || n.includes('Idaho') || n.includes('Utah') || n.includes('Hawaii') || n.includes('Dakota')) return '🇺🇸';
+      if (n.includes('Ấn Độ') || n.includes('Lonar') || n.includes('Ladakh')) return '🇮🇳';
+      if (n.includes('TQ') || n.includes('Trung Quốc') || n.includes('Qaidam')) return '🇨🇳';
+      if (n.includes('Chile') || n.includes('Atacama')) return '🇨🇱';
+      if (n.includes('Anh') || n.includes('Boulby') || n.includes('UK')) return '🇬🇧';
+      if (n.includes('Ethiopia') || n.includes('Dallol')) return '🇪🇹';
+      if (n.includes('Iceland') || n.includes('Krafla')) return '🇮🇸';
+      if (n.includes('Nam Cực') || n.includes('McMurdo')) return '❄️';
+      if (site.isCustom) return '🧑‍🎓';
+      return '📍';
+    }
+
     function selectSite(index, skipEarthFly = false) {
       currentIndex = index;
       const site = analogs[index];
       if (!site) return;
 
-      document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
+      // Update chip states
+      document.querySelectorAll('.chip-btn, .loc-btn').forEach(b => b.classList.remove('active'));
       const activeBtn = document.getElementById(`btn-${index}`);
-      if (activeBtn) activeBtn.classList.add('active');
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+
+      // Update dropdown list states
+      document.querySelectorAll('.menu-site-item').forEach(it => it.classList.remove('active'));
+      const activeDd = document.getElementById(`dd-item-${index}`);
+      if (activeDd) activeDd.classList.add('active');
+
+      // Update global view button state
+      const globalBtn = document.getElementById('btn-global');
+      if (globalBtn) globalBtn.classList.remove('active');
+
+      // Update dropdown trigger button deck
+      const hIcon = document.getElementById('header-site-icon');
+      const hTitle = document.getElementById('header-site-title');
+      const hScore = document.getElementById('header-site-score');
+      const rawLabel = site.shortLabel || site.name;
+      const cleanLabel = rawLabel.replace(/^[^\w\s\u00C0-\u024F\u1EA0-\u1EF9]+/u, '').trim();
+      if (hIcon) hIcon.innerText = getSiteFlag(site);
+      if (hTitle) hTitle.innerText = `${index + 1}. ${cleanLabel}`;
+      if (hScore) {
+        const m = computeMetrics(site);
+        hScore.innerText = `${m.esi}%`;
+      }
 
       if (!skipEarthFly && earthMap) {
         earthMap.flyTo(site.earthCoords, site.earthZoom, { duration: 1.2 });
@@ -1304,31 +1689,248 @@
     }
 
     function renderTopButtons() {
+      // 1. Render Middle Horizontal Chips
       const btnGroup = document.getElementById('btn-group');
-      if (!btnGroup) return;
-      btnGroup.innerHTML = '';
+      if (btnGroup) {
+        btnGroup.innerHTML = '';
+        analogs.forEach((site, idx) => {
+          const btn = document.createElement('button');
+          let cls = 'chip-btn';
+          if (site.isVietnam) cls += ' vn-chip';
+          else if (site.isBaseline) cls += ' base-chip';
+          else if (site.isCustom) cls += ' custom-chip';
+          if (idx === currentIndex) cls += ' active';
+
+          btn.className = cls;
+          btn.id = `btn-${idx}`;
+          const flag = getSiteFlag(site);
+          const rawLabel = site.shortLabel || site.name;
+          const cleanLabel = rawLabel.replace(/^[^\w\s\u00C0-\u024F\u1EA0-\u1EF9]+/u, '').trim();
+          btn.innerHTML = `<span>${flag}</span> <span>${cleanLabel}</span> <span class="chip-pill" id="pill-${idx}">...</span>`;
+          btn.title = `${site.name} → ${site.target}`;
+          btn.onclick = () => selectSite(idx);
+          btnGroup.appendChild(btn);
+        });
+      }
+
+      // 2. Render Dropdown Menu Items
+      renderDropdownList();
+    }
+
+    function renderDropdownList() {
+      const container = document.getElementById('menu-site-list');
+      if (!container) return;
+      container.innerHTML = '';
 
       analogs.forEach((site, idx) => {
-        const btn = document.createElement('button');
-        let cls = 'loc-btn';
-        if (site.isVietnam) cls += ' vn-highlight';
-        else if (site.isBaseline) cls += ' baseline';
-        else if (site.isCustom) cls += ' custom-site';
+        const item = document.createElement('div');
+        item.className = 'menu-site-item' + (idx === currentIndex ? ' active' : '');
+        item.id = `dd-item-${idx}`;
+        item.setAttribute('data-idx', idx);
 
-        btn.className = cls;
-        btn.id = `btn-${idx}`;
-        btn.innerHTML = `${site.name} <span class="score-pill" id="pill-${idx}">...</span>`;
-        btn.onclick = () => selectSite(idx);
-        btnGroup.appendChild(btn);
+        const flag = getSiteFlag(site);
+        const isMoon = site.bodyType === 'moon';
+        const bodyClass = isMoon ? 'body-moon' : 'body-mars';
+        const bodyLabel = isMoon ? 'MOON' : 'MARS';
+
+        item.innerHTML = `
+          <div class="site-item-left">
+            <span class="site-item-flag">${flag}</span>
+            <span class="site-item-name" title="${site.name}">${site.name}</span>
+          </div>
+          <div class="site-item-right">
+            <span class="site-item-body ${bodyClass}">${bodyLabel}</span>
+            <span class="site-item-esi" id="dd-pill-${idx}">...</span>
+          </div>
+        `;
+
+        item.onclick = () => {
+          selectSite(idx);
+          closeSiteDropdown();
+        };
+
+        container.appendChild(item);
       });
     }
 
-    // 6. Modal & Student Templates Logic
+    // Dropdown Toggling & Keyboard / Outside Click
+    function toggleSiteDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('site-dropdown-menu');
+      if (!menu) return;
+      const isShown = menu.classList.contains('show');
+      if (isShown) {
+        closeSiteDropdown();
+      } else {
+        menu.classList.add('show');
+        const searchInp = document.getElementById('site-search-input');
+        if (searchInp) {
+          searchInp.value = '';
+          setTimeout(() => searchInp.focus(), 60);
+        }
+        filterSiteList();
+      }
+    }
+
+    function closeSiteDropdown() {
+      const menu = document.getElementById('site-dropdown-menu');
+      if (menu) menu.classList.remove('show');
+    }
+
+    document.addEventListener('click', (e) => {
+      const container = document.querySelector('.site-dropdown-container');
+      if (container && !container.contains(e.target)) {
+        closeSiteDropdown();
+      }
+    });
+
+    let currentCategory = 'all';
+
+    function filterCategory(cat, btn) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      filterSiteList();
+    }
+
+    function filterSiteList() {
+      const query = (document.getElementById('site-search-input')?.value || '').toLowerCase().trim();
+      const items = document.querySelectorAll('.menu-site-item');
+
+      items.forEach(item => {
+        const idx = parseInt(item.getAttribute('data-idx'));
+        const site = analogs[idx];
+        if (!site) return;
+
+        let matchesCat = true;
+        if (currentCategory === 'moon') matchesCat = site.bodyType === 'moon';
+        else if (currentCategory === 'mars') matchesCat = site.bodyType === 'mars';
+        else if (currentCategory === 'vn') matchesCat = !!site.isVietnam;
+        else if (currentCategory === 'custom') matchesCat = !!site.isCustom;
+
+        let matchesQuery = true;
+        if (query) {
+          const searchStr = `${site.name} ${site.shortLabel || ''} ${site.target || ''} ${site.planetSiteName || ''} ${site.geology || ''}`.toLowerCase();
+          matchesQuery = searchStr.includes(query);
+        }
+
+        if (matchesCat && matchesQuery) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    function stepSite(delta) {
+      if (!analogs.length) return;
+      const nextIdx = (currentIndex + delta + analogs.length) % analogs.length;
+      selectSite(nextIdx);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      if (e.key === 'ArrowLeft') stepSite(-1);
+      if (e.key === 'ArrowRight') stepSite(1);
+    });
+
+    // 6. Modal & Student Templates Logic (Planetary Analog Studio)
     function openAddModal() {
       document.getElementById('add-modal').style.display = 'flex';
+      updateModalLiveEsi();
     }
+
     function closeAddModal() {
       document.getElementById('add-modal').style.display = 'none';
+      if (isMapPinning) cancelMapPinning();
+    }
+
+    function updateModalLiveEsi() {
+      const minScore = parseFloat(document.getElementById('inp-minscore')?.value) || 0;
+      const eSlope = parseFloat(document.getElementById('inp-eslope')?.value) || 0;
+      const pSlope = parseFloat(document.getElementById('inp-pslope')?.value) || 0;
+      const eTemp = parseFloat(document.getElementById('inp-etemp')?.value) || 0;
+      const pTemp = parseFloat(document.getElementById('inp-ptemp')?.value) || 0;
+      const ePress = parseFloat(document.getElementById('inp-epress')?.value) || 0;
+      const pPress = parseFloat(document.getElementById('inp-ppress')?.value) || 0;
+
+      const sMin = Math.max(0, Math.min(1, minScore));
+      const sSlope = (eSlope + pSlope) > 0 ? Math.max(0, 1 - Math.abs(eSlope - pSlope) / (eSlope + pSlope)) : 1;
+      const sTemp = (eTemp + pTemp) > 0 ? Math.max(0, 1 - Math.abs(eTemp - pTemp) / (eTemp + pTemp)) : 1;
+      const sPress = (ePress + pPress) > 0 ? Math.max(0, 1 - Math.abs(ePress - pPress) / (ePress + pPress)) : 0;
+
+      const w1 = parseFloat(document.getElementById('w-mineral')?.value) || 1.0;
+      const w2 = parseFloat(document.getElementById('w-slope')?.value) || 1.0;
+      const w3 = parseFloat(document.getElementById('w-temp')?.value) || 0.5;
+      const w4 = parseFloat(document.getElementById('w-press')?.value) || 0.0;
+      const sumW = w1 + w2 + w3 + w4;
+
+      let esi = 0;
+      if (sumW > 0) {
+        let prod = 1;
+        if (w1 > 0) prod *= Math.pow(Math.max(sMin, 0.0001), w1);
+        if (w2 > 0) prod *= Math.pow(Math.max(sSlope, 0.0001), w2);
+        if (w3 > 0) prod *= Math.pow(Math.max(sTemp, 0.0001), w3);
+        if (w4 > 0) prod *= Math.pow(Math.max(sPress, 0.0001), w4);
+        esi = (Math.pow(prod, 1 / sumW) * 100);
+      }
+
+      const liveEsiEl = document.getElementById('modal-live-esi');
+      if (liveEsiEl) liveEsiEl.innerText = `${esi.toFixed(1)}%`;
+
+      const fMin = document.getElementById('meter-fill-min');
+      const vMin = document.getElementById('meter-val-min');
+      if (fMin) fMin.style.width = `${(sMin * 100).toFixed(0)}%`;
+      if (vMin) vMin.innerText = `${(sMin * 100).toFixed(0)}%`;
+
+      const fSlope = document.getElementById('meter-fill-slope');
+      const vSlope = document.getElementById('meter-val-slope');
+      if (fSlope) fSlope.style.width = `${(sSlope * 100).toFixed(0)}%`;
+      if (vSlope) vSlope.innerText = `${(sSlope * 100).toFixed(0)}%`;
+
+      const fTemp = document.getElementById('meter-fill-temp');
+      const vTemp = document.getElementById('meter-val-temp');
+      if (fTemp) fTemp.style.width = `${(sTemp * 100).toFixed(0)}%`;
+      if (vTemp) vTemp.innerText = `${(sTemp * 100).toFixed(0)}%`;
+
+      const fPress = document.getElementById('meter-fill-press');
+      const vPress = document.getElementById('meter-val-press');
+      if (fPress) fPress.style.width = `${(sPress * 100).toFixed(0)}%`;
+      if (vPress) vPress.innerText = `${(sPress * 100).toFixed(1)}%`;
+    }
+
+    // Earth Map Pinning Tool
+    let isMapPinning = false;
+    let pinClickHandler = null;
+
+    function startMapPinning() {
+      document.getElementById('add-modal').style.display = 'none';
+      const toast = document.getElementById('map-pin-toast');
+      if (toast) toast.classList.add('show');
+      isMapPinning = true;
+
+      if (earthMap) {
+        pinClickHandler = function(e) {
+          const lat = parseFloat(e.latlng.lat.toFixed(4));
+          const lon = parseFloat(e.latlng.lng.toFixed(4));
+          document.getElementById('inp-elat').value = lat;
+          document.getElementById('inp-elon').value = lon;
+          cancelMapPinning();
+          updateModalLiveEsi();
+        };
+        earthMap.once('click', pinClickHandler);
+      }
+    }
+
+    function cancelMapPinning() {
+      isMapPinning = false;
+      const toast = document.getElementById('map-pin-toast');
+      if (toast) toast.classList.remove('show');
+      if (earthMap && pinClickHandler) {
+        earthMap.off('click', pinClickHandler);
+        pinClickHandler = null;
+      }
+      openAddModal();
     }
 
     const studentTemplates = {
@@ -1403,6 +2005,7 @@
 
       document.getElementById('inp-geology').value = t.geology;
       document.getElementById('inp-limits').value = t.limits;
+      updateModalLiveEsi();
     }
 
     function saveCustomSite(e) {

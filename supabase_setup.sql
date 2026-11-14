@@ -4,8 +4,10 @@
 -- Project URL: https://prhngciivgzoarwoburu.supabase.co
 -- ========================================================
 
--- 1. TẠO BẢNG analog_sites NẾU CHƯA CÓ
-create table if not exists public.analog_sites (
+-- 1. DỌN SẠCH BẢNG CŨ VÀ TẠO BẢNG CHUẨN 100%
+drop table if exists public.analog_sites cascade;
+
+create table public.analog_sites (
   id text primary key,
   name_vi text not null,
   name_en text not null,
@@ -39,17 +41,6 @@ create table if not exists public.analog_sites (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- Tự động bổ sung các cột NASA mới nếu bảng đã được tạo trước đó
-alter table public.analog_sites add column if not exists mineral_score numeric;
-alter table public.analog_sites add column if not exists earth_mineral text;
-alter table public.analog_sites add column if not exists planet_mineral text;
-alter table public.analog_sites add column if not exists earth_slope numeric;
-alter table public.analog_sites add column if not exists planet_slope numeric;
-alter table public.analog_sites add column if not exists earth_temp_k numeric;
-alter table public.analog_sites add column if not exists planet_temp_k numeric;
-alter table public.analog_sites add column if not exists earth_pressure_kpa numeric;
-alter table public.analog_sites add column if not exists planet_pressure_kpa numeric;
-
 -- 2. BẬT BẢO MẬT HÀNG (ROW LEVEL SECURITY)
 alter table public.analog_sites enable row level security;
 
@@ -69,9 +60,6 @@ create policy "Allow public update access"
 drop policy if exists "Allow public delete access" on public.analog_sites;
 create policy "Allow public delete access"
   on public.analog_sites for delete to anon, authenticated using (true);
-
--- 4. DỌN SẠCH CÁC DÒNG CŨ ĐỂ ĐỒNG BỘ CHUẨN 12 ĐỊA ĐIỂM
-delete from public.analog_sites where is_custom = false or id in ('chubluk', 'boulby', 'dallol', 'iceland', 'qaidam');
 
 -- 5. NẠP TOÀN BỘ 12 ĐIỂM DỮ LIỆU ĐẦY ĐỦ VÀO DATABASE
 insert into public.analog_sites (
