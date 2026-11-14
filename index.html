@@ -452,7 +452,11 @@
         <button type="button" class="quick-fill-btn" onclick="fillTemplate('chudangya')">🇻🇳 Núi lửa Chư Đăng Ya (Moon)</button>
         <button type="button" class="quick-fill-btn" onclick="fillTemplate('muine')">🇻🇳 Đồi cát Mũi Né (Mars)</button>
         <button type="button" class="quick-fill-btn" onclick="fillTemplate('lyson')">🇻🇳 Đảo Lý Sơn (Moon)</button>
+        <button type="button" class="quick-fill-btn" style="background: rgba(14, 165, 233, 0.25); border-color: #0284c7; color: #38bdf8;" onclick="document.getElementById('nasa-csv-input').click()">📂 Tải file CSV NASA POWER (Tự động điền)</button>
+        <input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleNasaCsvUpload(event)">
       </div>
+
+      <div id="csv-upload-status" style="display:none; font-size:11.5px; padding:8px 12px; margin-bottom:12px; border-radius:6px; background:rgba(16, 185, 129, 0.2); border:1px solid #10b981; color:#34d399; line-height: 1.4;"></div>
 
       <form id="custom-site-form" onsubmit="saveCustomSite(event)">
         <div class="form-grid">
@@ -1079,6 +1083,106 @@
       document.getElementById('inp-ppress').value = t.ppress;
       document.getElementById('inp-geology').value = t.geology;
       document.getElementById('inp-limits').value = t.limits;
+    }
+
+    function handleNasaCsvUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        
+        // 1. Tọa độ từ Header
+        const latMatch = text.match(/latitude\s+([-\d.]+)/i);
+        const lonMatch = text.match(/longitude\s+([-\d.]+)/i);
+        if (latMatch) document.getElementById('inp-elat').value = parseFloat(latMatch[1]);
+        if (lonMatch) document.getElementById('inp-elon').value = parseFloat(lonMatch[1]);
+
+        // 2. Tìm bảng dữ liệu
+        const lines = text.split(/\r?\n/);
+        let headerIdx = -1;
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].includes('YEAR') && lines[i].includes('T2M')) {
+            headerIdx = i;
+            break;
+          }
+        }
+
+        if (headerIdx !== -1) {
+          const headers = lines[headerIdx].split(',').map(s => s.trim());
+          const t2mIdx = headers.indexOf('T2M');
+          const psIdx = headers.indexOf('PS');
+          const rangeIdx = headers.indexOf('T2M_RANGE');
+
+          let t2mSum = 0, t2mCnt = 0;
+          let psSum = 0, psCnt = 0;
+          let rangeSum = 0, rangeCnt = 0;
+
+          for (let i = headerIdx + 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const cols = line.split(',');
+            if (t2mIdx !== -1 && cols[t2mIdx] !== undefined) {
+              const val = parseFloat(cols[t2mIdx]);
+              if (!isNaN(val) && val > -900) { t2mSum += val; t2mCnt++; }
+            }
+            if (psIdx !== -1 && cols[psIdx] !== undefined) {
+              const val = parseFloat(cols[psIdx]);
+              if (!isNaN(val) && val > -900) { psSum += val; psCnt++; }
+            }
+            if (rangeIdx !== -1 && cols[rangeIdx] !== undefined) {
+              const val = parseFloat(cols[rangeIdx]);
+              if (!isNaN(val) && val > -900) { rangeSum += val; rangeCnt++; }
+            }
+          }
+
+          let meanT2mC = 25, meanPs = 100, meanRange = 10;
+          if (t2mCnt > 0) {
+            meanT2mC = t2mSum / t2mCnt;
+            const kelvin = meanT2mC + 273.15;
+            document.getElementById('inp-etemp').value = kelvin.toFixed(1);
+          }
+          if (psCnt > 0) {
+            meanPs = psSum / psCnt;
+            document.getElementById('inp-epress').value = meanPs.toFixed(1);
+          }
+
+          // Điền tên gợi ý nếu đang trống
+          const nextNum = analogs.length + 1;
+          if (!document.getElementById('inp-name').value) {
+            document.getElementById('inp-name').value = `${nextNum}. NASA POWER Site (${latMatch ? latMatch[1] : 'VN'})`;
+          }
+          if (!document.getElementById('inp-short').value) {
+            document.getElementById('inp-short').value = `📍 Site ${latMatch ? parseFloat(latMatch[1]).toFixed(1) : ''}`;
+          }
+
+          // Điền thông số mặc định nếu còn trống
+          if (!document.getElementById('inp-body').value) document.getElementById('inp-body').value = 'moon';
+          if (!document.getElementById('inp-pname').value) document.getElementById('inp-pname').value = 'Marius Hills (Moon)';
+          if (!document.getElementById('inp-plat').value) document.getElementById('inp-plat').value = 14.1;
+          if (!document.getElementById('inp-plon').value) document.getElementById('inp-plon').value = -56.7;
+          if (!document.getElementById('inp-minscore').value) document.getElementById('inp-minscore').value = 0.85;
+          if (!document.getElementById('inp-mintext').value) document.getElementById('inp-mintext').value = 'Analog Basalt/Regolith';
+          if (!document.getElementById('inp-eslope').value) document.getElementById('inp-eslope').value = 4.0;
+          if (!document.getElementById('inp-pslope').value) document.getElementById('inp-pslope').value = 4.5;
+          if (!document.getElementById('inp-ptemp').value) document.getElementById('inp-ptemp').value = 250.0;
+          if (!document.getElementById('inp-ppress').value) document.getElementById('inp-ppress').value = 0.0;
+          if (!document.getElementById('inp-geology').value) document.getElementById('inp-geology').value = 'Data imported directly from NASA POWER Climatology satellite archive for mission rover testing.';
+          if (!document.getElementById('inp-limits').value) document.getElementById('inp-limits').value = 'Earth atmosphere (MERRA-2 atmospheric model) and surface vegetation cover.';
+
+          const statusBox = document.getElementById('csv-upload-status');
+          if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.innerHTML = `🎉 <b>Tự động đọc thành công file NASA POWER!</b><br>` +
+              `• Tọa độ: <b>${latMatch ? latMatch[1] : ''}°N, ${lonMatch ? lonMatch[1] : ''}°E</b> (${t2mCnt} ngày hợp lệ)<br>` +
+              `• Nhiệt độ TB: <b>${meanT2mC.toFixed(2)}°C</b> ➔ Tự đổi sang <b>${(meanT2mC+273.15).toFixed(1)} K</b><br>` +
+              `• Áp suất khí quyển: <b>${meanPs.toFixed(2)} kPa</b><br>` +
+              `• Biên độ nhiệt: <b>${(rangeSum/rangeCnt).toFixed(2)}°C</b><br>` +
+              `<i>👉 Toàn bộ các ô bên dưới đã được điền tự động! Bạn chỉ cần nhấn nút <b>Save & Plot</b> bên dưới.</i>`;
+          }
+        }
+      };
+      reader.readAsText(file);
     }
 
     function saveCustomSite(e) {
