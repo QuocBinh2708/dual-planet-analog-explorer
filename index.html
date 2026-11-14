@@ -2553,48 +2553,49 @@
     async function syncSiteToSupabase(site) {
       if (!supabaseClient) return;
       try {
-        setCloudStatus('syncing', 'Saving...');
+        setCloudStatus('syncing', 'Saving to Cloud...');
         const row = {
           id: site.id,
           name_vi: site.name,
           name_en: site.name,
-          name: site.name,
           short_label: site.shortLabel,
-          is_vietnam: site.isVietnam,
-          is_baseline: site.isBaseline,
+          is_vietnam: !!site.isVietnam,
+          is_baseline: !!site.isBaseline,
           is_custom: true,
-          body_type: site.bodyType,
+          body_type: site.bodyType || 'moon',
           earth_lat: site.earthCoords[0],
           earth_lon: site.earthCoords[1],
-          earth_zoom: site.earthZoom,
+          earth_zoom: site.earthZoom || 11,
           planet_lat: site.planetCoords[0],
           planet_lon: site.planetCoords[1],
-          planet_zoom: site.planetZoom,
-          planet_site_name: site.planetSiteName,
+          planet_zoom: site.planetZoom || 7,
+          planet_site_name: site.planetSiteName || site.target,
           target_vi: site.target,
           target_en: site.target,
-          target: site.target,
-          mineral_score: site.earth.mineralScore,
-          earth_mineral: site.earth.mineralText,
-          planet_mineral: site.planet.mineralText,
-          earth_slope: site.earth.slope,
-          planet_slope: site.planet.slope,
-          earth_temp_k: site.earth.tempK,
-          planet_temp_k: site.planet.tempK,
-          earth_pressure_kpa: site.earth.pressureKpa,
-          planet_pressure_kpa: site.planet.pressureKpa,
-          geology_vi: site.geology,
-          geology: site.geology,
-          limits_vi: site.limits,
-          limits: site.limits
+          mineral_score: site.earth.mineralScore || 0.85,
+          earth_mineral: site.earth.mineralText || '',
+          planet_mineral: site.planet.mineralText || '',
+          earth_slope: site.earth.slope || 10.0,
+          planet_slope: site.planet.slope || 12.0,
+          earth_temp_k: site.earth.tempK || 295.0,
+          planet_temp_k: site.planet.tempK || 252.0,
+          earth_pressure_kpa: site.earth.pressureKpa || 95.0,
+          planet_pressure_kpa: site.planet.pressureKpa || 0.0,
+          geology_vi: site.geology || '',
+          geology_en: site.geology || '',
+          limits_vi: site.limits || '',
+          limits_en: site.limits || ''
         };
         const { error } = await supabaseClient.from('analog_sites').upsert(row);
         if (!error) {
+          console.log('✅ Supabase sync success:', site.id);
           setCloudStatus('online', `${analogs.length} Sites Synced`);
         } else {
+          console.error('❌ Supabase upsert error:', error);
           setCloudStatus('offline', 'Saved Locally');
         }
       } catch (e) {
+        console.error('❌ Supabase sync exception:', e);
         setCloudStatus('offline', 'Saved Locally');
       }
     }
