@@ -2578,39 +2578,60 @@
       return Math.max(0.0, 1.0 - Math.abs(xEarth - xTarget) / (xEarth + xTarget));
     }
 
+
+    const planetaryCatalog = {
+      moon: [
+        { name: "Descartes Highlands (Apollo 16)", coords: [-8.97, 15.5], tempK: 250, slope: 12.0, minScore: 0.86, minText: "Anorthositic Highland Regolith, Breccia" },
+        { name: "Mare Serenitatis Basin", coords: [28.0, 17.5], tempK: 252, slope: 7.5, minScore: 0.88, minText: "Mare Basalt, Ilmenite, Dark Mantle" },
+        { name: "Oceanus Procellarum Mare", coords: [18.4, -57.4], tempK: 254, slope: 6.0, minScore: 0.85, minText: "High-Ti Basalt Regolith, KREEP" },
+        { name: "Shackleton Crater Polar Ridge", coords: [-89.9, 0.0], tempK: 220, slope: 18.0, minScore: 0.80, minText: "Permanently Shadowed Cryogenic Regolith" },
+        { name: "Copernicus Crater Central Basin", coords: [9.6, -20.1], tempK: 248, slope: 16.0, minScore: 0.84, minText: "Impact-Melt Sheet, Olivine-Rich Basalt" },
+        { name: "Aristarchus Plateau Volcanics", coords: [23.7, -47.4], tempK: 255, slope: 10.0, minScore: 0.89, minText: "Pyroclastic Glass, Silicic Dome Complex" },
+        { name: "Reiner Gamma Swirl Formation", coords: [7.5, -59.0], tempK: 250, slope: 5.5, minScore: 0.82, minText: "Optically Immature Albedo Swirl Regolith" },
+        { name: "Fra Mauro Regolith Plains", coords: [-3.6, -17.5], tempK: 251, slope: 9.0, minScore: 0.87, minText: "Imbrium Ejecta Blanket, Impact Breccia" }
+      ],
+      mars: [
+        { name: "Jezero Crater Delta Paleolake", coords: [18.38, 77.58], tempK: 210, slope: 8.5, minScore: 0.88, minText: "Clay Minerals, Carbonates, Deltaic Mudstones" },
+        { name: "Mawrth Vallis Layered Clays", coords: [23.9, -18.9], tempK: 212, slope: 9.0, minScore: 0.86, minText: "Phyllosilicates, Smectite, Ancient Crust" },
+        { name: "Hellas Planitia Basin Floor", coords: [-40.0, 70.0], tempK: 205, slope: 8.0, minScore: 0.83, minText: "Glacial Permafrost Sediments, Trap Basalt" },
+        { name: "Valles Marineris Chasma Uplands", coords: [-14.0, -59.2], tempK: 212, slope: 18.5, minScore: 0.85, minText: "Layered Wall Strata, Sulfate Deposits" },
+        { name: "Elysium Planitia Volcanic Fissures", coords: [11.7, 147.2], tempK: 215, slope: 11.0, minScore: 0.89, minText: "Flood Basalt Plates, Cerberus Fossae" },
+        { name: "Eberswalde Crater Delta", coords: [-24.0, -33.3], tempK: 215, slope: 10.0, minScore: 0.85, minText: "Meandering Inverted Siltstone Channels" },
+        { name: "Meridiani Planum Outcrops", coords: [-0.2, -5.5], tempK: 216, slope: 6.0, minScore: 0.88, minText: "Hematite Concretions, Jarosite Sandstone" },
+        { name: "Olympia Undae Polar Erg", coords: [81.0, 170.0], tempK: 195, slope: 12.0, minScore: 0.81, minText: "Gypsum Sand Dunes, Perennial Ice Borders" }
+      ]
+    };
+
     function synthesizeCounterpart(site, targetBody) {
       const isMoon = targetBody === 'moon';
       const cleanName = (site.name || 'Site').replace(/^\d+\.\s*/, '');
       const sLabel = site.shortLabel || cleanName;
-      if (isMoon) {
-        return {
-          planetSiteName: `${cleanName} (Moon Equivalent / Mare Basalt)`,
-          planetCoords: [14.0, -56.0],
-          planetZoom: 7,
-          target: `MOON (${sLabel.toUpperCase()})`,
-          slope: site.targets?.mars?.slope ?? site.earth?.slope ?? 11.0,
-          tempK: 250.0,
-          pressureKpa: 0.0,
-          mineralScore: Math.max(0.70, (site.targets?.mars?.mineralScore ?? 0.85) - 0.02),
-          mineralText: "Mare Basalt, Anorthositic Regolith",
-          geology: site.geology || "Terrestrial basaltic and volcanic terrain providing scientific analog for lunar mare exploration.",
-          limits: "Earth 1g gravity (6x lunar), atmospheric moisture, and absence of lunar hard vacuum."
-        };
-      } else {
-        return {
-          planetSiteName: `${cleanName} (Mars Equivalent / Volcanic Plains)`,
-          planetCoords: [-11.5, -121.0],
-          planetZoom: 7,
-          target: `MARS (${sLabel.toUpperCase()})`,
-          slope: site.targets?.moon?.slope ?? site.earth?.slope ?? 13.0,
-          tempK: 215.0,
-          pressureKpa: 0.6,
-          mineralScore: Math.max(0.70, (site.targets?.moon?.mineralScore ?? 0.85) - 0.03),
-          mineralText: "Martian Basalt, Olivine, Ferric Oxides",
-          geology: site.geology || "Arid terrestrial volcanic and sedimentary analog environment for Martian rover surface exploration.",
-          limits: "Earth 1g gravity (3x Mars), atmospheric pressure (100x Martian 0.6 kPa)."
-        };
+      const catalog = isMoon ? planetaryCatalog.moon : planetaryCatalog.mars;
+
+      // Hash site id/name deterministically to pick a distinct, authentic NASA planetary target
+      let hash = 0;
+      const keyStr = (site.id || site.name || 'key');
+      for (let i = 0; i < keyStr.length; i++) {
+        hash = ((hash << 5) - hash) + keyStr.charCodeAt(i);
+        hash |= 0;
       }
+      const choice = catalog[Math.abs(hash) % catalog.length];
+
+      return {
+        planetSiteName: `${choice.name} (${isMoon ? 'Moon' : 'Mars'})`,
+        planetCoords: [...choice.coords],
+        planetZoom: 7,
+        target: `${isMoon ? 'MOON' : 'MARS'} (${choice.name.toUpperCase()})`,
+        slope: choice.slope,
+        tempK: choice.tempK,
+        pressureKpa: isMoon ? 0.0 : 0.6,
+        mineralScore: choice.minScore,
+        mineralText: choice.minText,
+        geology: `NASA planetary benchmark feature at ${choice.name}. Terrestrial field site ${cleanName} provides comparative morphological and lithological data for robotic and human planetary surface simulation.`,
+        limits: isMoon 
+          ? "Earth 1g gravity (6x lunar), atmospheric moisture, and absence of ultra-high vacuum conditions." 
+          : "Earth 1g gravity (3x Martian), atmospheric pressure (100x Martian 0.6 kPa)."
+      };
     }
 
     function ensureDualTargets(site) {
@@ -2738,7 +2759,11 @@
 
       renderPlanetMarkers();
 
-      planetMap.flyTo(targetData.planetCoords, targetData.planetZoom || 7, { duration: 1.2 });
+      const flyCoords = (planetMarkers[currentIndex])
+        ? planetMarkers[currentIndex].getLatLng()
+        : targetData.planetCoords;
+
+      planetMap.flyTo(flyCoords, targetData.planetZoom || 7, { duration: 1.2 });
       if (planetMarkers[currentIndex]) {
         planetMarkers[currentIndex].openPopup();
       }
@@ -2748,56 +2773,86 @@
     
     function renderPlanetMarkers() {
       if (!planetMap || typeof L === 'undefined') return;
-      planetMarkers.forEach(m => planetMap.removeLayer(m));
+      planetMarkers.forEach(m => { if (m) planetMap.removeLayer(m); });
       planetMarkers = [];
 
+      // 1. Group targets by coordinate proximity to detect overlaps/stacking
+      const coordGroups = new Map();
       analogs.forEach((site, idx) => {
         ensureDualTargets(site);
         const targetData = site.targets[currentTargetBody] || site.targets.moon;
         if (!targetData || !targetData.planetCoords) return;
 
-        const m = computeMetrics(site, currentTargetBody);
-        const scoreNum = parseFloat(m.esi);
-        const isSub80 = scoreNum < 80;
-        const isActive = (idx === currentIndex);
+        // Key by rounded lat, lon to detect targets sharing the same region
+        const key = `${Math.round(targetData.planetCoords[0] * 5) / 5},${Math.round(targetData.planetCoords[1] * 5) / 5}`;
+        if (!coordGroups.has(key)) coordGroups.set(key, []);
+        coordGroups.get(key).push({ site, idx, targetData });
+      });
 
-        const isMoon = currentTargetBody === 'moon';
-        const cleanTargetName = (targetData.planetSiteName || 'Target').replace(/\s*\((Moon|Mars)\)/i, '');
-        const tipClass = `site-tooltip ${isMoon ? 'moon-tip' : 'mars-tip'} ${isSub80 ? 'sub80-tip' : ''} ${isActive ? 'active-target-tip' : ''}`;
+      // 2. Render each group: if cluster size > 1, apply clean radial spiderfy dispersal
+      coordGroups.forEach((group) => {
+        const isCluster = group.length > 1;
 
-        const marker = L.marker(targetData.planetCoords)
-          .bindTooltip(`${idx + 1}. ${cleanTargetName}`, {
-            permanent: true,
-            direction: 'top',
-            className: tipClass,
-            offset: [0, -10]
-          })
-          .bindPopup(`
-            <div style="font-family:'Segoe UI',system-ui,sans-serif; min-width:190px; color:#0f172a; padding:2px;">
-              <div style="font-size:10px; font-weight:800; color:${isMoon ? '#0284c7' : '#ea580c'}; text-transform:uppercase; letter-spacing:0.5px;">
-                ${isMoon ? '🌑 NASA LUNAR WAYPOINT' : '🔴 NASA MARTIAN WAYPOINT'}
-              </div>
-              <div style="font-size:13px; font-weight:700; margin:2px 0 2px 0;">
-                ${idx + 1}. ${targetData.planetSiteName}
-              </div>
-              <div style="font-size:11px; color:#475569;">
-                Earth Analog: <b>${site.name}</b>
-              </div>
-              <div style="font-size:11px; margin-top:4px; font-weight:700; color:${isSub80 ? '#b45309' : '#047857'}; background:${isSub80 ? '#fef3c7' : '#d1fae5'}; padding:2px 6px; border-radius:4px; display:inline-block;">
-                Similarity: ${m.esi}% ${isSub80 ? '(Caution: <80%)' : '✓'}
-              </div>
-            </div>
-          `)
-          .on('click', () => {
-            selectSite(idx, false, currentTargetBody);
-          });
+        group.forEach((item, clusterIdx) => {
+          const { site, idx, targetData } = item;
+          const m = computeMetrics(site, currentTargetBody);
+          const scoreNum = parseFloat(m.esi);
+          const isSub80 = scoreNum < 80;
+          const isActive = (idx === currentIndex);
+          const isMoon = currentTargetBody === 'moon';
 
-        marker.addTo(planetMap);
-        planetMarkers.push(marker);
+          // Disperse coordinates radially so markers never stack
+          let renderCoords = [targetData.planetCoords[0], targetData.planetCoords[1]];
+          if (isCluster) {
+            const angle = (2 * Math.PI * clusterIdx) / group.length;
+            const rOffset = 1.35; // degrees visual offset
+            const cosLat = Math.max(0.15, Math.cos(targetData.planetCoords[0] * Math.PI / 180));
+            renderCoords[0] += rOffset * Math.sin(angle);
+            renderCoords[1] += (rOffset * Math.cos(angle)) / cosLat;
+          }
 
-        if (isActive) {
-          planetMarker = marker;
-        }
+          const cleanTargetName = (targetData.planetSiteName || 'Target').replace(/\s*\((Moon|Mars)\)/i, '');
+          const tipClass = `site-tooltip ${isMoon ? 'moon-tip' : 'mars-tip'} ${isSub80 ? 'sub80-tip' : ''} ${isActive ? 'active-target-tip' : ''}`;
+
+          const clusterNote = isCluster
+            ? `<div style="font-size:10px; color:#64748b; margin-top:2px;">Station ${clusterIdx + 1} of ${group.length} in this target cluster</div>`
+            : '';
+
+          const marker = L.marker(renderCoords)
+            .bindTooltip(`${idx + 1}. ${cleanTargetName}`, {
+              permanent: true,
+              direction: 'top',
+              className: tipClass,
+              offset: [0, -10]
+            })
+            .bindPopup(`
+              <div style="font-family:'Segoe UI',system-ui,sans-serif; min-width:200px; color:#0f172a; padding:2px;">
+                <div style="font-size:10px; font-weight:800; color:${isMoon ? '#0284c7' : '#ea580c'}; text-transform:uppercase; letter-spacing:0.5px;">
+                  ${isMoon ? '🌑 NASA LUNAR WAYPOINT' : '🔴 NASA MARTIAN WAYPOINT'}
+                </div>
+                <div style="font-size:13px; font-weight:700; margin:2px 0 2px 0;">
+                  ${idx + 1}. ${targetData.planetSiteName}
+                </div>
+                <div style="font-size:11px; color:#475569;">
+                  Earth Terrestrial Analog: <b>${site.name}</b>
+                </div>
+                ${clusterNote}
+                <div style="font-size:11px; margin-top:4px; font-weight:700; color:${isSub80 ? '#b45309' : '#047857'}; background:${isSub80 ? '#fef3c7' : '#d1fae5'}; padding:2px 6px; border-radius:4px; display:inline-block;">
+                  Similarity: ${m.esi}% ${isSub80 ? '(Caution: <80%)' : '✓'}
+                </div>
+              </div>
+            `)
+            .on('click', () => {
+              selectSite(idx, false, currentTargetBody);
+            });
+
+          marker.addTo(planetMap);
+          planetMarkers[idx] = marker;
+
+          if (isActive) {
+            planetMarker = marker;
+          }
+        });
       });
     }
 
