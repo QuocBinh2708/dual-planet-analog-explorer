@@ -273,10 +273,26 @@
 
     @media (max-width: 900px) {
       body { flex-direction: column; height: auto; overflow-y: auto; }
-      #maps-wrapper { height: 70vh; flex: none; border-right: none; border-bottom: 2px solid #1e293b; }
-      #sidebar { flex: none; overflow-y: visible; }
+      #maps-wrapper { height: 60vh; min-height: 400px; flex: none; border-right: none; border-bottom: 2px solid #1e293b; }
+      #sidebar { flex: none; overflow-y: visible; padding: 14px; }
+      .top-nav-bar { left: 48px; right: 8px; top: 8px; gap: 6px; }
+      .location-bar {
+        overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px;
+        scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;
+      }
+      .location-bar::-webkit-scrollbar { display: none; }
+      .loc-btn { white-space: nowrap; flex-shrink: 0; padding: 5px 9px; font-size: 11px; }
+      .cave-subbar {
+        overflow-x: auto; flex-wrap: nowrap; padding: 4px 8px; gap: 4px;
+        scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;
+      }
+      .cave-subbar::-webkit-scrollbar { display: none; }
+      .cave-subbar-title { white-space: nowrap; flex-shrink: 0; }
+      .cave-btn { white-space: nowrap; flex-shrink: 0; padding: 3px 7px; font-size: 10px; }
+      .map-label { font-size: 10.5px; padding: 4px 8px; bottom: 8px; left: 8px; }
       .cave-specs, .form-grid { grid-template-columns: 1fr; }
       .form-group.full, .form-section-title { grid-column: span 1; }
+      .modal-box { width: 95%; max-height: 90vh; padding: 14px; }
     }
   </style>
 </head>
