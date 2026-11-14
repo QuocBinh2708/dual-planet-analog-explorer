@@ -1,0 +1,25 @@
+1. Tính cấp thiết và Lý do chọn đề tài
+Bối cảnh khoa học: Trong thập kỷ hiện tại, các cơ quan hàng không vũ trụ lớn như NASA (chương trình Artemis) đang tập trung vào mục tiêu đưa con người quay trở lại Mặt Trăng và xây dựng căn cứ lưu trú dài hạn. Do bức xạ vũ trụ, thiên thạch vi mô và biên độ nhiệt khắc nghiệt trên bề mặt Mặt Trăng, các ống dung nham ngầm (lunar lava tubes) — tiêu biểu là khu vực Marius Hills — được xem là nơi trú ẩn tự nhiên lý tưởng nhất.
+Tiềm năng của Việt Nam: Để thử nghiệm xe tự hành (rover), robot thả dây và mô-đun sinh tồn trước khi phóng lên vũ trụ, các nhà khoa học cần những môi trường tương đồng trên Trái Đất (Planetary Analog Sites). Việt Nam sở hữu hệ thống hang động núi lửa Krông Nô – Chư Bluk (Công viên địa chất toàn cầu UNESCO Đắk Nông) dài nhất Đông Nam Á (
+>
+25
+ km
+>25 km với hơn 
+50
+50 hang động bazan trẻ), có cấu trúc giếng trời sập trần (skylight) và đường hầm dung nham tương đồng cao với địa hình Mặt Trăng.
+Vấn đề giải quyết: Hiện chưa có công cụ trực quan tích hợp dữ liệu vệ tinh mở của NASA để định lượng mức độ tương đồng giữa Krông Nô với các "chuẩn vàng" quốc tế (như Krafla – Iceland hay Atacama – Chile), cũng như chưa có môi trường mở để sinh viên và nhà nghiên cứu tự bổ sung dữ liệu thực địa mới.
+2. Mục tiêu nghiên cứu
+Xây dựng bản đồ đối chiếu không gian kép (Dual-Synchronized Geospatial Map) kết nối trực tiếp ảnh vệ tinh Trái Đất với bề mặt Mặt Trăng và Sao Hỏa thông qua API mở của NASA (NASA GIBS, NASA Moon Trek, NASA Mars Trek).
+Số hóa và trực quan hóa mạng lưới hang động núi lửa Krông Nô – Chư Bluk (tập trung vào các hang tiêu biểu: C7, A1, C3, C8 và miệng núi lửa nguồn Chư Bluk) gắn với các kịch bản thử nghiệm kỹ thuật không gian cụ thể.
+Mô hình hóa toán học và lập trình bộ mô phỏng thời gian thực Chỉ số Tương đồng Trái Đất – Hành tinh (ESI) cho phép tùy biến trọng số theo từng mục tiêu sứ mệnh.
+Phát triển tính năng Citizen Science Sandbox (+ Add Analog Site), cho phép sinh viên và cộng đồng khoa học tự nhập tọa độ, thông số địa chất – môi trường của các địa điểm mới tại Việt Nam và thế giới để mở rộng cơ sở dữ liệu.
+Phương pháp thu thập & chuẩn hóa dữ liệu vệ tinh:
+Sử dụng giao thức WMTS của NASA GIBS (dữ liệu địa hình ASTER GDEM, nhiệt độ bề mặt MODIS LST) và NASA Solar System Treks (LRO WAC Mosaic cho Mặt Trăng; Viking MDIM21 & MOLA DEM cho Sao Hỏa).
+Chuẩn hóa 4 nhóm thông số định lượng cho từng cặp đối chiếu: Thành phần khoáng vật & thạch học, Độ dốc địa hình (
+∘
+∘
+ ), Nhiệt độ bề mặt/lòng hang (
+K
+K), và Áp suất khí quyển (
+kPa
+kPa).
