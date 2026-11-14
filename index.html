@@ -33,10 +33,10 @@
     /* Top Mission Control Header Deck (Redesigned & Uncrowded) */
     .mission-header-bar {
       position: absolute; top: 10px; left: 50px; right: 12px; z-index: 1000;
-      display: flex; gap: 8px; align-items: center; justify-content: space-between;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
       pointer-events: none;
     }
-    .mission-selector-group, .chips-scroll-area, .action-hub-group {
+    .mission-selector-group, .chips-scroll-area, .action-hub-group, .cave-subbar {
       pointer-events: auto;
     }
 
@@ -322,12 +322,12 @@
 
     /* Sub-bar for Krong No Caves (C7, A1, C3, C8, Chu Bluk) */
     .cave-subbar {
-      position: absolute; top: 56px; left: 50px; right: 12px; z-index: 999;
       display: none; gap: 6px; overflow-x: auto; flex-wrap: nowrap; align-items: center;
       background: rgba(15, 23, 42, 0.94); border: 1px solid #f43f5e;
       padding: 6px 10px; border-radius: 8px; backdrop-filter: blur(6px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       scrollbar-width: none; -webkit-overflow-scrolling: touch;
+      width: 100%; margin-top: 2px;
     }
     .cave-subbar::-webkit-scrollbar { display: none; }
     .cave-subbar-title {
@@ -471,22 +471,7 @@
     .warning-card h3 { color: #f87171; }
     .chart-box { height: 235px; width: 100%; display: flex; justify-content: center; }
 
-    /* Modal for Student Custom Analog Site Input */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(5, 8, 15, 0.85);
-      z-index: 2000; display: none; justify-content: center; align-items: center;
-      backdrop-filter: blur(5px); padding: 16px;
-    }
-    .modal-box {
-      background: #111827; border: 1px solid #3b82f6; border-radius: 10px;
-      width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-    }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .modal-header h2 { font-size: 16px; color: #f8fafc; }
-    .close-modal { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; }
-    .close-modal:hover { color: #ffffff; }
-
+    /* Student Custom Analog Site Input Forms */
     .quick-fill-bar {
       display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;
       background: rgba(30, 41, 59, 0.6); padding: 8px 10px; border-radius: 6px; border: 1px solid #334155;
@@ -510,16 +495,6 @@
     .form-section-title {
       grid-column: span 2; font-size: 12px; font-weight: bold; color: #38bdf8;
       border-bottom: 1px solid #334155; padding-bottom: 3px; margin-top: 6px;
-    }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
-    .btn-save {
-      background: #2563eb; color: #ffffff; border: none; padding: 7px 15px;
-      border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12.5px;
-    }
-    .btn-save:hover { background: #1d4ed8; }
-    .btn-cancel {
-      background: #334155; color: #cbd5e1; border: none; padding: 7px 13px;
-      border-radius: 6px; cursor: pointer; font-size: 12.5px;
     }
 
     /* ================================================================
@@ -691,17 +666,407 @@
     }
     .match-sub-link:hover { color: #38bdf8; }
 
-    @media (max-width: 760px) {
-      .match-compare-grid { grid-template-columns: 1fr; }
-      .match-esi-center { padding: 14px; }
+    /* ================================================================
+       RESPONSIVE & MOBILE POLISH (PHONES, TABLETS & DESKTOPS)
+       ================================================================ */
+
+    /* Universal Viewport & Reset Protection */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
     }
 
+    /* Desktop Navigation Container */
+    .mission-nav-top {
+      display: contents; /* On desktop, items behave as direct children of .mission-header-bar */
+    }
+
+    /* Mobile Map Switcher & Floating Pill - hidden on desktop */
+    .mobile-map-bar {
+      display: none;
+    }
+    .floating-back-to-map {
+      display: none;
+    }
+
+    /* Tablets & Laptops (max-width: 1100px) */
+    @media (max-width: 1100px) {
+      .site-select-title { max-width: 130px; }
+      .chips-scroll-area { max-width: 320px; }
+      .btn-user-input { padding: 5px 9px; font-size: 11.5px; }
+    }
+
+    /* Mobile & Tablet Screens (max-width: 900px) */
     @media (max-width: 900px) {
-      body { flex-direction: column; overflow-y: auto; height: auto; }
-      #maps-wrapper { height: 500px; flex: none; }
-      #sidebar { height: auto; }
-      .location-bar { left: 10px; right: 10px; }
-      .cave-subbar { left: 10px; right: 10px; top: 52px; }
+      body {
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      #maps-wrapper {
+        height: 450px;
+        flex: none;
+        width: 100%;
+        max-width: 100vw;
+        position: relative;
+        overflow: hidden;
+        border-right: none;
+        border-bottom: 1px solid #1e293b;
+      }
+
+      /* Unified Mission Header Bar on Mobile */
+      .mission-header-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(11, 17, 32, 0.95);
+        border-bottom: 1px solid #1e293b;
+        padding: 6px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+        pointer-events: auto;
+        z-index: 1000;
+      }
+
+      .mission-nav-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 6px;
+        pointer-events: auto;
+      }
+
+      .mission-selector-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .site-dropdown-container {
+        flex: 1;
+        min-width: 0;
+        max-width: 220px;
+      }
+
+      .site-select-btn {
+        width: 100%;
+        padding: 5px 8px;
+        gap: 5px;
+        font-size: 11.5px;
+      }
+
+      .site-select-title {
+        max-width: 110px;
+        font-size: 11.5px;
+      }
+
+      .site-select-score {
+        font-size: 10px;
+        padding: 1px 4px;
+      }
+
+      .icon-nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 9px;
+        flex-shrink: 0;
+      }
+
+      .btn-action-global {
+        padding: 4px 7px;
+        font-size: 11px;
+        flex-shrink: 0;
+      }
+
+      .action-hub-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+        pointer-events: auto;
+      }
+
+      .btn-user-input {
+        padding: 5px 9px;
+        font-size: 11.5px;
+        gap: 4px;
+      }
+
+      .cloud-status-badge {
+        padding: 5px 7px;
+        font-size: 10.5px;
+      }
+
+      /* Row 2: Chips Track or Caves Track */
+      .chips-scroll-area {
+        order: 2;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        pointer-events: auto;
+      }
+
+      /* When Krong No Caves are active on mobile, cleanly swap chips track for caves track */
+      .mission-header-bar.caves-active .chips-scroll-area {
+        display: none !important;
+      }
+
+      /* Krong No Caves Subbar on Mobile */
+      .cave-subbar {
+        order: 2;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+        gap: 4px !important;
+      }
+      .cave-subbar-title {
+        font-size: 10px !important;
+        margin-right: 2px !important;
+      }
+      .cave-btn {
+        padding: 3px 7px !important;
+        font-size: 10.5px !important;
+      }
+
+      /* Relocate Leaflet Zoom Controls so they NEVER overlap header or cave bar */
+      .leaflet-top.leaflet-left {
+        top: auto !important;
+        bottom: 28px !important;
+        left: 6px !important;
+      }
+      .leaflet-control-zoom {
+        margin: 0 !important;
+        border: 1px solid #334155 !important;
+      }
+      .leaflet-control-zoom a {
+        width: 26px !important;
+        height: 26px !important;
+        line-height: 26px !important;
+        font-size: 13px !important;
+        background: rgba(15, 23, 42, 0.92) !important;
+        color: #38bdf8 !important;
+      }
+      .leaflet-bottom.leaflet-right {
+        bottom: 6px !important;
+        right: 6px !important;
+      }
+      .leaflet-control-layers {
+        margin: 0 !important;
+      }
+
+      /* Reposition Map Label Tags */
+      .map-label {
+        bottom: 6px !important;
+        left: 40px !important;
+        padding: 3px 8px !important;
+        font-size: 10px !important;
+        max-width: calc(100% - 90px) !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      /* Mobile Map Mode Bar */
+      .mobile-map-bar {
+        display: flex;
+        background: #0b1120;
+        border-top: 1px solid #1e293b;
+        border-bottom: 1px solid #1e293b;
+        padding: 6px 10px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        max-width: 100vw;
+      }
+      .map-view-tabs {
+        display: flex;
+        background: #090d16;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 2px;
+        gap: 2px;
+      }
+      .map-tab {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 4px 9px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .map-tab.active {
+        background: #38bdf8;
+        color: #090d16;
+        font-weight: 700;
+      }
+      .btn-jump-analysis {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid #10b981;
+        color: #34d399;
+        padding: 4px 9px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* Right Sidebar on Mobile */
+      #sidebar {
+        height: auto;
+        padding: 14px 12px 60px 12px;
+        gap: 10px;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+
+      .header-top {
+        gap: 6px;
+      }
+      .asi-display {
+        padding: 4px 10px;
+        min-width: 80px;
+      }
+      .asi-display .value {
+        font-size: 18px;
+      }
+      h1#site-title {
+        font-size: 17px;
+        margin-top: 2px;
+      }
+      .card {
+        padding: 10px 11px;
+      }
+      .chart-box {
+        height: 220px;
+      }
+
+      /* Floating Back to Map Pill */
+      .floating-back-to-map {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid #38bdf8;
+        color: #38bdf8;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.8), 0 0 12px rgba(56, 189, 248, 0.35);
+        backdrop-filter: blur(8px);
+        z-index: 1500;
+        transition: all 0.2s ease;
+      }
+      .floating-back-to-map:hover {
+        background: #38bdf8;
+        color: #090d16;
+      }
+
+      /* Dropdown Menu on Mobile -> Native Floating Card */
+      .site-dropdown-menu {
+        position: fixed !important;
+        top: 48px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: auto !important;
+        max-width: none !important;
+        max-height: 75vh !important;
+        z-index: 3000 !important;
+        border-radius: 12px !important;
+      }
+      .menu-site-item {
+        padding: 9px 10px !important;
+      }
+      .site-item-name {
+        max-width: 170px !important;
+      }
+    }
+
+    /* Small Mobile Phones (max-width: 500px) */
+    @media (max-width: 500px) {
+      .site-select-title {
+        max-width: 75px;
+      }
+      .btn-action-global span.global-text {
+        display: none;
+      }
+      .btn-user-input span.btn-add-text-long {
+        display: none;
+      }
+      .cloud-status-badge span#cloud-text {
+        display: none;
+      }
+      .cave-specs {
+        grid-template-columns: 1fr 1fr;
+      }
+      .cave-specs .cave-spec-item:last-child {
+        grid-column: span 2;
+      }
+
+      /* Modal Box on Mobile */
+      .modal-overlay {
+        padding: 6px !important;
+      }
+      .modal-box {
+        padding: 14px 12px !important;
+        max-height: 94vh !important;
+        border-radius: 10px !important;
+      }
+      .modal-header h2 {
+        font-size: 13.5px !important;
+      }
+      .modal-tabs {
+        flex-direction: column !important;
+        gap: 5px !important;
+      }
+      .modal-tab {
+        padding: 7px 8px !important;
+        font-size: 11px !important;
+      }
+      .match-compare-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+      }
+      .match-esi-center {
+        order: -1 !important;
+        padding: 10px !important;
+      }
+      .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 7px !important;
+      }
+      .form-group.full {
+        grid-column: span 1 !important;
+      }
+      .form-section-title {
+        grid-column: span 1 !important;
+        font-size: 11px !important;
+      }
     }
   </style>
 </head>
@@ -712,53 +1077,67 @@
     <!-- Top Interactive Location Selector -->
     <!-- New Mission Control Header Deck -->
     <div class="mission-header-bar">
-      <!-- 1. Left Group: Dropdown & Navigation -->
-      <div class="mission-selector-group">
-        <div class="site-dropdown-container">
-          <button class="site-select-btn" id="site-select-btn" onclick="toggleSiteDropdown(event)">
-            <span class="site-badge-icon" id="header-site-icon">🇻🇳</span>
-            <span class="site-select-title" id="header-site-title">1. Krong No – Chu Bluk</span>
-            <span class="site-select-score" id="header-site-score">93.3%</span>
-            <span class="site-caret" id="dropdown-caret">▼</span>
-          </button>
+      <!-- Top Row on Mobile: Dropdown & Steppers on Left, Add & Cloud on Right -->
+      <div class="mission-nav-top">
+        <!-- 1. Left Group: Dropdown & Navigation -->
+        <div class="mission-selector-group">
+          <div class="site-dropdown-container">
+            <button class="site-select-btn" id="site-select-btn" onclick="toggleSiteDropdown(event)">
+              <span class="site-badge-icon" id="header-site-icon">🇻🇳</span>
+              <span class="site-select-title" id="header-site-title">1. Krong No – Chu Bluk</span>
+              <span class="site-select-score" id="header-site-score">93.3%</span>
+              <span class="site-caret" id="dropdown-caret">▼</span>
+            </button>
 
-          <!-- Dropdown Popover Menu -->
-          <div class="site-dropdown-menu" id="site-dropdown-menu">
-            <div class="menu-search-box">
-              <input type="text" id="site-search-input" placeholder="🔍 Search sites, countries, planets..." oninput="filterSiteList()" />
+            <!-- Dropdown Popover Menu -->
+            <div class="site-dropdown-menu" id="site-dropdown-menu">
+              <div class="menu-search-box">
+                <input type="text" id="site-search-input" placeholder="🔍 Search sites, countries, planets..." oninput="filterSiteList()" />
+              </div>
+              <div class="menu-category-tabs">
+                <button class="cat-tab active" data-cat="all" onclick="filterCategory('all', this)">All Sites (12)</button>
+                <button class="cat-tab" data-cat="moon" onclick="filterCategory('moon', this)">🌑 Moon</button>
+                <button class="cat-tab" data-cat="mars" onclick="filterCategory('mars', this)">🔴 Mars</button>
+                <button class="cat-tab" data-cat="vn" onclick="filterCategory('vn', this)">🇻🇳 Vietnam</button>
+                <button class="cat-tab" data-cat="custom" onclick="filterCategory('custom', this)">🧑‍🎓 Custom Sites</button>
+              </div>
+              <div class="menu-site-list" id="menu-site-list"></div>
             </div>
-            <div class="menu-category-tabs">
-              <button class="cat-tab active" data-cat="all" onclick="filterCategory('all', this)">All Sites (12)</button>
-              <button class="cat-tab" data-cat="moon" onclick="filterCategory('moon', this)">🌑 Moon</button>
-              <button class="cat-tab" data-cat="mars" onclick="filterCategory('mars', this)">🔴 Mars</button>
-              <button class="cat-tab" data-cat="vn" onclick="filterCategory('vn', this)">🇻🇳 Vietnam</button>
-              <button class="cat-tab" data-cat="custom" onclick="filterCategory('custom', this)">🧑‍🎓 Custom Sites</button>
-            </div>
-            <div class="menu-site-list" id="menu-site-list"></div>
           </div>
+
+          <button class="icon-nav-btn" title="Previous Site (◀ Key)" onclick="stepSite(-1)">◀</button>
+          <button class="icon-nav-btn" title="Next Site (▶ Key)" onclick="stepSite(1)">▶</button>
+          <button class="btn-action-global" id="btn-global" title="View global overview" onclick="showGlobalOverview()">🌐 <span class="global-text">Global View</span></button>
         </div>
 
-        <button class="icon-nav-btn" title="Previous Site (◀ Key)" onclick="stepSite(-1)">◀</button>
-        <button class="icon-nav-btn" title="Next Site (▶ Key)" onclick="stepSite(1)">▶</button>
-        <button class="btn-action-global" id="btn-global" title="View global overview" onclick="showGlobalOverview()">🌐 Global View</button>
+        <!-- 3. Fixed Right Action Hub (Always Visible!) -->
+        <div class="action-hub-group">
+          <button class="btn-user-input" id="btn-open-input" onclick="openAddModal()" title="Add Custom Planetary Analog Site">
+            <span style="font-size:13px;">✍️</span>
+            <span>Add <span class="btn-add-text-long">Analog </span>Site</span>
+            <span class="btn-sparkle">✦</span>
+          </button>
+          <div class="cloud-status-badge" id="cloud-pill" title="Supabase Real-time Cloud Synchronization">
+            <span id="cloud-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981;"></span>
+            <span id="cloud-text">Sync</span>
+          </div>
+        </div>
       </div>
 
-      <!-- 2. Middle Scrollable Chips -->
-      <div class="chips-scroll-area">
+      <!-- 2. Middle Scrollable Chips (Full Width Row on Mobile) -->
+      <div class="chips-scroll-area" id="chips-scroll-area">
         <div id="btn-group" class="chips-track"></div>
       </div>
 
-      <!-- 3. Fixed Right Action Hub (Always Visible!) -->
-      <div class="action-hub-group">
-        <button class="btn-user-input" id="btn-open-input" onclick="openAddModal()">
-          <span style="font-size:13px;">✍️</span>
-          <span>Add Analog Site</span>
-          <span class="btn-sparkle">✦</span>
-        </button>
-        <div class="cloud-status-badge" id="cloud-pill" title="Supabase Real-time Cloud Synchronization">
-          <span id="cloud-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981;"></span>
-          <span id="cloud-text">Cloud Sync</span>
-        </div>
+      <!-- Krong No Cave Network Subbar -->
+      <div class="cave-subbar" id="cave-subbar">
+        <div class="cave-subbar-title">🌋 Caves:</div>
+        <button class="cave-btn active" id="cbtn-all" onclick="focusAllCaves()">Overview</button>
+        <button class="cave-btn" id="cbtn-c7" onclick="focusSingleCave(0)">🌋 C7 (1,266 m)</button>
+        <button class="cave-btn" id="cbtn-a1" onclick="focusSingleCave(1)">🕳️ A1 (457 m)</button>
+        <button class="cave-btn" id="cbtn-c3" onclick="focusSingleCave(2)">🧭 C3 (594 m)</button>
+        <button class="cave-btn" id="cbtn-c8" onclick="focusSingleCave(3)">🦇 C8 (~320 m)</button>
+        <button class="cave-btn" id="cbtn-cb" onclick="focusSingleCave(4)">🌋 Chu Bluk</button>
       </div>
     </div>
 
@@ -766,17 +1145,6 @@
     <div id="map-pin-toast">
       <span>📍 Map Pinning Active: <b>Click anywhere on the Earth map to pick coordinates</b></span>
       <button style="background:transparent; border:none; color:#ffffff; cursor:pointer; font-weight:bold; margin-left:8px;" onclick="cancelMapPinning()">✕</button>
-    </div>
-
-    <!-- Krong No Cave Network Subbar -->
-    <div class="cave-subbar" id="cave-subbar">
-      <div class="cave-subbar-title">🌋 Krong No Caves:</div>
-      <button class="cave-btn active" id="cbtn-all" onclick="focusAllCaves()">System Overview</button>
-      <button class="cave-btn" id="cbtn-c7" onclick="focusSingleCave(0)">🌋 Cave C7 (1,266.5 m)</button>
-      <button class="cave-btn" id="cbtn-a1" onclick="focusSingleCave(1)">🕳️ Cave A1 (456.7 m)</button>
-      <button class="cave-btn" id="cbtn-c3" onclick="focusSingleCave(2)">🧭 Cave C3 (594.4 m)</button>
-      <button class="cave-btn" id="cbtn-c8" onclick="focusSingleCave(3)">🦇 Cave C8 (~320 m)</button>
-      <button class="cave-btn" id="cbtn-cb" onclick="focusSingleCave(4)">🌋 Chu Bluk Volcano</button>
     </div>
 
     <!-- Upper Map: Earth Terrestrial Analog Site -->
@@ -794,6 +1162,19 @@
         <span>🌑 LUNAR FRONTIER // MARIUS HILLS (MOON)</span>
       </div>
     </div>
+  </div>
+
+  <!-- Mobile Map Mode Switcher & Quick Navigation Bar (Visible on mobile/tablet) -->
+  <div class="mobile-map-bar" id="mobile-map-bar">
+    <div class="map-view-tabs">
+      <button class="map-tab active" id="tab-split" onclick="setMapLayout('split')">⚏ Dual Split</button>
+      <button class="map-tab" id="tab-earth" onclick="setMapLayout('earth')">🌍 Earth Map</button>
+      <button class="map-tab" id="tab-planet" onclick="setMapLayout('planet')">🌑 Target Map</button>
+    </div>
+    <button class="btn-jump-analysis" onclick="scrollToAnalysis()" title="Jump down to ESI scientific analysis">
+      <span>Analysis</span>
+      <span style="font-size: 10px;">▼</span>
+    </button>
   </div>
 
   <!-- Right Side: Analytical Scientific Sidebar -->
@@ -875,17 +1256,19 @@
     <!-- Quantitative Parameters (NASA Datasets) Table -->
     <div class="card">
       <h3>📊 QUANTITATIVE PARAMETERS (NASA DATASETS)</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Earth Site</th>
-            <th>Target Body</th>
-            <th>ESI (Sᵢ)</th>
-          </tr>
-        </thead>
-        <tbody id="quant-tbody"></tbody>
-      </table>
+      <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Earth Site</th>
+              <th>Target Body</th>
+              <th>ESI (Sᵢ)</th>
+            </tr>
+          </thead>
+          <tbody id="quant-tbody"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Multi-Dimensional Radar Chart -->
@@ -1802,6 +2185,10 @@
         earthMap.removeLayer(krongNoLayerGroup);
       }
       document.getElementById('cave-subbar').style.display = 'none';
+      const mhb = document.querySelector('.mission-header-bar');
+      if (mhb) mhb.classList.remove('caves-active');
+      const earthLabel = document.getElementById('earth-label');
+      if (earthLabel) earthLabel.innerHTML = `<span>🌍 GLOBAL OVERVIEW // ${analogs.length} SITES</span>`;
       if (earthMarkers.length > 0) {
         const group = new L.featureGroup(earthMarkers);
         earthMap.flyToBounds(group.getBounds().pad(0.2), { duration: 1.2 });
@@ -1965,17 +2352,30 @@
         earthMap.flyTo(site.earthCoords, site.earthZoom, { duration: 1.2 });
       }
 
+      const mhb = document.querySelector('.mission-header-bar');
       if (site.id === 'krongno') {
         if (krongNoLayerGroup && !earthMap.hasLayer(krongNoLayerGroup)) {
           krongNoLayerGroup.addTo(earthMap);
         }
         document.getElementById('cave-subbar').style.display = 'flex';
+        if (mhb) mhb.classList.add('caves-active');
         setCaveSubbarActive('cbtn-all');
       } else {
         if (krongNoLayerGroup && earthMap.hasLayer(krongNoLayerGroup)) {
           earthMap.removeLayer(krongNoLayerGroup);
         }
         document.getElementById('cave-subbar').style.display = 'none';
+        if (mhb) mhb.classList.remove('caves-active');
+      }
+
+      const earthLabel = document.getElementById('earth-label');
+      if (earthLabel) {
+        if (site.id === 'krongno') {
+          earthLabel.innerHTML = `<span>🌍 TERRESTRIAL TESTBED // KRONG NO (C7, A1, C3, C8)</span>`;
+        } else {
+          const shortName = site.shortLabel ? site.shortLabel.replace(/^[A-Z]{2}\s*/, '').replace(/^[^\w\s]+\s*/, '') : site.name;
+          earthLabel.innerHTML = `<span>🌍 TERRESTRIAL ANALOG // ${shortName.toUpperCase()}</span>`;
+        }
       }
 
       if (planetMap) {
@@ -3094,7 +3494,88 @@
       }, 250);
     }
 
+    /* Mobile Map Switcher and Navigation Utilities */
+    let currentMobileLayout = 'split';
+    function setMapLayout(mode) {
+      currentMobileLayout = mode;
+      const earthPane = document.getElementById('earth-map').parentElement;
+      const planetPane = document.getElementById('planet-map').parentElement;
+      const tabSplit = document.getElementById('tab-split');
+      const tabEarth = document.getElementById('tab-earth');
+      const tabPlanet = document.getElementById('tab-planet');
+
+      if (tabSplit) tabSplit.classList.remove('active');
+      if (tabEarth) tabEarth.classList.remove('active');
+      if (tabPlanet) tabPlanet.classList.remove('active');
+
+      if (mode === 'earth') {
+        earthPane.style.display = 'block';
+        earthPane.style.height = '100%';
+        planetPane.style.display = 'none';
+        if (tabEarth) tabEarth.classList.add('active');
+      } else if (mode === 'planet') {
+        earthPane.style.display = 'none';
+        planetPane.style.display = 'block';
+        planetPane.style.height = '100%';
+        if (tabPlanet) tabPlanet.classList.add('active');
+      } else {
+        // split
+        earthPane.style.display = 'block';
+        earthPane.style.height = '';
+        planetPane.style.display = 'block';
+        planetPane.style.height = '';
+        if (tabSplit) tabSplit.classList.add('active');
+      }
+
+      setTimeout(() => {
+        if (earthMap) earthMap.invalidateSize();
+        if (planetMap) planetMap.invalidateSize();
+      }, 120);
+    }
+
+    function scrollToAnalysis() {
+      const sb = document.getElementById('sidebar');
+      if (sb) sb.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function scrollToMap() {
+      const mw = document.getElementById('maps-wrapper');
+      if (mw) mw.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('floating-back-to-map');
+      if (!btn) return;
+      if (window.innerWidth <= 900) {
+        if (window.scrollY > 350) {
+          btn.style.display = 'inline-flex';
+        } else {
+          btn.style.display = 'none';
+        }
+      } else {
+        btn.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        const earthPane = document.getElementById('earth-map').parentElement;
+        const planetPane = document.getElementById('planet-map').parentElement;
+        earthPane.style.display = 'block';
+        earthPane.style.height = '';
+        planetPane.style.display = 'block';
+        planetPane.style.height = '';
+      }
+      if (earthMap) earthMap.invalidateSize();
+      if (planetMap) planetMap.invalidateSize();
+    });
+
     window.addEventListener('load', initApp);
   </script>
+
+  <!-- Mobile Floating Quick-Jump Button -->
+  <button class="floating-back-to-map" id="floating-back-to-map" onclick="scrollToMap()" title="Return to interactive maps">
+    <span>🗺️ Back to Map</span> <span>↑</span>
+  </button>
 </body>
 </html>
