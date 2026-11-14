@@ -1,877 +1,1928 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KRONOS-SIM: Krông Nô Lunar Analog Mission Control (NASA APIs)</title>
-  <!-- Leaflet Map Library with Automatic CDN Fallback -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="anonymous" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"></script>
+  <title>Dual-Planet Analog Explorer — ESI Telemetry</title>
+
+  <!-- Typography: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet Map Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <!-- Chart.js Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- KaTeX Library for Mathematical Notation -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { display: flex; height: 100vh; background: #090d16; color: #e2e8f0; overflow: hidden; }
-    
-    /* Dual-Map Container on the Left */
+    :root {
+      --bg-canvas: #090a0d;
+      --bg-surface: #111318;
+      --bg-elevated: #171a21;
+      --bg-inset: #0d0f13;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-blue: #3b82f6;
+      --accent-blue-soft: rgba(59, 130, 246, 0.14);
+      --accent-earth: #10b981;
+      --accent-planet: #f97316;
+      --accent-gold: #eab308;
+      --accent-gold-soft: rgba(234, 179, 8, 0.14);
+      --accent-danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Workstation Header Bar */
+    .app-header {
+      height: 50px;
+      min-height: 50px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      gap: 12px;
+      z-index: 1200;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      white-space: nowrap;
+      padding-right: 8px;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+    }
+
+    .brand-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Site Selector Dropdown & Stepper */
+    .site-selector-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      max-width: 440px;
+      min-width: 210px;
+      position: relative;
+    }
+
+    .step-btn {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      width: 30px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .step-btn:hover {
+      background: #1e222b;
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .site-dropdown {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .site-dropdown-trigger {
+      width: 100%;
+      height: 32px;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 500;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .site-dropdown-trigger:hover,
+    .site-dropdown.open .site-dropdown-trigger {
+      background: #1e222b;
+      border-color: var(--accent-blue);
+    }
+
+    .trigger-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .trigger-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .trigger-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .trigger-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      background: var(--accent-blue-soft);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trigger-chevron {
+      color: var(--text-secondary);
+      transition: transform 0.18s ease;
+    }
+
+    .site-dropdown.open .trigger-chevron {
+      transform: rotate(180deg);
+    }
+
+    .site-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 100%;
+      min-width: 310px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+      z-index: 2200;
+      overflow: hidden;
+    }
+
+    .site-dropdown.open .site-dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-toolbar {
+      padding: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-inset);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropdown-search {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .dropdown-search:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .dropdown-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .dropdown-list {
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .dropdown-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .dropdown-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 3px;
+    }
+
+    .site-option {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 7px 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.12s ease;
+    }
+
+    .site-option:hover {
+      background: var(--bg-elevated);
+    }
+
+    .site-option.active {
+      background: var(--accent-blue-soft);
+      border-color: rgba(59, 130, 246, 0.32);
+    }
+
+    .option-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .option-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .option-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .option-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .site-option.active .option-score {
+      color: var(--accent-blue);
+    }
+
+    /* Header Right Controls */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-ghost {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--border-strong);
+      background: #1e222b;
+    }
+
+    /* Segmented Language Switcher */
+    .lang-switch {
+      display: inline-flex;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 2px;
+    }
+
+    .lang-opt {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lang-opt.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Main Split Workspace */
+    .workspace {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      width: 100%;
+    }
+
+    /* Left Dual-Viewport Map Column */
     #maps-wrapper {
-      flex: 1.5; display: flex; flex-direction: column; position: relative;
-      border-right: 1px solid #1e293b;
+      flex: 1.45;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border-subtle);
+      min-width: 0;
+      position: relative;
     }
 
-    /* Top Navigation Container */
-    .top-nav-bar {
-      position: absolute; top: 10px; left: 55px; right: 12px; z-index: 1000;
-      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    .map-pane {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      min-height: 180px;
     }
 
-    /* Top Site Selection Bar */
-    .location-bar {
-      display: flex; gap: 5px; flex-wrap: wrap; align-items: center; pointer-events: auto;
-    }
-    .loc-btn {
-      background: rgba(15, 23, 42, 0.92); color: #38bdf8; border: 1px solid #0284c7;
-      padding: 5px 9px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11.5px;
-      transition: all 0.2s; backdrop-filter: blur(4px);
-    }
-    .loc-btn:hover, .loc-btn.active { background: #38bdf8; color: #090d16; border-color: #38bdf8; }
-    
-    /* Global Overview Button */
-    .loc-btn.global-btn {
-      border-color: #10b981; color: #34d399;
-    }
-    .loc-btn.global-btn:hover, .loc-btn.global-btn.active {
-      background: #10b981; color: #090d16; border-color: #10b981;
+    #earth-map {
+      width: 100%;
+      height: 100%;
+      background: #0b0d11;
+      border-bottom: 1px solid var(--border-strong);
     }
 
-    /* Vietnam Focus Highlight Button */
-    .loc-btn.vn-highlight {
-      border-color: #f43f5e; color: #fda4af;
-    }
-    .loc-btn.vn-highlight:hover, .loc-btn.vn-highlight.active {
-      background: #f43f5e; color: #ffffff; border-color: #f43f5e;
+    #planet-map {
+      width: 100%;
+      height: 100%;
+      background: #060709;
     }
 
-    /* Gold Border for NASA Baseline Benchmarks */
-    .loc-btn.baseline { border-color: #f59e0b; color: #fbbf24; }
-    .loc-btn.baseline:hover, .loc-btn.baseline.active { background: #f59e0b; color: #090d16; border-color: #f59e0b; }
-
-    /* Custom Student Site Button */
-    .loc-btn.custom-site { border-color: #a855f7; color: #d8b4fe; }
-    .loc-btn.custom-site:hover, .loc-btn.custom-site.active { background: #a855f7; color: #ffffff; border-color: #a855f7; }
-
-    /* Add Custom Site Trigger Button */
-    .loc-btn.add-btn {
-      background: linear-gradient(135deg, #7e22ce, #a855f7);
-      color: #ffffff; border: 1px solid #d8b4fe;
-      box-shadow: 0 2px 8px rgba(168, 85, 247, 0.45);
-    }
-    .loc-btn.add-btn:hover { background: #9333ea; transform: translateY(-1px); }
-
-    .loc-btn span.score-pill {
-      display: inline-block; margin-left: 4px; padding: 1px 5px; border-radius: 10px;
-      background: rgba(0, 0, 0, 0.35); font-size: 10px;
+    /* Minimalist Telemetry HUD Overlay on Maps */
+    .map-hud {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 900;
+      background: rgba(11, 13, 17, 0.86);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-strong);
+      border-radius: 7px;
+      padding: 6px 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
     }
 
-    /* Sub-bar for Krông Nô Caves (C7, A1, C3, C8...) */
-    .cave-subbar {
-      display: none; gap: 6px; flex-wrap: wrap; align-items: center; pointer-events: auto;
-      background: rgba(15, 23, 42, 0.94); border: 1px solid #f43f5e;
-      padding: 6px 10px; border-radius: 8px; backdrop-filter: blur(6px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-    }
-    .cave-subbar-title {
-      font-size: 11px; font-weight: 700; color: #fda4af; text-transform: uppercase;
-      margin-right: 4px;
-    }
-    .cave-btn {
-      background: #1e293b; color: #fecdd3; border: 1px solid #be123c;
-      padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .cave-btn:hover, .cave-btn.active {
-      background: #f43f5e; color: #ffffff; border-color: #f43f5e;
+    .hud-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
-    /* Synchronized Map Panes */
-    .map-pane { flex: 1; position: relative; width: 100%; }
-    #earth-map { width: 100%; height: 100%; border-bottom: 2px solid #38bdf8; }
-    #planet-map { width: 100%; height: 100%; background: #05070c; }
+    .hud-dot.earth {
+      background: var(--accent-earth);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
 
-    /* Custom Marker Tooltip */
-    .site-tooltip {
-      background: rgba(15, 23, 42, 0.92); color: #f8fafc; border: 1px solid #38bdf8;
-      border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    .hud-dot.planet {
+      background: var(--accent-planet);
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
     }
-    .site-tooltip.vn-tip { border-color: #f43f5e; color: #fecdd3; }
-    .site-tooltip.custom-tip { border-color: #a855f7; color: #e9d5ff; }
-    .site-tooltip.cave-tip {
-      background: rgba(136, 19, 55, 0.92); border-color: #fb7185; color: #fff1f2;
-      font-size: 10.5px; padding: 2px 5px;
-    }
-    .site-tooltip.base-tip { border-color: #f59e0b; color: #fde68a; }
 
-    /* Map Labels */
-    .map-label {
-      position: absolute; bottom: 12px; left: 12px; z-index: 999;
-      background: rgba(9, 13, 22, 0.88); border: 1px solid #334155;
-      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold;
-      display: flex; align-items: center; gap: 8px; backdrop-filter: blur(4px);
+    .hud-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
     }
-    .earth-tag { color: #34d399; border-color: #059669; }
-    .planet-tag { color: #fb923c; border-color: #ea580c; }
+
+    .hud-coords {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-secondary);
+      padding-left: 6px;
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    /* Dark Theme Override for Leaflet Controls */
+    .leaflet-control-zoom a,
+    .leaflet-control-layers {
+      background-color: rgba(17, 19, 24, 0.92) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-strong) !important;
+      backdrop-filter: blur(8px);
+    }
+
+    .leaflet-control-zoom a:hover {
+      background-color: var(--bg-elevated) !important;
+    }
+
+    .leaflet-control-layers-expanded {
+      padding: 8px 10px !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 11.5px !important;
+      color: var(--text-secondary) !important;
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(9, 10, 13, 0.72) !important;
+      color: var(--text-muted) !important;
+      font-size: 10px !important;
+    }
+
+    .leaflet-control-attribution a {
+      color: var(--text-secondary) !important;
+    }
 
     /* Right Analytical Sidebar */
     #sidebar {
-      flex: 1; padding: 18px; overflow-y: auto; background: #111827;
-      display: flex; flex-direction: column; gap: 12px;
-    }
-    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .badge-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .badge {
-      padding: 4px 8px; border-radius: 4px; font-size: 10.5px; font-weight: bold;
-      background: #1e3a8a; color: #93c5fd; text-transform: uppercase;
-    }
-    .badge-baseline { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-    .badge-vn { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid #f43f5e; }
-    .badge-custom { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid #a855f7; }
-
-    .delete-custom-btn {
-      background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444;
-      padding: 3px 8px; border-radius: 4px; font-size: 10.5px; font-weight: 700;
-      cursor: pointer; display: none;
-    }
-    .delete-custom-btn:hover { background: #ef4444; color: #ffffff; }
-
-    .asi-display {
-      background: linear-gradient(135deg, #0284c7, #1d4ed8);
-      padding: 6px 14px; border-radius: 8px; text-align: right; min-width: 115px;
-    }
-    .asi-display .label { font-size: 9.5px; text-transform: uppercase; opacity: 0.9; }
-    .asi-display .value { font-size: 20px; font-weight: 800; color: #ffffff; }
-
-    h1 { font-size: 19px; color: #f8fafc; margin-top: 4px; }
-    .project-banner {
-      font-size: 11px; color: #38bdf8; font-weight: 700; letter-spacing: 0.6px;
-      text-transform: uppercase; margin-bottom: 4px;
+      flex: 1;
+      max-width: 560px;
+      min-width: 360px;
+      background: var(--bg-surface);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
-    .card {
-      background: #1e293b; padding: 12px; border-radius: 8px; border: 1px solid #334155;
-    }
-    .card h3 { font-size: 12.5px; color: #38bdf8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .card p { font-size: 13px; line-height: 1.45; color: #cbd5e1; }
-
-    /* Cave System Sub-card in Sidebar */
-    .cave-detail-card {
-      background: rgba(136, 19, 55, 0.22); border: 1px solid #f43f5e;
-      padding: 11px; border-radius: 8px; display: none;
-    }
-    .cave-detail-card h3 { color: #fda4af; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; }
-    .cave-specs {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;
-    }
-    .cave-spec-item {
-      background: rgba(15, 23, 42, 0.75); padding: 6px 8px; border-radius: 5px;
-      border-left: 2px solid #f43f5e;
-    }
-    .cave-spec-item .lbl { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
-    .cave-spec-item .val { font-size: 12.5px; font-weight: 700; color: #fff1f2; margin-top: 1px; }
-
-    /* Formula Display Box */
-    .formula-pill {
-      font-family: 'Courier New', monospace; font-size: 11.5px; color: #a5f3fc;
-      background: #0f172a; padding: 6px 8px; border-radius: 5px; margin-bottom: 8px;
-      border-left: 3px solid #38bdf8;
+    .inspector-section {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
-    /* Quantitative Comparison Table */
-    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .data-table th, .data-table td { padding: 5px 6px; border-bottom: 1px solid #334155; text-align: left; }
-    .data-table th { color: #94a3b8; font-weight: 600; }
-    .data-table td.num { font-family: 'Courier New', monospace; color: #f8fafc; }
-
-    /* Mission Weight Sliders */
-    .weight-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
-    .weight-row label { flex: 1.3; color: #cbd5e1; }
-    .weight-row input[type="range"] { flex: 1.4; accent-color: #38bdf8; cursor: pointer; }
-    .weight-row span { width: 30px; text-align: right; font-weight: bold; color: #38bdf8; }
-
-    .preset-btns { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
-    .preset-btn {
-      background: #0f172a; color: #94a3b8; border: 1px solid #334155;
-      padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;
+    .inspector-section:last-child {
+      border-bottom: none;
     }
-    .preset-btn:hover { border-color: #38bdf8; color: #38bdf8; }
 
-    .warning-card { background: rgba(127, 29, 29, 0.25); border-color: #ef4444; }
-    .warning-card h3 { color: #f87171; }
-    /* Chart Container with padding to prevent label clipping */
-    .chart-box { height: 215px; width: 100%; position: relative; }
+    /* Site Summary Header */
+    .site-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
 
-    /* Modal for Student Custom Analog Site Input */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(5, 8, 15, 0.85);
-      z-index: 2000; display: none; justify-content: center; align-items: center;
-      backdrop-filter: blur(5px); padding: 16px;
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
     }
-    .modal-box {
-      background: #111827; border: 1px solid #a855f7; border-radius: 12px;
-      width: 100%; max-width: 650px; max-height: 92vh; overflow-y: auto;
-      padding: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.75);
+
+    .meta-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      text-transform: uppercase;
     }
+
+    .site-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    /* Precision ESI Readout */
+    .esi-readout {
+      text-align: right;
+      flex-shrink: 0;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 12px;
+      border-radius: 8px;
+      min-width: 112px;
+    }
+
+    .esi-readout-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .esi-readout-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .esi-bar-track {
+      width: 100%;
+      height: 3px;
+      background: var(--bg-elevated);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .esi-bar-fill {
+      height: 100%;
+      background: var(--accent-blue);
+      border-radius: 2px;
+      transition: width 0.25s ease, background-color 0.25s ease;
+    }
+
+    /* Section Headings */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Recessed Mathematical Formula Block */
+    .formula-box {
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: 7px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+    }
+
+    .formula-math {
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .formula-math .katex {
+      font-size: 1.05em;
+    }
+
+    .formula-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Scenario Presets */
+    .preset-strip {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .preset-chip {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 9px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .preset-chip.active {
+      background: var(--accent-blue-soft);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* Custom Precision Sliders */
+    .weight-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 38px;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 0;
+      font-size: 12px;
+    }
+
+    .weight-row label {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .weight-row span {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      background: #262a33;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      border: 2px solid var(--accent-blue);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      border: 2px solid var(--accent-blue);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+    }
+
+    /* Quantitative Table with Inline Similarity Bars */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .data-table th {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 11px;
+      padding: 0 6px 7px 6px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+
+    .data-table th.num,
+    .data-table td.num {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .data-table td {
+      padding: 6px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table td.num {
+      color: var(--text-primary);
+      font-size: 11.5px;
+    }
+
+    .sim-cell {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+    }
+
+    .mini-bar {
+      width: 34px;
+      height: 4px;
+      background: var(--bg-inset);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .mini-bar-fill {
+      height: 100%;
+      background: var(--accent-blue);
+      border-radius: 2px;
+    }
+
+    /* Radar Chart Container */
+    .chart-box {
+      height: 210px;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Editorial Field Notes */
+    .note-block {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    .constraint-callout {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-left: 2px solid var(--accent-planet);
+      border-radius: 6px;
+    }
+
+    .constraint-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-planet);
+      margin-bottom: 4px;
+    }
+
+    /* Clean Workstation Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 6, 8, 0.78);
+      backdrop-filter: blur(6px);
+      z-index: 2500;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.65);
+    }
+
     .modal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 14px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .modal-header h2 { font-size: 17px; color: #e9d5ff; }
-    .close-modal {
-      background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;
-    }
-    .close-modal:hover { color: #ffffff; }
 
-    .form-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+    .modal-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
     }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group.full { grid-column: span 2; }
-    .form-group label { font-size: 11px; color: #cbd5e1; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea {
-      background: #0f172a; border: 1px solid #334155; color: #f8fafc;
-      padding: 7px 9px; border-radius: 6px; font-size: 12.5px;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none; border-color: #a855f7;
-    }
-    .form-section-title {
-      grid-column: span 2; font-size: 11.5px; font-weight: 700; color: #38bdf8;
-      text-transform: uppercase; margin-top: 6px; border-bottom: 1px dashed #334155; padding-bottom: 3px;
-    }
-    .quick-fill-bar {
-      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center;
-      background: rgba(168, 85, 247, 0.12); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(168, 85, 247, 0.4);
-    }
-    .quick-fill-btn {
-      background: #1e293b; color: #e9d5ff; border: 1px solid #7e22ce;
-      padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;
-    }
-    .quick-fill-btn:hover { background: #7e22ce; color: #ffffff; }
 
-    .modal-actions {
-      display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;
+    .modal-body {
+      padding: 16px 18px;
     }
-    .btn-cancel {
-      background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
-      padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;
-    }
-    .btn-save {
-      background: linear-gradient(135deg, #7e22ce, #a855f7); color: #ffffff; border: none;
-      padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700;
-    }
-    .btn-save:hover { background: #9333ea; }
 
-    @media (max-width: 900px) {
-      body { flex-direction: column; height: auto; overflow-y: auto; }
-      #maps-wrapper { height: 60vh; min-height: 400px; flex: none; border-right: none; border-bottom: 2px solid #1e293b; }
-      #sidebar { flex: none; overflow-y: visible; padding: 14px; }
-      .top-nav-bar { left: 48px; right: 8px; top: 8px; gap: 6px; }
-      .location-bar {
-        overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px;
-        scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-inset);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .field-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-block label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .field-block input,
+    .field-block select,
+    .field-block textarea {
+      width: 100%;
+      padding: 7px 9px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .field-block input:focus,
+    .field-block select:focus,
+    .field-block textarea:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .criteria-edit-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .criteria-edit-row input {
+      width: 100%;
+      padding: 6px 8px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      color: #ffffff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-danger-ghost {
+      background: transparent;
+      color: var(--accent-danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-danger-ghost:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Subtle Status Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      z-index: 3000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast-msg.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Mobile & Tablet Layout */
+    @media (max-width: 960px) {
+      body {
+        height: auto;
+        overflow-y: auto;
       }
-      .location-bar::-webkit-scrollbar { display: none; }
-      .loc-btn { white-space: nowrap; flex-shrink: 0; padding: 5px 9px; font-size: 11px; }
-      .cave-subbar {
-        overflow-x: auto; flex-wrap: nowrap; padding: 4px 8px; gap: 4px;
-        scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;
+
+      .app-header {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 12px;
       }
-      .cave-subbar::-webkit-scrollbar { display: none; }
-      .cave-subbar-title { white-space: nowrap; flex-shrink: 0; }
-      .cave-btn { white-space: nowrap; flex-shrink: 0; padding: 3px 7px; font-size: 10px; }
-      .map-label { font-size: 10.5px; padding: 4px 8px; bottom: 8px; left: 8px; }
-      .cave-specs, .form-grid { grid-template-columns: 1fr; }
-      .form-group.full, .form-section-title { grid-column: span 1; }
-      .modal-box { width: 95%; max-height: 90vh; padding: 14px; }
+
+      .brand {
+        border-right: none;
+      }
+
+      .site-selector-wrap {
+        order: 3;
+        max-width: 100%;
+        width: 100%;
+        padding-top: 6px;
+        border-top: 1px solid var(--border-subtle);
+      }
+
+      .workspace {
+        flex-direction: column;
+      }
+
+      #maps-wrapper {
+        flex: none;
+        height: 60vh;
+        min-height: 400px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      #sidebar {
+        max-width: 100%;
+        min-width: 0;
+        overflow-y: visible;
+      }
     }
   </style>
 </head>
 <body>
-
-  <!-- Dual Synchronized Maps (Earth & Moon/Mars) -->
-  <div id="maps-wrapper">
-    <div class="top-nav-bar">
-      <div class="location-bar" id="btn-group"></div>
-
-      <!-- Sub-toolbar specifically for Krông Nô Lava Tube Network -->
-      <div class="cave-subbar" id="cave-subbar">
-        <span class="cave-subbar-title">🌋 Krông Nô Lava Tubes:</span>
-        <button class="cave-btn active" id="cave-btn-all" onclick="focusAllCaves()">All Caves (Flow Path)</button>
-        <button class="cave-btn" id="cave-btn-0" onclick="focusSingleCave(0)">Hang C7 (1,266.5m)</button>
-        <button class="cave-btn" id="cave-btn-1" onclick="focusSingleCave(1)">Hang A1 (456.7m)</button>
-        <button class="cave-btn" id="cave-btn-2" onclick="focusSingleCave(2)">Hang C3 (594.4m)</button>
-        <button class="cave-btn" id="cave-btn-3" onclick="focusSingleCave(3)">Hang C8 (~320m)</button>
-        <button class="cave-btn" id="cave-btn-4" onclick="focusSingleCave(4)">Chư Bluk Crater (Source)</button>
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3.6 9h16.8M3.6 15h16.8" />
+          <ellipse cx="12" cy="12" rx="4" ry="9" />
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">Analog Explorer</div>
+        <div class="brand-sub">ESI-7 MODEL</div>
       </div>
     </div>
-    
-    <!-- Map 1: Earth (NASA GIBS) -->
-    <div class="map-pane">
-      <div id="earth-map"></div>
-      <div class="map-label earth-tag" id="earth-label">🛰️ TERRESTRIAL TESTBED // Global Overview (All Analog Sites)</div>
+
+    <div class="site-selector-wrap">
+      <button class="step-btn" id="prev-site-btn" onclick="stepSite(-1)" title="Địa điểm trước" aria-label="Previous site">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+      </button>
+
+      <div class="site-dropdown" id="site-dropdown">
+        <button type="button" class="site-dropdown-trigger" id="site-dropdown-trigger" onclick="toggleSiteDropdown(event)" aria-haspopup="listbox" aria-expanded="false">
+          <span class="trigger-left">
+            <span class="hud-dot earth" id="trigger-dot"></span>
+            <span class="trigger-name" id="trigger-name">1. Chư Bluk (Việt Nam)</span>
+          </span>
+          <span class="trigger-right">
+            <span class="trigger-score" id="trigger-score">0.0%</span>
+            <svg class="trigger-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </button>
+
+        <div class="site-dropdown-menu" id="site-dropdown-menu" role="listbox">
+          <div class="dropdown-toolbar">
+            <input type="text" class="dropdown-search" id="dropdown-search" placeholder="Tìm tên địa điểm hoặc hành tinh..." oninput="filterSiteDropdown()" />
+            <span class="dropdown-count" id="dropdown-count">7</span>
+          </div>
+          <div class="dropdown-list" id="dropdown-list"></div>
+        </div>
+      </div>
+
+      <button class="step-btn" id="next-site-btn" onclick="stepSite(1)" title="Địa điểm tiếp theo" aria-label="Next site">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
     </div>
 
-    <!-- Map 2: Moon / Mars (NASA Solar System Treks) -->
-    <div class="map-pane">
-      <div id="planet-map"></div>
-      <div class="map-label planet-tag" id="planet-label">🌑 LUNAR FRONTIER // Marius Hills (NASA LRO)</div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="openModal('add')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        <span data-i18n="addSiteBtn">Thêm địa điểm</span>
+      </button>
+
+      <div class="lang-switch" role="group" aria-label="Language switcher">
+        <button class="lang-opt active" id="lang-vi" onclick="setLang('vi')">VI</button>
+        <button class="lang-opt" id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
     </div>
+  </header>
+
+  <!-- Split Workstation -->
+  <div class="workspace">
+    <!-- Left Dual-Map Viewports -->
+    <main id="maps-wrapper">
+      <div class="map-pane">
+        <div id="earth-map"></div>
+        <div class="map-hud">
+          <span class="hud-dot earth"></span>
+          <span class="hud-title" id="earth-label">Trái Đất</span>
+          <span class="hud-coords" id="earth-coords-hud">12.485°N, 107.902°E</span>
+        </div>
+      </div>
+
+      <div class="map-pane">
+        <div id="planet-map"></div>
+        <div class="map-hud">
+          <span class="hud-dot planet"></span>
+          <span class="hud-title" id="planet-label">Mặt Trăng</span>
+          <span class="hud-coords" id="planet-coords-hud">14.000°N, 56.000°W</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Analytical Inspector -->
+    <aside id="sidebar">
+      <!-- 1. Site Overview & Composite ESI -->
+      <section class="inspector-section">
+        <div class="site-header">
+          <div>
+            <div class="meta-row">
+              <span class="meta-tag" id="target-body">TARGET BODY</span>
+            </div>
+            <div class="site-title-row">
+              <h1 id="site-title">Site Name</h1>
+              <button class="icon-btn" onclick="openModal('edit')" id="edit-icon-btn" title="Chỉnh sửa thông số">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="esi-readout">
+            <div class="esi-readout-label" data-i18n="esiScoreLabel">Chỉ số ESI</div>
+            <div class="esi-readout-val" id="asi-score">0.0%</div>
+            <div class="esi-bar-track">
+              <div class="esi-bar-fill" id="esi-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Weighting Simulator & Mathematical Model -->
+      <section class="inspector-section">
+        <div class="section-head">
+          <div class="section-title" data-i18n="missionWeights">Trọng số Nhiệm vụ & Mô hình Toán học</div>
+        </div>
+
+        <div class="formula-box">
+          <div class="formula-math" id="esi-formula">
+            ESI = &prod;<sub>i=1</sub><sup>n</sup> (1 &minus; |x<sub>i</sub> &minus; x<sub>io</sub>| / (x<sub>i</sub> + x<sub>io</sub>))<sup>w<sub>i</sub>/n</sup>
+          </div>
+          <div class="formula-caption" id="formula-caption">
+            <i>x</i><sub>i</sub>: Hành tinh &nbsp;·&nbsp; <i>x</i><sub>io</sub>: Trái Đất &nbsp;·&nbsp; <i>w</i><sub>i</sub>: Trọng số &nbsp;·&nbsp; <i>n</i> = 7
+          </div>
+        </div>
+
+        <div class="preset-strip" id="preset-btns"></div>
+        <div id="sliders"></div>
+      </section>
+
+      <!-- 3. Quantitative Comparison Matrix -->
+      <section class="inspector-section">
+        <div class="section-head">
+          <div class="section-title" data-i18n="quantParams">Bảng Đối chiếu Định lượng (7 Tiêu chí)</div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th data-i18n="colCriterion">Tiêu chí</th>
+              <th class="num" data-i18n="colEarth">Trái Đất</th>
+              <th class="num" data-i18n="colPlanet">Hành tinh</th>
+              <th class="num">Sᵢ</th>
+            </tr>
+          </thead>
+          <tbody id="quant-tbody"></tbody>
+        </table>
+      </section>
+
+      <!-- 4. Multi-Dimensional Radar Profile -->
+      <section class="inspector-section">
+        <div class="section-head">
+          <div class="section-title" data-i18n="radarTitle">Biểu đồ Tương đồng Đa chiều</div>
+        </div>
+        <div class="chart-box">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </section>
+
+      <!-- 5. Geological Context & Field Limitations -->
+      <section class="inspector-section">
+        <div class="section-head">
+          <div class="section-title" data-i18n="geoTitle">Bối cảnh Địa chất & Giá trị Thử nghiệm</div>
+        </div>
+        <p class="note-block" id="site-geology"></p>
+
+        <div class="constraint-callout">
+          <div class="constraint-title" data-i18n="limitTitle">Hạn chế Mô phỏng Trên Trái Đất</div>
+          <p class="note-block" id="site-limits"></p>
+        </div>
+      </section>
+    </aside>
   </div>
 
-  <!-- Right Sidebar: Quantitative Analysis & ESI Simulator -->
-  <div id="sidebar">
-    <div>
-      <div class="project-banner">🚀 KRONOS-SIM: Krông Nô Lunar Analog Mission Control</div>
-      <div class="header-top">
-        <div class="badge-group">
-          <span class="badge" id="target-body">TARGET BODY</span>
-          <span class="badge badge-vn" id="vn-tag" style="display:none;">🇻🇳 VIETNAM FOCUS SITE</span>
-          <span class="badge badge-baseline" id="baseline-tag" style="display:none;">⭐ NASA BASELINE BENCHMARK</span>
-          <span class="badge badge-custom" id="custom-tag" style="display:none;">🧑‍🎓 STUDENT RESEARCH SITE</span>
-          <button class="delete-custom-btn" id="delete-site-btn" onclick="deleteCurrentCustomSite()">🗑️ Remove Site</button>
-        </div>
-        <div class="asi-display">
-          <div class="label">Analog ESI Score</div>
-          <div class="value" id="asi-score">0%</div>
-        </div>
-      </div>
-      <h1 id="site-title">Site Name</h1>
-    </div>
-
-    <!-- Dedicated Sub-Card for Krông Nô Caves (C7, A1, C3, C8, Chư Bluk) -->
-    <div class="cave-detail-card" id="cave-detail-card">
-      <h3 id="cave-card-title">🌋 Krông Nô Volcanic Cave System Network (C7, A1, C3, C8)</h3>
-      <div class="cave-specs">
-        <div class="cave-spec-item">
-          <div class="lbl">Surveyed Length</div>
-          <div class="val" id="cave-spec-len">1,266.5 m (C7)</div>
-        </div>
-        <div class="cave-spec-item">
-          <div class="lbl">Morphology</div>
-          <div class="val" id="cave-spec-morph">Lava Tube + Skylight</div>
-        </div>
-        <div class="cave-spec-item">
-          <div class="lbl">Lunar Analog Role</div>
-          <div class="val" id="cave-spec-role">Habitat & Rover Test</div>
-        </div>
-      </div>
-      <p id="cave-card-desc" style="font-size: 12.5px; color: #ffe4e6;"></p>
-    </div>
-
-    <!-- Mission Weight Simulator -->
-    <div class="card">
-      <h3>🎛️ ESI Weight Simulator (Schulze-Makuch, 2011)</h3>
-      <div class="formula-pill">
-        ESI = [ Π (1 - |Xᵢ - X₀| / (Xᵢ + X₀))^wᵢ ]^(1 / Σwᵢ)
-      </div>
-      <div class="preset-btns">
-        <button class="preset-btn" onclick="applyPreset(1.0, 1.0, 0.5, 0.0)">Surface & Geology (Default)</button>
-        <button class="preset-btn" onclick="applyPreset(1.0, 0.9, 0.1, 0.0)">Rover Mobility Test</button>
-        <button class="preset-btn" onclick="applyPreset(1.0, 0.3, 0.6, 0.2)">Full Environmental (Incl. Pressure)</button>
-      </div>
-      <div class="weight-row">
-        <label>Mineralogy & Lithology (w₁)</label>
-        <input type="range" id="w-mineral" min="0" max="1" step="0.1" value="1" oninput="updateAll()">
-        <span id="val-mineral">1.0</span>
-      </div>
-      <div class="weight-row">
-        <label>Topographic Slope (w₂)</label>
-        <input type="range" id="w-slope" min="0" max="1" step="0.1" value="1" oninput="updateAll()">
-        <span id="val-slope">1.0</span>
-      </div>
-      <div class="weight-row">
-        <label>Surface Temperature (w₃)</label>
-        <input type="range" id="w-temp" min="0" max="1" step="0.1" value="0.5" oninput="updateAll()">
-        <span id="val-temp">0.5</span>
-      </div>
-      <div class="weight-row">
-        <label>Atmospheric Pressure (w₄)</label>
-        <input type="range" id="w-press" min="0" max="1" step="0.1" value="0.0" oninput="updateAll()">
-        <span id="val-press">0.0</span>
-      </div>
-    </div>
-
-    <!-- Quantitative Data Comparison Table -->
-    <div class="card">
-      <h3>📊 Quantitative Parameters (NASA Datasets)</h3>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Earth Site</th>
-            <th>Target Body</th>
-            <th>ESI (Sᵢ)</th>
-          </tr>
-        </thead>
-        <tbody id="quant-tbody"></tbody>
-      </table>
-    </div>
-
-    <!-- Multi-Dimensional Radar Chart -->
-    <div class="card">
-      <h3>📈 Multi-Dimensional ESI Profile</h3>
-      <div class="chart-box">
-        <canvas id="radarChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Geological Context & Exploration Utility -->
-    <div class="card">
-      <h3>🚀 Geological Context & Exploration Utility</h3>
-      <p id="site-geology"></p>
-    </div>
-
-    <!-- Terrestrial Limitations -->
-    <div class="card warning-card">
-      <h3>⚠️ Terrestrial Limitations (Key Discrepancies)</h3>
-      <p id="site-limits"></p>
-    </div>
-  </div>
-
-  <!-- Student Research Input Modal -->
-  <div class="modal-overlay" id="add-modal">
-    <div class="modal-box">
+  <!-- Add / Edit Site Modal -->
+  <div id="edit-modal" class="modal" onclick="if(event.target === this) closeModal()">
+    <div class="modal-content">
       <div class="modal-header">
-        <h2>🧑‍🎓 Add Student Research Analog Site</h2>
-        <button class="close-modal" onclick="closeAddModal()">✕</button>
+        <div class="modal-title" id="modal-title">Thêm / Chỉnh sửa Địa điểm</div>
+        <button class="icon-btn" onclick="closeModal()" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
-      <!-- Quick Sample Templates for Students -->
-      <div class="quick-fill-bar">
-        <span style="font-size: 11px; color: #e9d5ff; font-weight: 700;">⚡ Quick Sample Data:</span>
-        <button type="button" class="quick-fill-btn" onclick="fillTemplate('chudangya')">🇻🇳 Núi lửa Chư Đăng Ya (Moon)</button>
-        <button type="button" class="quick-fill-btn" onclick="fillTemplate('muine')">🇻🇳 Đồi cát Mũi Né (Mars)</button>
-        <button type="button" class="quick-fill-btn" onclick="fillTemplate('lyson')">🇻🇳 Đảo Lý Sơn (Moon)</button>
-        <button type="button" class="quick-fill-btn" style="background: rgba(14, 165, 233, 0.25); border-color: #0284c7; color: #38bdf8;" onclick="document.getElementById('nasa-csv-input').click()">📂 Tải file CSV NASA POWER (Tự động điền)</button>
-        <input type="file" id="nasa-csv-input" accept=".csv" style="display:none;" onchange="handleNasaCsvUpload(event)">
-      </div>
+      <div class="modal-body">
+        <div class="modal-grid-2">
+          <div class="field-block">
+            <label data-i18n="lblSiteNameVi">Tên địa điểm (Tiếng Việt)</label>
+            <input type="text" id="m-name-vi" placeholder="VD: 8. Hang Tân Lập (Việt Nam)" />
+          </div>
+          <div class="field-block">
+            <label data-i18n="lblSiteNameEn">Tên địa điểm (Tiếng Anh)</label>
+            <input type="text" id="m-name-en" placeholder="e.g., 8. Tan Lap Cave (Vietnam)" />
+          </div>
+        </div>
 
-      <div id="csv-upload-status" style="display:none; font-size:11.5px; padding:8px 12px; margin-bottom:12px; border-radius:6px; background:rgba(16, 185, 129, 0.2); border:1px solid #10b981; color:#34d399; line-height: 1.4;"></div>
-
-      <form id="custom-site-form" onsubmit="saveCustomSite(event)">
-        <div class="form-grid">
-          <div class="form-section-title">1. Earth Analog Site Info</div>
-          <div class="form-group">
-            <label>Site Name (e.g., Chư Đăng Ya Volcano)</label>
-            <input type="text" id="inp-name" required placeholder="Núi lửa Chư Đăng Ya (Vietnam)" />
-          </div>
-          <div class="form-group">
-            <label>Short Pin Label on Map</label>
-            <input type="text" id="inp-short" required placeholder="🇻🇳 Chư Đăng Ya" />
-          </div>
-          <div class="form-group">
-            <label>Earth Latitude (Vĩ độ)</label>
-            <input type="number" step="any" id="inp-elat" required placeholder="14.113" />
-          </div>
-          <div class="form-group">
-            <label>Earth Longitude (Kinh độ)</label>
-            <input type="number" step="any" id="inp-elon" required placeholder="108.027" />
-          </div>
-
-          <div class="form-section-title">2. Target Planetary Body (Moon / Mars)</div>
-          <div class="form-group">
-            <label>Target Body</label>
-            <select id="inp-body" required>
-              <option value="moon">🌑 Moon (NASA LRO)</option>
-              <option value="mars">🔴 Mars (NASA Viking / MOLA)</option>
+        <div class="modal-grid-2">
+          <div class="field-block">
+            <label data-i18n="lblTargetBody">Hành tinh đích</label>
+            <select id="m-body">
+              <option value="moon">Moon / Mặt Trăng</option>
+              <option value="mars">Mars / Sao Hỏa</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Target Feature Name</label>
-            <input type="text" id="inp-pname" required placeholder="Hadley Rille - Apollo 15 (Moon)" />
-          </div>
-          <div class="form-group">
-            <label>Planet Latitude</label>
-            <input type="number" step="any" id="inp-plat" required placeholder="26.1" />
-          </div>
-          <div class="form-group">
-            <label>Planet Longitude</label>
-            <input type="number" step="any" id="inp-plon" required placeholder="3.6" />
-          </div>
-
-          <div class="form-section-title">3. Quantitative Parameters (For ESI Calculation)</div>
-          <div class="form-group">
-            <label>Mineralogy Similarity Score (0.0 – 1.0)</label>
-            <input type="number" step="0.01" min="0" max="1" id="inp-minscore" required value="0.88" />
-          </div>
-          <div class="form-group">
-            <label>Earth vs Target Mineralogy Text</label>
-            <input type="text" id="inp-mintext" required placeholder="Basalt, Scoria vs. Mare Basalt" />
-          </div>
-          <div class="form-group">
-            <label>Earth Mean Slope (°)</label>
-            <input type="number" step="0.1" min="0" max="90" id="inp-eslope" required value="12.0" />
-          </div>
-          <div class="form-group">
-            <label>Target Body Slope (°)</label>
-            <input type="number" step="0.1" min="0" max="90" id="inp-pslope" required value="14.0" />
-          </div>
-          <div class="form-group">
-            <label>Earth Temp (Kelvin, K = °C + 273.15)</label>
-            <input type="number" step="0.1" min="50" max="500" id="inp-etemp" required value="295.0" />
-          </div>
-          <div class="form-group">
-            <label>Target Body Temp (Kelvin)</label>
-            <input type="number" step="0.1" min="50" max="500" id="inp-ptemp" required value="252.0" />
-          </div>
-          <div class="form-group">
-            <label>Earth Pressure (kPa)</label>
-            <input type="number" step="0.1" min="0" max="200" id="inp-epress" required value="94.0" />
-          </div>
-          <div class="form-group">
-            <label>Target Body Pressure (kPa)</label>
-            <input type="number" step="0.01" min="0" max="200" id="inp-ppress" required value="0.0" />
-          </div>
-
-          <div class="form-section-title">4. Scientific Notes</div>
-          <div class="form-group full">
-            <label>Geological Context & Mission Utility</label>
-            <textarea id="inp-geology" rows="2" required placeholder="Describe why this Earth site is useful for testing Moon/Mars rovers or habitats..."></textarea>
-          </div>
-          <div class="form-group full">
-            <label>Terrestrial Limitations (Discrepancies)</label>
-            <textarea id="inp-limits" rows="2" required placeholder="Mention Earth gravity (1g), vegetation, rainfall, or atmospheric pressure differences..."></textarea>
+          <div class="field-block">
+            <label data-i18n="lblPlanetSite">Tên khu vực trên Hành tinh</label>
+            <input type="text" id="m-planet-name" placeholder="e.g., Philolaus Crater (Moon)" />
           </div>
         </div>
 
-        <div class="modal-actions">
-          <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-          <button type="submit" class="btn-save">🚀 Save & Plot on Dual-Map</button>
+        <div class="modal-grid-2">
+          <div class="field-block">
+            <label data-i18n="lblEarthCoords">Tọa độ Trái Đất (Vĩ độ, Kinh độ)</label>
+            <input type="text" id="m-earth-coords" placeholder="12.485, 107.902" />
+          </div>
+          <div class="field-block">
+            <label data-i18n="lblPlanetCoords">Tọa độ Hành tinh (Vĩ độ, Kinh độ)</label>
+            <input type="text" id="m-planet-coords" placeholder="14.0, -56.0" />
+          </div>
         </div>
-      </form>
+
+        <div style="margin: 12px 0 8px; font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;" data-i18n="lbl7CriteriaHeader">
+          Thông số 7 Tiêu chí (Trái Đất / Hành tinh)
+        </div>
+        <div class="criteria-edit-row" style="color: var(--text-muted); font-weight: 600; font-size: 11px;">
+          <span data-i18n="colCriterion">Tiêu chí</span>
+          <span data-i18n="colEarth">Trái Đất</span>
+          <span data-i18n="colPlanet">Hành tinh</span>
+        </div>
+        <div id="m-criteria-inputs"></div>
+
+        <div class="modal-grid-2" style="margin-top: 10px;">
+          <div class="field-block">
+            <label data-i18n="lblGeoNote">Bối cảnh Địa chất & Giá trị Thử nghiệm</label>
+            <textarea id="m-geology" rows="2"></textarea>
+          </div>
+          <div class="field-block">
+            <label data-i18n="lblLimitNote">Hạn chế Mô phỏng Trên Trái Đất</label>
+            <textarea id="m-limits" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div>
+          <button class="btn-danger-ghost" id="delete-site-btn" onclick="deleteCurrentSite()" data-i18n="deleteBtn">Xóa địa điểm</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-ghost" onclick="closeModal()" data-i18n="cancelBtn">Hủy</button>
+          <button class="btn-primary" onclick="saveSite()" data-i18n="saveBtn">Lưu thay đổi</button>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Non-blocking Status Notification -->
+  <div id="toast" class="toast-msg"></div>
+
   <script>
-    // 1. Base Quantitative Dataset for 7 Core Analog Sites
-    const defaultAnalogs = [
+    // 1. Bilingual Dictionary (Vietnamese & English)
+    const i18n = {
+      vi: {
+        earthPrefix: "Trái Đất",
+        moonPrefix: "Mặt Trăng (LRO)",
+        marsPrefix: "Sao Hỏa (Viking)",
+        esiScoreLabel: "Chỉ số ESI",
+        addSiteBtn: "Thêm địa điểm",
+        editTooltip: "Chỉnh sửa thông số địa điểm",
+        missionWeights: "Trọng số Nhiệm vụ & Mô hình Toán học",
+        quantParams: "Bảng Đối chiếu Định lượng (7 Tiêu chí)",
+        colCriterion: "Tiêu chí",
+        colEarth: "Trái Đất",
+        colPlanet: "Hành tinh",
+        radarTitle: "Biểu đồ Tương đồng Đa chiều",
+        geoTitle: "Bối cảnh Địa chất & Giá trị Thử nghiệm",
+        limitTitle: "Hạn chế Mô phỏng Trên Trái Đất",
+        modalAddTitle: "Thêm Cặp Địa Điểm Mô Phỏng Mới",
+        modalEditTitle: "Chỉnh Sửa Thông Số Địa Điểm",
+        lblSiteNameVi: "Tên địa điểm (Tiếng Việt)",
+        lblSiteNameEn: "Tên địa điểm (Tiếng Anh)",
+        lblTargetBody: "Hành tinh đích",
+        lblPlanetSite: "Tên khu vực trên Hành tinh",
+        lblEarthCoords: "Tọa độ Trái Đất (Vĩ độ, Kinh độ)",
+        lblPlanetCoords: "Tọa độ Hành tinh (Vĩ độ, Kinh độ)",
+        lbl7CriteriaHeader: "Thông số 7 Tiêu chí (Trái Đất / Hành tinh)",
+        lblGeoNote: "Bối cảnh Địa chất & Giá trị Thử nghiệm",
+        lblLimitNote: "Hạn chế Mô phỏng Trên Trái Đất",
+        saveBtn: "Lưu thay đổi",
+        deleteBtn: "Xóa địa điểm",
+        cancelBtn: "Hủy",
+        compScoreLabel: "Điểm thành phần Sᵢ",
+        presetGeo: "Địa hóa & Đá",
+        presetCave: "Căn cứ Hang ngầm",
+        presetAll: "Toàn diện (Đều)",
+        savedToast: "Đã lưu cập nhật thông số.",
+        deletedToast: "Đã xóa địa điểm khỏi danh sách.",
+        searchPlaceholder: "Tìm địa điểm hoặc hành tinh...",
+        prevSiteTooltip: "Địa điểm trước",
+        nextSiteTooltip: "Địa điểm tiếp theo",
+        c_sio2: "SiO₂ (%)",
+        c_feo: "FeO (%)",
+        c_tio2: "TiO₂ (%)",
+        c_density: "Mật độ đá (g/cm³)",
+        c_thermal: "Đệm nhiệt (%)",
+        c_roof: "Độ dày trần hang (m)",
+        c_gravity: "Trọng trường (m/s²)"
+      },
+      en: {
+        earthPrefix: "Earth",
+        moonPrefix: "Moon (LRO)",
+        marsPrefix: "Mars (Viking)",
+        esiScoreLabel: "Analog ESI",
+        addSiteBtn: "Add Site",
+        editTooltip: "Edit site parameters",
+        missionWeights: "Mission Weighting & Mathematical Model",
+        quantParams: "Quantitative 7-Criteria Comparison",
+        colCriterion: "Criterion",
+        colEarth: "Earth",
+        colPlanet: "Planet",
+        radarTitle: "Multi-Dimensional Similarity Profile",
+        geoTitle: "Geological Context & Exploration Utility",
+        limitTitle: "Terrestrial Limitations",
+        modalAddTitle: "Add New Analog Pair",
+        modalEditTitle: "Edit Site Parameters",
+        lblSiteNameVi: "Site Name (Vietnamese)",
+        lblSiteNameEn: "Site Name (English)",
+        lblTargetBody: "Target Planetary Body",
+        lblPlanetSite: "Planetary Target Region",
+        lblEarthCoords: "Earth Coordinates (Lat, Lon)",
+        lblPlanetCoords: "Planet Coordinates (Lat, Lon)",
+        lbl7CriteriaHeader: "7 Criteria Parameters (Earth / Planet)",
+        lblGeoNote: "Geological Context & Utility",
+        lblLimitNote: "Terrestrial Limitations",
+        saveBtn: "Save Changes",
+        deleteBtn: "Delete Site",
+        cancelBtn: "Cancel",
+        compScoreLabel: "Component Score Sᵢ",
+        presetGeo: "Geochemistry & Rock",
+        presetCave: "Subsurface Habitat",
+        presetAll: "Equal Weights",
+        savedToast: "Site parameters saved.",
+        deletedToast: "Site removed from workspace.",
+        searchPlaceholder: "Filter site or target body...",
+        prevSiteTooltip: "Previous site",
+        nextSiteTooltip: "Next site",
+        c_sio2: "SiO₂ (%)",
+        c_feo: "FeO (%)",
+        c_tio2: "TiO₂ (%)",
+        c_density: "Rock Density (g/cm³)",
+        c_thermal: "Thermal Buffering (%)",
+        c_roof: "Roof Thickness (m)",
+        c_gravity: "Gravity (m/s²)"
+      }
+    };
+
+    const criteriaKeys = [
+      'c_sio2',
+      'c_feo',
+      'c_tio2',
+      'c_density',
+      'c_thermal',
+      'c_roof',
+      'c_gravity'
+    ];
+
+    let currentLang = 'vi';
+    let currentIndex = 0;
+    let editMode = 'add';
+    let activePresetIdx = 0;
+
+    // 2. Complete 7-Site Dataset with the 7 ESI Criteria
+    let analogs = [
       {
-        id: "krongno",
-        name: "1. Krông Nô – Chư Bluk (Vietnam)",
-        shortLabel: "🇻🇳 Krông Nô – Chư Bluk",
-        isVietnam: true,
+        id: "chubluk",
+        nameVi: "1. Chư Bluk (Việt Nam)",
+        nameEn: "1. Chư Bluk (Vietnam)",
         isBaseline: false,
-        isCustom: false,
         bodyType: "moon",
-        earthCoords: [12.518, 107.905],
-        earthZoom: 13,
+        earthCoords: [12.485, 107.902],
+        earthZoom: 12,
         planetCoords: [14.0, -56.0],
         planetZoom: 7,
         planetSiteName: "Marius Hills (Moon)",
-        target: "MOON (MARIUS HILLS)",
-        earth: { slope: 9.0, tempK: 296.6, pressureKpa: 96.0, mineralScore: 0.90, mineralText: "Basalt (FeO 12%)" },
-        planet: { slope: 9.5, tempK: 253.0, pressureKpa: 0.0, mineralScore: 0.90, mineralText: "Mare Basalt (FeO 17%)" },
-        geology: "Southeast Asia's longest volcanic lava tube system (>25 km, 50+ caves including C7, A1, C3, C8) in Dak Nong UNESCO Global Geopark, erupted from Chư Bluk volcano on young Pleistocene basalts. Subsurface tube temperatures stay buffered around 20–22°C (293–295 K), demonstrating natural basaltic thermal insulation analogous to lunar mare tubes (~253 K).",
-        limits: "Tropical monsoon climate produces dense surface vegetation and rapid chemical weathering; experiences 1g Earth gravity (6x lunar gravity) and lacks high-vacuum conditions."
+        targetVi: "MẶT TRĂNG (MARIUS HILLS)",
+        targetEn: "MOON (MARIUS HILLS)",
+        earth: { c_sio2: 50.2, c_feo: 12.1, c_tio2: 1.5, c_density: 2.80, c_thermal: 85, c_roof: 15.0, c_gravity: 9.81 },
+        planet: { c_sio2: 45.5, c_feo: 17.5, c_tio2: 4.5, c_density: 3.10, c_thermal: 92, c_roof: 20.0, c_gravity: 1.62 },
+        geologyVi: "Hệ thống hang động ống dung nham dài nhất Đông Nam Á (>25 km, hơn 100 hang) trên nền đá bazan trẻ. Trần hang dày ~15 m giúp ổn định nhiệt độ và che chắn bức xạ, lý tưởng để thử nghiệm robot tự hành không GPS (SLAM) và căn cứ ngầm Mặt Trăng.",
+        geologyEn: "Southeast Asia's longest volcanic lava tube system (>25 km, 100+ caves) hosted in young Pleistocene basalts. ~15 m basalt roof provides thermal buffering and radiation shielding for GPS-denied SLAM rover and lunar habitat testing.",
+        limitsVi: "Khí hậu nhiệt đới gió mùa gây phong hóa hóa học bề mặt; trọng lực 1g (gấp 6 lần Mặt Trăng) và không có môi trường chân không.",
+        limitsEn: "Tropical monsoon climate causes surface weathering; experiences 1g Earth gravity (6x lunar gravity) and lacks vacuum conditions."
       },
       {
         id: "lonar",
-        name: "2. Lonar Crater (India)",
-        shortLabel: "🇮🇳 Lonar Crater",
-        isVietnam: false,
+        nameVi: "2. Hố Lonar (Ấn Độ)",
+        nameEn: "2. Lonar Crater (India)",
         isBaseline: false,
-        isCustom: false,
         bodyType: "mars",
         earthCoords: [19.976, 76.508],
         earthZoom: 14,
         planetCoords: [18.38, 77.58],
         planetZoom: 7,
         planetSiteName: "Jezero Crater (Mars)",
-        target: "MARS (JEZERO CRATER)",
-        earth: { slope: 20.5, tempK: 300.1, pressureKpa: 95.0, mineralScore: 0.95, mineralText: "Basalt, Maskelynite, Smectite" },
-        planet: { slope: 17.0, tempK: 218.1, pressureKpa: 0.65, mineralScore: 0.95, mineralText: "Basalt, Olivine, Smectite" },
-        geology: "A rare young hypervelocity impact crater (1.83 km diameter) excavated directly into Deccan flood basalts. Contains shock-metamorphosed maskelynite glass, smectite clays, and carbonates matching MRO CRISM and Perseverance observations at Jezero Crater.",
-        limits: "Hosts a perennial hyper-alkaline saline lake on the crater floor with active microbial/lacustrine ecosystems and monsoonal rainfall."
+        targetVi: "SAO HỎA (HỐ JEZERO)",
+        targetEn: "MARS (JEZERO CRATER)",
+        earth: { c_sio2: 49.8, c_feo: 13.4, c_tio2: 2.2, c_density: 2.90, c_thermal: 72, c_roof: 0, c_gravity: 9.81 },
+        planet: { c_sio2: 44.5, c_feo: 18.2, c_tio2: 1.1, c_density: 2.95, c_thermal: 76, c_roof: 0, c_gravity: 3.72 },
+        geologyVi: "Hố va chạm thiên thạch trẻ (đường kính 1,83 km) trên nền đá bazan Deccan, chứa thủy tinh biến chất maskelynite và khoáng sét smectite trùng khớp phổ dữ liệu tàu MRO CRISM tại hố Jezero.",
+        geologyEn: "Young hypervelocity impact crater (1.83 km diameter) excavated into Deccan flood basalts, containing shock-metamorphosed maskelynite glass and smectite clays matching MRO CRISM spectra at Jezero Crater.",
+        limitsVi: "Lòng hố có hồ nước siêu kiềm mặn quanh năm với hệ sinh thái vi sinh vật hoạt động mạnh.",
+        limitsEn: "Hosts a perennial hyper-alkaline saline lake on the crater floor with active microbial ecosystems."
       },
       {
         id: "qaidam",
-        name: "3. Qaidam Basin (China)",
-        shortLabel: "🇨🇳 Qaidam Basin",
-        isVietnam: false,
+        nameVi: "3. Bồn địa Qaidam (TQ)",
+        nameEn: "3. Qaidam Basin (China)",
         isBaseline: false,
-        isCustom: false,
         bodyType: "mars",
         earthCoords: [37.500, 94.500],
         earthZoom: 9,
         planetCoords: [-5.4, 137.8],
         planetZoom: 7,
         planetSiteName: "Gale Crater (Mars)",
-        target: "MARS (GALE CRATER)",
-        earth: { slope: 2.5, tempK: 276.1, pressureKpa: 71.0, mineralScore: 0.92, mineralText: "Halite, Gypsum, MgSO₄" },
-        planet: { slope: 3.5, tempK: 223.1, pressureKpa: 0.75, mineralScore: 0.92, mineralText: "Gypsum, MgSO₄, Phyllosilicates" },
-        geology: "High-altitude (~2,800 m) hyper-arid desert rich in evaporite deposits (halite, gypsum, magnesium sulfates) and Earth's largest aerodynamic yardang field. Enables quantitative modeling of Martian aeolian erosion rates and rover mobility testing on fine regolith.",
-        limits: "Atmospheric pressure (~71 kPa) remains >100x higher than Mars (~0.75 kPa), and high atmospheric O₂ drives distinct surface oxidation chemistry."
+        targetVi: "SAO HỎA (MIỆNG NÚI LỬA GALE)",
+        targetEn: "MARS (GALE CRATER)",
+        earth: { c_sio2: 54.0, c_feo: 6.5, c_tio2: 0.7, c_density: 2.35, c_thermal: 68, c_roof: 0, c_gravity: 9.81 },
+        planet: { c_sio2: 47.2, c_feo: 15.8, c_tio2: 0.9, c_density: 2.50, c_thermal: 74, c_roof: 0, c_gravity: 3.72 },
+        geologyVi: "Hoang mạc siêu khô hạn ở độ cao ~2.800 m giàu muối bay hơi (halite, gypsum, sulfat) và địa hình đồi gió mòn (yardangs) lớn nhất Trái Đất, tương đồng trầm tích hồ cổ đại tại Gale Crater.",
+        geologyEn: "High-altitude (~2,800 m) hyper-arid desert rich in evaporites (halite, gypsum, sulfates) and Earth's largest aerodynamic yardang field, mirroring ancient lacustrine strata in Gale Crater.",
+        limitsVi: "Áp suất khí quyển (~71 kPa) vẫn cao hơn Sao Hỏa >100 lần và hàm lượng oxy tự do cao.",
+        limitsEn: "Atmospheric pressure (~71 kPa) remains >100x higher than Mars, with high atmospheric oxygen."
       },
       {
         id: "dallol",
-        name: "4. Dallol Geothermal (Ethiopia)",
-        shortLabel: "🇪🇹 Dallol",
-        isVietnam: false,
+        nameVi: "4. Địa nhiệt Dallol (Ethiopia)",
+        nameEn: "4. Dallol Geothermal (Ethiopia)",
         isBaseline: false,
-        isCustom: false,
         bodyType: "mars",
         earthCoords: [14.242, 40.300],
         earthZoom: 13,
         planetCoords: [-14.5, 175.4],
         planetZoom: 7,
         planetSiteName: "Columbia Hills - Gusev (Mars)",
-        target: "EARLY MARS (GUSEV CRATER)",
-        earth: { slope: 5.0, tempK: 307.7, pressureKpa: 102.0, mineralScore: 0.88, mineralText: "Jarosite, Fe-Salts, Sulfur" },
-        planet: { slope: 7.0, tempK: 213.1, pressureKpa: 0.62, mineralScore: 0.88, mineralText: "Opaline Silica, Jarosite" },
-        geology: "Polyextreme volcanic hydrothermal system (pH down to 0.25, hypersaline brines >35%, iron- and sulfur-rich precipitates) modeling Noachian Mars hot springs (~3.5 Ga). Used to calibrate astrobiological instruments for detecting fossilized biosignatures in salt chimneys.",
-        limits: "Highest annual mean air temperature on Earth (+34.6°C / 307.7 K), contrasting sharply with present-day cryogenic Martian temperatures (-60°C)."
+        targetVi: "SAO HỎA CỔ ĐẠI (GUSEV)",
+        targetEn: "EARLY MARS (GUSEV CRATER)",
+        earth: { c_sio2: 46.5, c_feo: 14.8, c_tio2: 1.8, c_density: 2.45, c_thermal: 65, c_roof: 0, c_gravity: 9.81 },
+        planet: { c_sio2: 45.0, c_feo: 16.5, c_tio2: 0.8, c_density: 2.60, c_thermal: 70, c_roof: 0, c_gravity: 3.72 },
+        geologyVi: "Hệ thống suối thủy nhiệt axit siêu mặn (pH 0,25) kết tủa jarosite, muối sắt và lưu huỳnh, mô phỏng các suối nước nóng Sao Hỏa kỷ Noachian (~3,5 tỷ năm trước).",
+        geologyEn: "Polyextreme acidic hypersaline hydrothermal system (pH 0.25) precipitating jarosite, iron salts, and sulfur, modeling Noachian Mars hot springs (~3.5 Ga).",
+        limitsVi: "Nhiệt độ trung bình năm cao nhất Trái Đất (+34,6°C), trái ngược khí hậu lạnh giá hiện tại của Sao Hỏa.",
+        limitsEn: "Highest annual mean air temperature on Earth (+34.6°C), contrasting sharply with present-day cryogenic Mars."
       },
       {
         id: "boulby",
-        name: "5. Boulby Mine (UK)",
-        shortLabel: "🇬🇧 Boulby Mine",
-        isVietnam: false,
+        nameVi: "5. Hầm mỏ Boulby (Anh)",
+        nameEn: "5. Boulby Mine (UK)",
         isBaseline: false,
-        isCustom: false,
         bodyType: "mars",
         earthCoords: [54.555, -0.825],
         earthZoom: 13,
         planetCoords: [-11.5, -121.0],
         planetZoom: 7,
         planetSiteName: "Arsia Mons Skylights (Mars)",
-        target: "SUBSURFACE MARS & MOON",
-        earth: { slope: 3.5, tempK: 301.6, pressureKpa: 112.0, mineralScore: 0.89, mineralText: "Halite, Sylvite, Polyhalite" },
-        planet: { slope: 5.5, tempK: 235.0, pressureKpa: 0.5, mineralScore: 0.89, mineralText: "Subsurface Sulfates & Chlorides" },
-        geology: "1.1 km deep Permian evaporite mine hosting the NASA/ESA MINAR (Mine Analog Research) facility. Provides a completely dark, GPS-denied, radiation-shielded environment to test autonomous subsurface rovers, deep-drilling rigs, and extremophile life-detection sensors.",
-        limits: "Geothermal gradient elevates ambient underground temperatures (~28.5°C) and barometric pressure (~112 kPa), opposite to cold, low-pressure Martian caves."
+        targetVi: "HANG NGẦM SAO HỎA (ARSIA MONS)",
+        targetEn: "SUBSURFACE MARS (ARSIA MONS)",
+        earth: { c_sio2: 12.0, c_feo: 3.2, c_tio2: 0.3, c_density: 2.20, c_thermal: 95, c_roof: 1100, c_gravity: 9.81 },
+        planet: { c_sio2: 43.8, c_feo: 17.0, c_tio2: 1.2, c_density: 2.85, c_thermal: 90, c_roof: 45, c_gravity: 3.72 },
+        geologyVi: "Mỏ muối sâu 1,1 km đặt phòng thí nghiệm MINAR của NASA/ESA. Tái tạo môi trường tối hoàn toàn, không GPS và che chắn bức xạ vũ trụ tối đa cho thử nghiệm robot khoan sâu.",
+        geologyEn: "1.1 km deep Permian evaporite mine hosting the NASA/ESA MINAR facility. Provides a completely dark, GPS-denied, radiation-shielded environment for deep subsurface rover testing.",
+        limitsVi: "Địa nhiệt làm tăng nhiệt độ hầm mỏ (~28,5°C) và áp suất khí quyển (~112 kPa), ngược với hang ngầm lạnh áp suất thấp trên Sao Hỏa.",
+        limitsEn: "Geothermal gradient elevates ambient underground temperatures (~28.5°C) and barometric pressure (~112 kPa)."
       },
       {
         id: "atacama",
-        name: "⭐ 6. Atacama (Mars Baseline)",
-        shortLabel: "⭐ Atacama (Baseline)",
-        isVietnam: false,
-        isBaseline: true,
-        isCustom: false,
+        nameVi: "6. Sa mạc Atacama (Chile)",
+        nameEn: "6. Atacama Desert (Chile)",
         bodyType: "mars",
         earthCoords: [-24.095, -69.925],
         earthZoom: 11,
         planetCoords: [4.5, 135.6],
         planetZoom: 7,
         planetSiteName: "Elysium Planitia (Mars)",
-        target: "MARS GOLD-STANDARD BASELINE",
-        earth: { slope: 4.0, tempK: 289.6, pressureKpa: 90.0, mineralScore: 0.94, mineralText: "Halite, Gypsum, Perchlorates" },
-        planet: { slope: 2.5, tempK: 215.1, pressureKpa: 0.65, mineralScore: 0.94, mineralText: "Dry Basalt, Sulfates, Perchlorates" },
-        geology: "NASA BENCHMARK SITE: The hyper-arid Yungay core (<1 mm/yr precipitation) features perchlorate-bearing soils and ultra-low microbial biomass, serving as the primary testbed for Viking, Curiosity, and Perseverance life-detection and mobility protocols.",
-        limits: "Located at ~1,000 m elevation, retaining ~90 kPa atmospheric pressure and Earth-like diurnal thermal cycles."
+        targetVi: "SAO HỎA (ELYSIUM PLANITIA)",
+        targetEn: "MARS (ELYSIUM PLANITIA)",
+        earth: { c_sio2: 56.2, c_feo: 7.8, c_tio2: 0.8, c_density: 2.55, c_thermal: 71, c_roof: 0, c_gravity: 9.81 },
+        planet: { c_sio2: 44.0, c_feo: 18.0, c_tio2: 1.0, c_density: 2.90, c_thermal: 75, c_roof: 0, c_gravity: 3.72 },
+        geologyVi: "Vùng lõi siêu khô hạn Yungay (<1 mm mưa/năm) chứa muối perchlorate và sinh khối cực thấp, bãi thử tiêu chuẩn cho các sứ mệnh Viking, Curiosity và Perseverance.",
+        geologyEn: "Hyper-arid Yungay core (<1 mm/yr precipitation) with perchlorate-bearing soils and ultra-low biomass, serving as a primary testbed for Viking, Curiosity, and Perseverance protocols.",
+        limitsVi: "Nằm ở độ cao ~1.000 m nên áp suất khí quyển vẫn đạt ~90 kPa.",
+        limitsEn: "Located at ~1,000 m elevation, retaining ~90 kPa atmospheric pressure."
       },
       {
         id: "iceland",
-        name: "⭐ 7. Krafla (Moon Baseline)",
-        shortLabel: "⭐ Krafla (Baseline)",
-        isVietnam: false,
-        isBaseline: true,
-        isCustom: false,
+        nameVi: "7. Krafla (Iceland)",
+        nameEn: "7. Krafla (Iceland)",
         bodyType: "moon",
         earthCoords: [65.715, -16.755],
         earthZoom: 11,
         planetCoords: [20.19, 30.77],
         planetZoom: 7,
         planetSiteName: "Taurus-Littrow - Apollo 17 (Moon)",
-        target: "MOON GOLD-STANDARD BASELINE",
-        earth: { slope: 10.0, tempK: 274.6, pressureKpa: 96.0, mineralScore: 0.93, mineralText: "Fresh Basalt, Volcanic Glass" },
-        planet: { slope: 11.0, tempK: 251.1, pressureKpa: 0.0, mineralScore: 0.93, mineralText: "Mare Basalt, Ilmenite, Glass Beads" },
-        geology: "NASA BENCHMARK SITE: Used to train Apollo astronauts and test Artemis EVA suits. Unvegetated young tholeiitic lava flows, cinder cones, and abrasive volcanic tephra closely replicate lunar mare surface mechanics.",
-        limits: "Subject to seasonal snow/ice hydrology, atmospheric weathering, and 1g terrestrial gravity."
+        targetVi: "MẶT TRĂNG (TAURUS-LITTROW)",
+        targetEn: "MOON (TAURUS-LITTROW)",
+        earth: { c_sio2: 49.5, c_feo: 13.0, c_tio2: 1.9, c_density: 2.88, c_thermal: 78, c_roof: 4.0, c_gravity: 9.81 },
+        planet: { c_sio2: 42.5, c_feo: 17.2, c_tio2: 5.5, c_density: 3.15, c_thermal: 82, c_roof: 5.0, c_gravity: 1.62 },
+        geologyVi: "Khu vực huấn luyện phi hành gia Apollo và thử nghiệm bộ đồ EVA Artemis. Các dòng dung nham bazan tươi không thảm thực vật mô phỏng sát cơ học bề mặt biển Mặt Trăng.",
+        geologyEn: "Training ground for Apollo astronauts and Artemis EVA suit testing. Unvegetated young tholeiitic lava flows closely replicate lunar mare surface mechanics.",
+        limitsVi: "Chịu tác động của tuyết/băng theo mùa, phong hóa khí quyển và trọng lực 1g.",
+        limitsEn: "Subject to seasonal snow/ice hydrology, atmospheric weathering, and 1g gravity."
       }
     ];
 
-    function loadSavedCustomSites() {
-      try {
-        const raw = localStorage.getItem('kronos_custom_analogs');
-        return raw ? JSON.parse(raw) : [];
-      } catch (e) {
-        return [];
-      }
+    function cleanSiteName(rawName) {
+      return (rawName || '').replace(/^⭐\s*/, '');
     }
 
-    let customAnalogs = loadSavedCustomSites();
-    let analogs = [...defaultAnalogs, ...customAnalogs];
+    function formatCoords(coords) {
+      const lat = coords[0];
+      const lon = coords[1];
+      const latDir = lat >= 0 ? 'N' : 'S';
+      const lonDir = lon >= 0 ? 'E' : 'W';
+      return `${Math.abs(lat).toFixed(3)}°${latDir}, ${Math.abs(lon).toFixed(3)}°${lonDir}`;
+    }
 
-    const krongNoCaves = [
-      {
-        code: "Hang C7",
-        label: "🌋 Hang C7 (1,266.5 m)",
-        coords: [12.5185, 107.9045],
-        length: "1,266.5 m (Longest in SE Asia)",
-        morphology: "Main Tube + Roof Collapse Skylight",
-        role: "Subsurface Lunar Base Analog",
-        desc: "Hang C7 is the longest volcanic lava tube in Southeast Asia, featuring a massive vaulted basalt ceiling and collapsed roof skylight directly analogous to the Marius Hills pit on the Moon. Ideal for testing inflatable lunar habitat deployment and radiation shielding."
-      },
-      {
-        code: "Hang A1",
-        label: "🕳️ Hang A1 (456.7 m)",
-        coords: [12.5095, 107.9012],
-        length: "456.7 m Main Passage (Pit Depth ~15–20 m)",
-        morphology: "Vertical Collapse Pit + Dual Branches",
-        role: "Tethered Rover Descent Test",
-        desc: "Hang A1 opens via a steep vertical collapse pit (skylight ~15–20 m deep) splitting into two basaltic branches. Serves as an exact structural analog for testing robotic crane/tethered descent systems (like NASA's Axel rover) into lunar lava tube entrances."
-      },
-      {
-        code: "Hang C3",
-        label: "🧭 Hang C3 (594.4 m)",
-        coords: [12.5260, 107.9080],
-        length: "594.4 m (Continuous Tube)",
-        morphology: "Smooth Pahoehoe Floor & Benches",
-        role: "GPS-Denied LiDAR SLAM Navigation",
-        desc: "Hang C3 preserves pristine lava benches, flow striations, and a relatively level basalt floor, providing an ideal corridor for benchmarking autonomous LiDAR/visual SLAM navigation and multi-hop underground mesh communications."
-      },
-      {
-        code: "Hang C8",
-        label: "🪜 Hang C8 (~320 m)",
-        coords: [12.5140, 107.9095],
-        length: "~320.0 m (Multi-Tier Tube)",
-        morphology: "Multi-Tiered Bifurcated Lava Tube",
-        role: "Subsurface GPR Mapping",
-        desc: "Hang C8 exhibits complex multi-level lava drainage channels and side passages, ideal for calibrating Ground-Penetrating Radar (GPR) algorithms used to detect hidden void networks from the lunar surface."
-      },
-      {
-        code: "Núi lửa Chư Bluk",
-        label: "⛰️ Chư Bluk Volcano (Source)",
-        coords: [12.4850, 107.8820],
-        length: "Elev. 601 m (Crater Ø ~400 m, Depth ~60 m)",
-        morphology: "Cinder Cone & Basalt Flow Source",
-        role: "Lunar Volcanic Dome Analog",
-        desc: "Chư Bluk (Buôn Choáh) is the young Pleistocene shield/cinder volcano (601 m ASL, crater ~400 m wide, ~60 m deep) that fed the >25 km Krông Nô basaltic lava tube network toward the Sêrêpốk River, mirroring the volcanic domes of Marius Hills on the Moon."
-      }
-    ];
-
-    let currentIndex = 0;
-    let earthMap, planetMap, moonTrekLayer, marsTrekLayer, marsMolaLayer, planetMarker;
-    let earthMarkers = [];
-    let krongNoLayerGroup;
-    let caveMarkers = [];
-    let radarChart = null;
-
+    // 3. ESI Formula (Schulze-Makuch et al., 2011) across 7 Criteria
     function esiComponent(xEarth, xTarget) {
       if (xEarth + xTarget === 0) return 1.0;
       return 1.0 - Math.abs(xEarth - xTarget) / (xEarth + xTarget);
     }
 
     function computeMetrics(site) {
-      const sMineral = site.earth.mineralScore;
-      const sSlope = esiComponent(site.earth.slope, site.planet.slope);
-      const sTemp = esiComponent(site.earth.tempK, site.planet.tempK);
-      const sPress = esiComponent(site.earth.pressureKpa, site.planet.pressureKpa);
+      const n = criteriaKeys.length;
+      let product = 1.0;
+      const scores = [];
 
-      const w1 = parseFloat(document.getElementById('w-mineral').value);
-      const w2 = parseFloat(document.getElementById('w-slope').value);
-      const w3 = parseFloat(document.getElementById('w-temp').value);
-      const w4 = parseFloat(document.getElementById('w-press').value);
+      criteriaKeys.forEach((key) => {
+        const sliderEl = document.getElementById(`w-${key}`);
+        const w = sliderEl ? parseFloat(sliderEl.value) : 1.0;
+        const s = esiComponent(site.earth[key], site.planet[key]);
+        scores.push(s);
+        if (w > 0) {
+          product *= Math.pow(Math.max(0.01, s), w / n);
+        }
+      });
 
-      const sumW = w1 + w2 + w3 + w4;
-      let esi = 0;
-
-      if (sumW > 0) {
-        const safeSPress = Math.max(0.01, sPress);
-        const product =
-          Math.pow(Math.max(0.01, sMineral), w1) *
-          Math.pow(Math.max(0.01, sSlope), w2) *
-          Math.pow(Math.max(0.01, sTemp), w3) *
-          Math.pow(safeSPress, w4);
-
-        esi = Math.pow(product, 1.0 / sumW) * 100;
-      }
-
-      return { sMineral, sSlope, sTemp, sPress, esi: esi.toFixed(1) };
+      const esi = product * 100;
+      return { scores, esi: esi.toFixed(1) };
     }
 
-    function renderEarthMarkers() {
-      if (!earthMap || typeof L === 'undefined') return;
-      earthMarkers.forEach(m => earthMap.removeLayer(m));
-      earthMarkers = [];
+    // 4. Initialize Map 1: EARTH (Esri + NASA GIBS)
+    const earthMap = L.map('earth-map').setView(analogs[0].earthCoords, analogs[0].earthZoom);
+
+    const earthSat = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { attribution: 'Esri Imagery' }
+    ).addTo(earthMap);
+
+    const nasaEarthDEM = L.tileLayer(
+      'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/ASTER_GDEM_Color_Shaded_Relief/default/GoogleMapsCompatible_Level12/{z}/{y}/{x}.jpg',
+      { attribution: 'NASA ASTER GDEM', opacity: 0.65, maxNativeZoom: 12 }
+    );
+
+    const nasaEarthTemp = L.tileLayer(
+      'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Land_Surface_Temp_Day/default/2023-04-15/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png',
+      { attribution: 'NASA MODIS LST', opacity: 0.6, maxNativeZoom: 7 }
+    );
+
+    L.control.layers(
+      { "True-Color Satellite": earthSat },
+      {
+        "NASA ASTER GDEM Relief": nasaEarthDEM,
+        "NASA MODIS Land Temp": nasaEarthTemp
+      },
+      { collapsed: true, position: 'bottomright' }
+    ).addTo(earthMap);
+
+    let earthMarkersGroup = L.layerGroup().addTo(earthMap);
+
+    function refreshEarthMarkers() {
+      earthMarkersGroup.clearLayers();
       analogs.forEach((site, idx) => {
-        const tipClass = site.isVietnam ? 'site-tooltip vn-tip' : (site.isBaseline ? 'site-tooltip base-tip' : (site.isCustom ? 'site-tooltip custom-tip' : 'site-tooltip'));
-        const marker = L.marker(site.earthCoords).addTo(earthMap)
-          .bindTooltip(site.shortLabel, { permanent: true, direction: 'top', className: tipClass, offset: [0, -10] })
-          .bindPopup(`<b>${site.name}</b><br/>Target: ${site.planetSiteName}`)
+        const displayName = cleanSiteName(currentLang === 'vi' ? site.nameVi : site.nameEn);
+        L.marker(site.earthCoords)
+          .addTo(earthMarkersGroup)
+          .bindPopup(`<b>${displayName}</b>`)
           .on('click', () => selectSite(idx));
-        earthMarkers.push(marker);
       });
     }
 
-    function setCaveSubbarActive(btnId) {
-      document.querySelectorAll('.cave-btn').forEach(b => b.classList.remove('active'));
-      const el = document.getElementById(btnId);
-      if (el) el.classList.add('active');
-    }
+    // 5. Initialize Map 2: MOON & MARS (NASA Solar System Treks WMTS)
+    const planetMap = L.map('planet-map', {
+      crs: L.CRS.EPSG3857,
+      minZoom: 2,
+      maxZoom: 9
+    }).setView(analogs[0].planetCoords, analogs[0].planetZoom);
 
-    function focusAllCaves() {
-      if (!earthMap || !krongNoLayerGroup) return;
-      if (!earthMap.hasLayer(krongNoLayerGroup)) {
-        krongNoLayerGroup.addTo(earthMap);
+    const moonTrekLayer = L.tileLayer(
+      'https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
+      { attribution: 'NASA LRO WAC', tms: false, noWrap: true }
+    );
+
+    const marsTrekLayer = L.tileLayer(
+      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
+      { attribution: 'NASA Viking MDIM21', tms: false, noWrap: true }
+    );
+
+    const marsMolaLayer = L.tileLayer(
+      'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
+      { attribution: 'NASA MOLA/HRSC DEM', tms: false, noWrap: true }
+    );
+
+    moonTrekLayer.addTo(planetMap);
+    let planetMarker = L.marker(analogs[0].planetCoords).addTo(planetMap);
+
+    L.control.layers(
+      {
+        "Moon: LRO WAC Mosaic": moonTrekLayer,
+        "Mars: Viking Color Mosaic": marsTrekLayer,
+        "Mars: MOLA Elevation DEM": marsMolaLayer
+      },
+      {},
+      { collapsed: true, position: 'bottomright' }
+    ).addTo(planetMap);
+
+    // 6. Initialize 7-Axis Radar Chart
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const radarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: criteriaKeys.map((k) => i18n[currentLang][k].split(' (')[0]),
+        datasets: [{
+          label: i18n[currentLang].compScoreLabel,
+          data: [0, 0, 0, 0, 0, 0, 0],
+          backgroundColor: 'rgba(59, 130, 246, 0.18)',
+          borderColor: '#3b82f6',
+          pointBackgroundColor: '#3b82f6',
+          pointBorderColor: '#111318',
+          pointRadius: 3,
+          borderWidth: 1.75
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { display: false, stepSize: 0.25 },
+            grid: { color: 'rgba(255, 255, 255, 0.07)' },
+            angleLines: { color: 'rgba(255, 255, 255, 0.07)' },
+            pointLabels: {
+              color: '#9ca3af',
+              font: { family: 'Inter', size: 10.5, weight: '500' }
+            }
+          }
+        },
+        plugins: { legend: { display: false } }
       }
-      const bounds = L.latLngBounds(krongNoCaves.map(c => c.coords));
-      earthMap.flyToBounds(bounds.pad(0.25), { duration: 1.2 });
-      document.getElementById('earth-label').innerText = `🛰️ TERRESTRIAL TESTBED // KRÔNG NÔ – CHƯ BLUK (C7, A1, C3, C8)`;
-      setCaveSubbarActive('cave-btn-all');
+    });
 
-      document.getElementById('cave-card-title').innerText = "🌋 Krông Nô Volcanic Cave System Network (C7, A1, C3, C8)";
-      document.getElementById('cave-spec-len').innerText = ">25 km (50+ Caves)";
-      document.getElementById('cave-spec-morph').innerText = "Basalt Lava Tubes";
-      document.getElementById('cave-spec-role').innerText = "Lunar Subsurface Analog";
-      document.getElementById('cave-card-desc').innerText = "Click any cave above (Hang C7, Hang A1, Hang C3, Hang C8, or Chư Bluk Crater) to inspect individual tube geometry, skylights, and NASA mission test profiles.";
-    }
+    // 7. Render Mathematical Formula via KaTeX
+    function renderLatexFormula() {
+      const formulaEl = document.getElementById('esi-formula');
+      const captionEl = document.getElementById('formula-caption');
 
-    function focusSingleCave(cIdx) {
-      if (!earthMap || !krongNoLayerGroup) return;
-      if (!earthMap.hasLayer(krongNoLayerGroup)) {
-        krongNoLayerGroup.addTo(earthMap);
+      if (formulaEl && typeof katex !== 'undefined') {
+        try {
+          katex.render(
+            String.raw`\text{ESI} = \prod_{i=1}^{n} \left( 1 - \left| \frac{x_i - x_{io}}{x_i + x_{io}} \right| \right)^{\frac{w_i}{n}}`,
+            formulaEl,
+            { throwOnError: false, displayMode: false }
+          );
+        } catch (err) {
+          // Retain fallback markup
+        }
       }
-      const cave = krongNoCaves[cIdx];
-      earthMap.flyTo(cave.coords, 15, { duration: 1.1 });
-      if (caveMarkers[cIdx]) caveMarkers[cIdx].openPopup();
-      document.getElementById('earth-label').innerText = `🛰️ TERRESTRIAL TESTBED // ${cave.code} – ${cave.role}`;
-      setCaveSubbarActive(`cave-btn-${cIdx}`);
 
-      document.getElementById('cave-card-title').innerText = `🌋 ${cave.label}`;
-      document.getElementById('cave-spec-len').innerText = cave.length;
-      document.getElementById('cave-spec-morph').innerText = cave.morphology;
-      document.getElementById('cave-spec-role').innerText = cave.role;
-      document.getElementById('cave-card-desc').innerText = cave.desc;
-    }
-
-    function showGlobalOverview() {
-      if (!earthMap) return;
-      if (krongNoLayerGroup && earthMap.hasLayer(krongNoLayerGroup)) {
-        earthMap.removeLayer(krongNoLayerGroup);
+      if (captionEl) {
+        captionEl.innerHTML = currentLang === 'vi'
+          ? '<i>x</i><sub>i</sub>: Hành tinh &nbsp;·&nbsp; <i>x</i><sub>io</sub>: Trái Đất &nbsp;·&nbsp; <i>w</i><sub>i</sub>: Trọng số &nbsp;·&nbsp; <i>n</i> = 7'
+          : '<i>x</i><sub>i</sub>: Planet &nbsp;·&nbsp; <i>x</i><sub>io</sub>: Earth &nbsp;·&nbsp; <i>w</i><sub>i</sub>: Weight &nbsp;·&nbsp; <i>n</i> = 7';
       }
-      document.getElementById('cave-subbar').style.display = 'none';
-      const group = new L.featureGroup(earthMarkers);
-      earthMap.flyToBounds(group.getBounds().pad(0.18), { duration: 1.3 });
-      document.getElementById('earth-label').innerText = `🛰️ TERRESTRIAL TESTBED // Global Overview (All ${analogs.length} Analog Sites)`;
-      document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
-      const globalBtn = document.getElementById('btn-global');
-      if (globalBtn) globalBtn.classList.add('active');
     }
 
-    function applyPreset(w1, w2, w3, w4) {
-      document.getElementById('w-mineral').value = w1;
-      document.getElementById('w-slope').value = w2;
-      document.getElementById('w-temp').value = w3;
-      document.getElementById('w-press').value = w4;
+    // 8. Mission Weighting Presets & Sliders
+    const missionPresets = [
+      { key: 'presetGeo', weights: [1.0, 1.0, 1.0, 0.8, 0.2, 0.0, 0.0] },
+      { key: 'presetCave', weights: [0.6, 0.6, 0.3, 0.8, 1.0, 1.0, 0.2] },
+      { key: 'presetAll', weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] }
+    ];
+
+    function renderPresets() {
+      const container = document.getElementById('preset-btns');
+      if (!container) return;
+      const t = i18n[currentLang];
+      container.innerHTML = '';
+
+      missionPresets.forEach((preset, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'preset-chip' + (idx === activePresetIdx ? ' active' : '');
+        btn.innerText = t[preset.key];
+        btn.onclick = () => applyPreset(idx);
+        container.appendChild(btn);
+      });
+    }
+
+    function applyPreset(presetIdx) {
+      activePresetIdx = presetIdx;
+      const weights = missionPresets[presetIdx].weights;
+      criteriaKeys.forEach((k, i) => {
+        const slider = document.getElementById(`w-${k}`);
+        if (slider) slider.value = weights[i];
+      });
+      renderPresets();
       updateAll();
     }
 
+    function renderSliders() {
+      const container = document.getElementById('sliders');
+      if (!container) return;
+      const t = i18n[currentLang];
+
+      const savedWeights = {};
+      criteriaKeys.forEach((k) => {
+        const existing = document.getElementById(`w-${k}`);
+        if (existing) savedWeights[k] = parseFloat(existing.value);
+      });
+
+      container.innerHTML = '';
+      criteriaKeys.forEach((k, i) => {
+        const val = savedWeights[k] !== undefined
+          ? savedWeights[k]
+          : missionPresets[activePresetIdx].weights[i];
+
+        const row = document.createElement('div');
+        row.className = 'weight-row';
+        row.innerHTML = `
+          <label for="w-${k}">${t[k]}</label>
+          <input type="range" id="w-${k}" min="0" max="1" step="0.1" value="${val}" oninput="activePresetIdx = -1; renderPresets(); updateAll();" />
+          <span id="val-${k}">${val.toFixed(1)}</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // 9. Render Site Dropdown Menu & Update Metrics
+    function toggleSiteDropdown(e) {
+      if (e) e.stopPropagation();
+      const dropdown = document.getElementById('site-dropdown');
+      const trigger = document.getElementById('site-dropdown-trigger');
+      const isOpen = dropdown.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      if (isOpen) {
+        const searchInput = document.getElementById('dropdown-search');
+        searchInput.value = '';
+        filterSiteDropdown();
+        setTimeout(() => searchInput.focus(), 30);
+      }
+    }
+
+    function closeSiteDropdown() {
+      const dropdown = document.getElementById('site-dropdown');
+      const trigger = document.getElementById('site-dropdown-trigger');
+      if (dropdown) dropdown.classList.remove('open');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function stepSite(delta) {
+      const total = analogs.length;
+      if (total === 0) return;
+      const nextIdx = (currentIndex + delta + total) % total;
+      selectSite(nextIdx);
+    }
+
+    function filterSiteDropdown() {
+      const query = (document.getElementById('dropdown-search').value || '').toLowerCase().trim();
+      const items = document.querySelectorAll('#dropdown-list .site-option');
+      let visibleCount = 0;
+
+      items.forEach((item) => {
+        const searchText = item.getAttribute('data-search') || '';
+        const match = !query || searchText.includes(query);
+        item.style.display = match ? 'flex' : 'none';
+        if (match) visibleCount++;
+      });
+
+      document.getElementById('dropdown-count').innerText = `${visibleCount}/${analogs.length}`;
+    }
+
+    function renderSiteDropdown() {
+      const listEl = document.getElementById('dropdown-list');
+      listEl.innerHTML = '';
+
+      analogs.forEach((site, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'site-option' + (idx === currentIndex ? ' active' : '');
+        const cleanLabel = cleanSiteName(currentLang === 'vi' ? site.nameVi : site.nameEn);
+        const targetLabel = currentLang === 'vi' ? site.targetVi : site.targetEn;
+        btn.setAttribute('data-search', `${cleanLabel} ${targetLabel} ${site.planetSiteName}`.toLowerCase());
+        btn.innerHTML = `
+          <div class="option-main">
+            <span class="option-title">${cleanLabel}</span>
+            <span class="option-sub">${targetLabel}</span>
+          </div>
+          <span class="option-score" id="pill-${idx}">0.0%</span>
+        `;
+        btn.onclick = () => {
+          closeSiteDropdown();
+          selectSite(idx);
+        };
+        listEl.appendChild(btn);
+      });
+
+      document.getElementById('dropdown-count').innerText = `${analogs.length}/${analogs.length}`;
+    }
+
     function updateAll() {
-      document.getElementById('val-mineral').innerText = parseFloat(document.getElementById('w-mineral').value).toFixed(1);
-      document.getElementById('val-slope').innerText = parseFloat(document.getElementById('w-slope').value).toFixed(1);
-      document.getElementById('val-temp').innerText = parseFloat(document.getElementById('w-temp').value).toFixed(1);
-      document.getElementById('val-press').innerText = parseFloat(document.getElementById('w-press').value).toFixed(1);
+      criteriaKeys.forEach((k) => {
+        const slider = document.getElementById(`w-${k}`);
+        const span = document.getElementById(`val-${k}`);
+        if (slider && span) span.innerText = parseFloat(slider.value).toFixed(1);
+      });
 
       analogs.forEach((site, idx) => {
         const m = computeMetrics(site);
@@ -881,549 +1932,302 @@
 
       const site = analogs[currentIndex];
       const metrics = computeMetrics(site);
+      const t = i18n[currentLang];
+      const cleanName = cleanSiteName(currentLang === 'vi' ? site.nameVi : site.nameEn);
+
+      document.getElementById('trigger-name').innerText = cleanName;
+      document.getElementById('trigger-score').innerText = `${metrics.esi}%`;
+      const triggerDot = document.getElementById('trigger-dot');
+      triggerDot.className = 'hud-dot ' + (site.bodyType === 'moon' ? 'planet' : 'earth');
 
       document.getElementById('asi-score').innerText = `${metrics.esi}%`;
-      document.getElementById('target-body').innerText = `TARGET: ${site.target}`;
-      document.getElementById('vn-tag').style.display = site.isVietnam ? 'inline-block' : 'none';
-      document.getElementById('baseline-tag').style.display = site.isBaseline ? 'inline-block' : 'none';
-      document.getElementById('custom-tag').style.display = site.isCustom ? 'inline-block' : 'none';
-      document.getElementById('delete-site-btn').style.display = site.isCustom ? 'inline-block' : 'none';
-      document.getElementById('cave-detail-card').style.display = (site.id === 'krongno') ? 'block' : 'none';
-      document.getElementById('site-title').innerText = site.name;
-      document.getElementById('site-geology').innerText = site.geology;
-      document.getElementById('site-limits').innerText = site.limits;
+      const barFill = document.getElementById('esi-bar-fill');
+      barFill.style.width = `${Math.min(100, Math.max(0, parseFloat(metrics.esi)))}%`;
+      barFill.style.backgroundColor = 'var(--accent-blue)';
 
-      const earthMinDisplay = site.earth.mineralText.includes('vs.') ? site.earth.mineralText.split('vs.')[0].trim() : site.earth.mineralText;
-      const planetMinDisplay = site.planet.mineralText.includes('vs.') ? site.planet.mineralText.split('vs.')[1].trim() : site.planet.mineralText;
+      document.getElementById('target-body').innerText = currentLang === 'vi' ? site.targetVi : site.targetEn;
 
-      document.getElementById('quant-tbody').innerHTML = `
-        <tr>
-          <td>Mineralogy</td>
-          <td>${earthMinDisplay}</td>
-          <td>${planetMinDisplay}</td>
-          <td class="num">${(metrics.sMineral * 100).toFixed(0)}%</td>
-        </tr>
-        <tr>
-          <td>Mean Slope</td>
-          <td class="num">${site.earth.slope}°</td>
-          <td class="num">${site.planet.slope}°</td>
-          <td class="num">${(metrics.sSlope * 100).toFixed(0)}%</td>
-        </tr>
-        <tr>
-          <td>Mean Temp</td>
-          <td class="num">${site.earth.tempK} K</td>
-          <td class="num">${site.planet.tempK} K</td>
-          <td class="num">${(metrics.sTemp * 100).toFixed(0)}%</td>
-        </tr>
-        <tr>
-          <td>Pressure</td>
-          <td class="num">${site.earth.pressureKpa} kPa</td>
-          <td class="num">${site.planet.pressureKpa} kPa</td>
-          <td class="num">${(metrics.sPress * 100).toFixed(1)}%</td>
-        </tr>
-      `;
+      document.getElementById('site-title').innerText = cleanName;
+      document.getElementById('edit-icon-btn').title = t.editTooltip;
+      document.getElementById('site-geology').innerText = currentLang === 'vi' ? site.geologyVi : site.geologyEn;
+      document.getElementById('site-limits').innerText = currentLang === 'vi' ? site.limitsVi : site.limitsEn;
 
-      if (radarChart) {
-        const chartColor = site.id === 'krongno' ? '#f43f5e' : (site.isBaseline ? '#f59e0b' : (site.isCustom ? '#a855f7' : '#38bdf8'));
-        const chartBg = site.id === 'krongno' ? 'rgba(244, 63, 94, 0.25)' : (site.isBaseline ? 'rgba(245, 158, 11, 0.25)' : (site.isCustom ? 'rgba(168, 85, 247, 0.25)' : 'rgba(56, 189, 248, 0.25)'));
-        radarChart.data.datasets[0].borderColor = chartColor;
-        radarChart.data.datasets[0].pointBackgroundColor = chartColor;
-        radarChart.data.datasets[0].backgroundColor = chartBg;
-        radarChart.data.datasets[0].data = [metrics.sMineral, metrics.sSlope, metrics.sTemp, metrics.sPress];
-        radarChart.update();
-      }
+      let tbodyHTML = '';
+      criteriaKeys.forEach((k, i) => {
+        const pct = Math.round(metrics.scores[i] * 100);
+        tbodyHTML += `
+          <tr>
+            <td>${t[k]}</td>
+            <td class="num">${site.earth[k]}</td>
+            <td class="num">${site.planet[k]}</td>
+            <td class="num">
+              <div class="sim-cell">
+                <div class="mini-bar">
+                  <div class="mini-bar-fill" style="width:${pct}%;"></div>
+                </div>
+                <span>${pct}%</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      document.getElementById('quant-tbody').innerHTML = tbodyHTML;
+
+      radarChart.data.labels = criteriaKeys.map((k) => t[k].split(' (')[0]);
+      radarChart.data.datasets[0].label = t.compScoreLabel;
+      radarChart.data.datasets[0].borderColor = '#3b82f6';
+      radarChart.data.datasets[0].pointBackgroundColor = '#3b82f6';
+      radarChart.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.18)';
+      radarChart.data.datasets[0].data = metrics.scores;
+      radarChart.update();
     }
 
-    function selectSite(index, skipEarthFly = false) {
+    function selectSite(index) {
+      if (index < 0 || index >= analogs.length) index = 0;
       currentIndex = index;
       const site = analogs[index];
+      const t = i18n[currentLang];
+      const displayName = cleanSiteName(currentLang === 'vi' ? site.nameVi : site.nameEn);
 
-      if (earthMap) {
-        if (site.id === 'krongno' && !skipEarthFly) {
-          document.getElementById('cave-subbar').style.display = 'flex';
-          focusAllCaves();
-        } else {
-          document.getElementById('cave-subbar').style.display = 'none';
-          if (krongNoLayerGroup && earthMap.hasLayer(krongNoLayerGroup)) {
-            earthMap.removeLayer(krongNoLayerGroup);
-          }
-          if (!skipEarthFly) {
-            earthMap.flyTo(site.earthCoords, site.earthZoom, { duration: 1.3 });
-            document.getElementById('earth-label').innerText = `🛰️ TERRESTRIAL TESTBED // ${site.name}`;
-          }
-        }
+      earthMap.flyTo(site.earthCoords, site.earthZoom || 11, { duration: 1.0 });
+      document.getElementById('earth-label').innerText = `${t.earthPrefix} · ${displayName}`;
+      document.getElementById('earth-coords-hud').innerText = formatCoords(site.earthCoords);
+
+      planetMap.removeLayer(moonTrekLayer);
+      planetMap.removeLayer(marsTrekLayer);
+      planetMap.removeLayer(marsMolaLayer);
+
+      if (site.bodyType === 'moon') {
+        moonTrekLayer.addTo(planetMap);
+        document.getElementById('planet-label').innerText = `${t.moonPrefix} · ${site.planetSiteName}`;
+      } else {
+        marsTrekLayer.addTo(planetMap);
+        document.getElementById('planet-label').innerText = `${t.marsPrefix} · ${site.planetSiteName}`;
       }
 
-      if (planetMap && moonTrekLayer && marsTrekLayer && marsMolaLayer) {
-        planetMap.removeLayer(moonTrekLayer);
-        planetMap.removeLayer(marsTrekLayer);
-        planetMap.removeLayer(marsMolaLayer);
+      planetMap.flyTo(site.planetCoords, site.planetZoom || 7, { duration: 1.0 });
+      document.getElementById('planet-coords-hud').innerText = formatCoords(site.planetCoords);
+      planetMarker.setLatLng(site.planetCoords).bindPopup(`<b>${site.planetSiteName}</b>`).openPopup();
 
-        if (site.bodyType === "moon") {
-          moonTrekLayer.addTo(planetMap);
-          document.getElementById('planet-label').innerText = `🌑 LUNAR FRONTIER // ${site.planetSiteName} (NASA LRO)`;
-        } else {
-          marsTrekLayer.addTo(planetMap);
-          document.getElementById('planet-label').innerText = `🔴 MARTIAN FRONTIER // ${site.planetSiteName} (NASA Viking)`;
-        }
-
-        planetMap.flyTo(site.planetCoords, site.planetZoom, { duration: 1.3 });
-        if (planetMarker) {
-          planetMarker.setLatLng(site.planetCoords).bindPopup(`<b>${site.planetSiteName}</b>`).openPopup();
-        }
-      }
-
-      document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
-      const activeBtn = document.getElementById(`site-btn-${index}`);
-      if (activeBtn && !skipEarthFly) activeBtn.classList.add('active');
-
+      renderSiteDropdown();
       updateAll();
     }
 
-    function renderTopButtons() {
-      const btnGroup = document.getElementById('btn-group');
-      btnGroup.innerHTML = '';
+    // 10. Language Switcher
+    function setLang(lang) {
+      if (currentLang === lang) return;
+      currentLang = lang;
+      const t = i18n[currentLang];
 
-      const globalBtn = document.createElement('button');
-      globalBtn.id = 'btn-global';
-      globalBtn.className = 'loc-btn global-btn';
-      globalBtn.innerHTML = `🌐 Global Overview (${analogs.length})`;
-      globalBtn.onclick = () => showGlobalOverview();
-      btnGroup.appendChild(globalBtn);
+      document.getElementById('lang-vi').classList.toggle('active', lang === 'vi');
+      document.getElementById('lang-en').classList.toggle('active', lang === 'en');
 
-      analogs.forEach((site, idx) => {
-        const btn = document.createElement('button');
-        btn.id = `site-btn-${idx}`;
-        let extraClass = '';
-        if (site.id === 'krongno') extraClass = ' vn-highlight';
-        else if (site.isBaseline) extraClass = ' baseline';
-        else if (site.isCustom) extraClass = ' custom-site';
-
-        btn.className = 'loc-btn' + extraClass;
-        btn.innerHTML = `${site.name} <span class="score-pill" id="pill-${idx}">0%</span>`;
-        btn.onclick = () => selectSite(idx, false);
-        btnGroup.appendChild(btn);
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerText = t[key];
       });
 
-      const addBtn = document.createElement('button');
-      addBtn.className = 'loc-btn add-btn';
-      addBtn.innerHTML = '➕ Add Analog Site';
-      addBtn.onclick = () => openAddModal();
-      btnGroup.appendChild(addBtn);
+      document.getElementById('dropdown-search').placeholder = t.searchPlaceholder;
+      document.getElementById('prev-site-btn').title = t.prevSiteTooltip;
+      document.getElementById('next-site-btn').title = t.nextSiteTooltip;
+
+      renderPresets();
+      renderSliders();
+      renderModalInputs();
+      renderLatexFormula();
+      refreshEarthMarkers();
+      selectSite(currentIndex);
     }
 
-    function openAddModal() {
-      document.getElementById('add-modal').style.display = 'flex';
-    }
-    function closeAddModal() {
-      document.getElementById('add-modal').style.display = 'none';
-    }
+    // 11. Add / Edit Modal Logic
+    function renderModalInputs() {
+      const container = document.getElementById('m-criteria-inputs');
+      if (!container) return;
+      const t = i18n[currentLang];
+      container.innerHTML = '';
 
-    const studentTemplates = {
-      chudangya: {
-        name: "8. Chư Đăng Ya Volcano (Vietnam)",
-        short: "🇻🇳 Chư Đăng Ya",
-        elat: 14.113, elon: 108.027,
-        body: "moon", pname: "Hadley Rille - Apollo 15 (Moon)",
-        plat: 26.1, plon: 3.6,
-        minscore: 0.89, mintext: "Basalt, Scoria vs. Mare Basalt",
-        eslope: 13.5, pslope: 15.0,
-        etemp: 295.0, ptemp: 252.0,
-        epress: 93.0, ppress: 0.0,
-        geology: "Extinct Pleistocene cinder cone in Gia Lai (Central Highlands, Vietnam) with scoria deposits and fertile basaltic tephra, serving as a volcanic crater & rille mobility analog for Apollo 15 / Artemis lunar missions.",
-        limits: "Dense agricultural vegetation and tropical rainfall alter surface cohesion compared to airless lunar regolith."
-      },
-      muine: {
-        name: "8. Mũi Né Red Sand Dunes (Vietnam)",
-        short: "🇻🇳 Mũi Né Dunes",
-        elat: 10.949, elon: 108.295,
-        body: "mars", pname: "Bagnold Dunes - Gale Crater (Mars)",
-        plat: -5.1, plon: 137.8,
-        minscore: 0.87, mintext: "Fe-Oxide Quartz Sand vs. Basaltic Sand",
-        eslope: 16.0, pslope: 18.0,
-        etemp: 301.0, ptemp: 223.0,
-        epress: 101.0, ppress: 0.75,
-        geology: "Coastal iron-oxide-rich shifting sand dunes in Bình Thuận (Vietnam) shaped by seasonal monsoon winds, ideal for testing rover wheel traction and slip-mitigation algorithms against Martian aeolian dunes.",
-        limits: "Earth gravity (1g vs. 0.38g on Mars) and higher moisture content affect grain cohesion and wheel sinkage."
-      },
-      lyson: {
-        name: "8. Lý Sơn Volcanic Island (Vietnam)",
-        short: "🇻🇳 Lý Sơn Crater",
-        elat: 15.381, elon: 109.118,
-        body: "moon", pname: "Aristarchus Plateau (Moon)",
-        plat: 23.7, plon: -47.4,
-        minscore: 0.91, mintext: "Columnar Basalt, Tuff vs. Pyroclastic Basalt",
-        eslope: 18.0, pslope: 16.5,
-        etemp: 299.0, ptemp: 250.0,
-        epress: 101.3, ppress: 0.0,
-        geology: "Quaternary volcanic island featuring Thới Lới crater, layered pyroclastic tuff cliffs, and columnar basalt formations analogous to lunar volcanic vents and pyroclastic deposits.",
-        limits: "Marine coastal erosion, salt spray weathering, and 101.3 kPa sea-level atmospheric pressure."
-      }
-    };
-
-    function fillTemplate(key) {
-      const t = studentTemplates[key];
-      if (!t) return;
-      const nextNum = analogs.length + 1;
-      document.getElementById('inp-name').value = t.name.replace(/^8\./, `${nextNum}.`);
-      document.getElementById('inp-short').value = t.short;
-      document.getElementById('inp-elat').value = t.elat;
-      document.getElementById('inp-elon').value = t.elon;
-      document.getElementById('inp-body').value = t.body;
-      document.getElementById('inp-pname').value = t.pname;
-      document.getElementById('inp-plat').value = t.plat;
-      document.getElementById('inp-plon').value = t.plon;
-      document.getElementById('inp-minscore').value = t.minscore;
-      document.getElementById('inp-mintext').value = t.mintext;
-      document.getElementById('inp-eslope').value = t.eslope;
-      document.getElementById('inp-pslope').value = t.pslope;
-      document.getElementById('inp-etemp').value = t.etemp;
-      document.getElementById('inp-ptemp').value = t.ptemp;
-      document.getElementById('inp-epress').value = t.epress;
-      document.getElementById('inp-ppress').value = t.ppress;
-      document.getElementById('inp-geology').value = t.geology;
-      document.getElementById('inp-limits').value = t.limits;
-    }
-
-    function handleNasaCsvUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const text = evt.target.result;
-        
-        // 1. Tọa độ từ Header
-        const latMatch = text.match(/latitude\s+([-\d.]+)/i);
-        const lonMatch = text.match(/longitude\s+([-\d.]+)/i);
-        if (latMatch) document.getElementById('inp-elat').value = parseFloat(latMatch[1]);
-        if (lonMatch) document.getElementById('inp-elon').value = parseFloat(lonMatch[1]);
-
-        // 2. Tìm bảng dữ liệu
-        const lines = text.split(/\r?\n/);
-        let headerIdx = -1;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].includes('YEAR') && lines[i].includes('T2M')) {
-            headerIdx = i;
-            break;
-          }
-        }
-
-        if (headerIdx !== -1) {
-          const headers = lines[headerIdx].split(',').map(s => s.trim());
-          const t2mIdx = headers.indexOf('T2M');
-          const psIdx = headers.indexOf('PS');
-          const rangeIdx = headers.indexOf('T2M_RANGE');
-
-          let t2mSum = 0, t2mCnt = 0;
-          let psSum = 0, psCnt = 0;
-          let rangeSum = 0, rangeCnt = 0;
-
-          for (let i = headerIdx + 1; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
-            const cols = line.split(',');
-            if (t2mIdx !== -1 && cols[t2mIdx] !== undefined) {
-              const val = parseFloat(cols[t2mIdx]);
-              if (!isNaN(val) && val > -900) { t2mSum += val; t2mCnt++; }
-            }
-            if (psIdx !== -1 && cols[psIdx] !== undefined) {
-              const val = parseFloat(cols[psIdx]);
-              if (!isNaN(val) && val > -900) { psSum += val; psCnt++; }
-            }
-            if (rangeIdx !== -1 && cols[rangeIdx] !== undefined) {
-              const val = parseFloat(cols[rangeIdx]);
-              if (!isNaN(val) && val > -900) { rangeSum += val; rangeCnt++; }
-            }
-          }
-
-          let meanT2mC = 25, meanPs = 100, meanRange = 10;
-          if (t2mCnt > 0) {
-            meanT2mC = t2mSum / t2mCnt;
-            const kelvin = meanT2mC + 273.15;
-            document.getElementById('inp-etemp').value = kelvin.toFixed(1);
-          }
-          if (psCnt > 0) {
-            meanPs = psSum / psCnt;
-            document.getElementById('inp-epress').value = meanPs.toFixed(1);
-          }
-
-          // Điền tên gợi ý nếu đang trống
-          const nextNum = analogs.length + 1;
-          if (!document.getElementById('inp-name').value) {
-            document.getElementById('inp-name').value = `${nextNum}. NASA POWER Site (${latMatch ? latMatch[1] : 'VN'})`;
-          }
-          if (!document.getElementById('inp-short').value) {
-            document.getElementById('inp-short').value = `📍 Site ${latMatch ? parseFloat(latMatch[1]).toFixed(1) : ''}`;
-          }
-
-          // Điền thông số mặc định nếu còn trống
-          if (!document.getElementById('inp-body').value) document.getElementById('inp-body').value = 'moon';
-          if (!document.getElementById('inp-pname').value) document.getElementById('inp-pname').value = 'Marius Hills (Moon)';
-          if (!document.getElementById('inp-plat').value) document.getElementById('inp-plat').value = 14.1;
-          if (!document.getElementById('inp-plon').value) document.getElementById('inp-plon').value = -56.7;
-          if (!document.getElementById('inp-minscore').value) document.getElementById('inp-minscore').value = 0.85;
-          if (!document.getElementById('inp-mintext').value) document.getElementById('inp-mintext').value = 'Analog Basalt/Regolith';
-          if (!document.getElementById('inp-eslope').value) document.getElementById('inp-eslope').value = 4.0;
-          if (!document.getElementById('inp-pslope').value) document.getElementById('inp-pslope').value = 4.5;
-          if (!document.getElementById('inp-ptemp').value) document.getElementById('inp-ptemp').value = 250.0;
-          if (!document.getElementById('inp-ppress').value) document.getElementById('inp-ppress').value = 0.0;
-          if (!document.getElementById('inp-geology').value) document.getElementById('inp-geology').value = 'Data imported directly from NASA POWER Climatology satellite archive for mission rover testing.';
-          if (!document.getElementById('inp-limits').value) document.getElementById('inp-limits').value = 'Earth atmosphere (MERRA-2 atmospheric model) and surface vegetation cover.';
-
-          const statusBox = document.getElementById('csv-upload-status');
-          if (statusBox) {
-            statusBox.style.display = 'block';
-            statusBox.innerHTML = `🎉 <b>Tự động đọc thành công file NASA POWER!</b><br>` +
-              `• Tọa độ: <b>${latMatch ? latMatch[1] : ''}°N, ${lonMatch ? lonMatch[1] : ''}°E</b> (${t2mCnt} ngày hợp lệ)<br>` +
-              `• Nhiệt độ TB: <b>${meanT2mC.toFixed(2)}°C</b> ➔ Tự đổi sang <b>${(meanT2mC+273.15).toFixed(1)} K</b><br>` +
-              `• Áp suất khí quyển: <b>${meanPs.toFixed(2)} kPa</b><br>` +
-              `• Biên độ nhiệt: <b>${(rangeSum/rangeCnt).toFixed(2)}°C</b><br>` +
-              `<i>👉 Toàn bộ các ô bên dưới đã được điền tự động! Bạn chỉ cần nhấn nút <b>Save & Plot</b> bên dưới.</i>`;
-          }
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function saveCustomSite(e) {
-      e.preventDefault();
-      const bodyType = document.getElementById('inp-body').value;
-      const pname = document.getElementById('inp-pname').value.trim();
-      const newSite = {
-        id: "custom_" + Date.now(),
-        name: document.getElementById('inp-name').value.trim(),
-        shortLabel: document.getElementById('inp-short').value.trim(),
-        isVietnam: document.getElementById('inp-name').value.toLowerCase().includes('vietnam'),
-        isBaseline: false,
-        isCustom: true,
-        bodyType: bodyType,
-        earthCoords: [parseFloat(document.getElementById('inp-elat').value), parseFloat(document.getElementById('inp-elon').value)],
-        earthZoom: 13,
-        planetCoords: [parseFloat(document.getElementById('inp-plat').value), parseFloat(document.getElementById('inp-plon').value)],
-        planetZoom: 7,
-        planetSiteName: pname,
-        target: `${bodyType.toUpperCase()} (${pname.toUpperCase()})`,
-        earth: {
-          slope: parseFloat(document.getElementById('inp-eslope').value),
-          tempK: parseFloat(document.getElementById('inp-etemp').value),
-          pressureKpa: parseFloat(document.getElementById('inp-epress').value),
-          mineralScore: parseFloat(document.getElementById('inp-minscore').value),
-          mineralText: document.getElementById('inp-mintext').value.trim()
-        },
-        planet: {
-          slope: parseFloat(document.getElementById('inp-pslope').value),
-          tempK: parseFloat(document.getElementById('inp-ptemp').value),
-          pressureKpa: parseFloat(document.getElementById('inp-ppress').value),
-          mineralScore: parseFloat(document.getElementById('inp-minscore').value),
-          mineralText: document.getElementById('inp-mintext').value.trim()
-        },
-        geology: document.getElementById('inp-geology').value.trim(),
-        limits: document.getElementById('inp-limits').value.trim()
-      };
-
-      customAnalogs.push(newSite);
-      localStorage.setItem('kronos_custom_analogs', JSON.stringify(customAnalogs));
-      analogs = [...defaultAnalogs, ...customAnalogs];
-
-      renderEarthMarkers();
-      renderTopButtons();
-      closeAddModal();
-      selectSite(analogs.length - 1, false);
-    }
-
-    function deleteCurrentCustomSite() {
-      const site = analogs[currentIndex];
-      if (!site || !site.isCustom) return;
-      customAnalogs = customAnalogs.filter(s => s.id !== site.id);
-      localStorage.setItem('kronos_custom_analogs', JSON.stringify(customAnalogs));
-      analogs = [...defaultAnalogs, ...customAnalogs];
-
-      renderEarthMarkers();
-      renderTopButtons();
-      selectSite(0, false);
-    }
-
-    function initApp() {
-      if (typeof L === 'undefined') {
-        document.getElementById('earth-label').innerText = '⚠️ Map library loading... please check internet connection.';
-        return;
-      }
-
-      // Initialize Map 1: EARTH (NASA GIBS)
-      earthMap = L.map('earth-map').setView([20, 40], 2);
-
-      const earthSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Esri World Imagery'
-      }).addTo(earthMap);
-
-      const nasaEarthDEM = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/ASTER_GDEM_Color_Shaded_Relief/default/GoogleMapsCompatible_Level12/{z}/{y}/{x}.jpg', {
-        attribution: 'NASA GIBS - ASTER GDEM',
-        opacity: 0.65,
-        maxNativeZoom: 12
+      criteriaKeys.forEach((k) => {
+        const row = document.createElement('div');
+        row.className = 'criteria-edit-row';
+        row.innerHTML = `
+          <label>${t[k]}</label>
+          <input type="number" step="any" id="mi-e-${k}" placeholder="0" />
+          <input type="number" step="any" id="mi-p-${k}" placeholder="0" />
+        `;
+        container.appendChild(row);
       });
+    }
 
-      const nasaEarthTemp = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Land_Surface_Temp_Day/default/2023-04-15/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', {
-        attribution: 'NASA GIBS - MODIS LST',
-        opacity: 0.6,
-        maxNativeZoom: 7
-      });
+    function openModal(mode) {
+      editMode = mode;
+      const t = i18n[currentLang];
+      renderModalInputs();
+      document.getElementById('edit-modal').style.display = 'flex';
+      document.getElementById('modal-title').innerText = mode === 'add' ? t.modalAddTitle : t.modalEditTitle;
+      document.getElementById('delete-site-btn').style.display = mode === 'edit' && analogs.length > 1 ? 'inline-block' : 'none';
 
-      L.control.layers(
-        { "Earth: True-Color Imagery": earthSat },
-        { 
-          "NASA: Elevation Relief (ASTER GDEM)": nasaEarthDEM,
-          "NASA: Land Surface Temp (MODIS)": nasaEarthTemp
-        },
-        { collapsed: true, position: 'bottomright' }
-      ).addTo(earthMap);
+      if (mode === 'edit') {
+        const s = analogs[currentIndex];
+        document.getElementById('m-name-vi').value = cleanSiteName(s.nameVi);
+        document.getElementById('m-name-en').value = cleanSiteName(s.nameEn);
+        document.getElementById('m-body').value = s.bodyType;
+        document.getElementById('m-planet-name').value = s.planetSiteName;
+        document.getElementById('m-earth-coords').value = `${s.earthCoords[0]}, ${s.earthCoords[1]}`;
+        document.getElementById('m-planet-coords').value = `${s.planetCoords[0]}, ${s.planetCoords[1]}`;
+        document.getElementById('m-geology').value = currentLang === 'vi' ? s.geologyVi : s.geologyEn;
+        document.getElementById('m-limits').value = currentLang === 'vi' ? s.limitsVi : s.limitsEn;
 
-      // LayerGroup for Krông Nô Individual Caves
-      krongNoLayerGroup = L.layerGroup();
-      const lavaFlowCoords = [
-        [12.4850, 107.8820],
-        [12.5095, 107.9012],
-        [12.5140, 107.9095],
-        [12.5185, 107.9045],
-        [12.5260, 107.9080]
-      ];
-      L.polyline(lavaFlowCoords, {
-        color: '#f43f5e',
-        weight: 3,
-        opacity: 0.85,
-        dashArray: '6, 6'
-      }).addTo(krongNoLayerGroup).bindTooltip("Chư Bluk – Krông Nô Basalt Lava Flow Axis", { sticky: true });
+        criteriaKeys.forEach((k) => {
+          document.getElementById(`mi-e-${k}`).value = s.earth[k];
+          document.getElementById(`mi-p-${k}`).value = s.planet[k];
+        });
+      } else {
+        const nextNum = analogs.length + 1;
+        document.getElementById('m-name-vi').value = `${nextNum}. Địa điểm mới`;
+        document.getElementById('m-name-en').value = `${nextNum}. New Analog Site`;
+        document.getElementById('m-body').value = 'mars';
+        document.getElementById('m-planet-name').value = 'Jezero Crater (Mars)';
+        document.getElementById('m-earth-coords').value = '16.05, 108.20';
+        document.getElementById('m-planet-coords').value = '18.38, 77.58';
+        document.getElementById('m-geology').value = '';
+        document.getElementById('m-limits').value = '';
 
-      krongNoCaves.forEach((cave, cIdx) => {
-        const cMarker = L.circleMarker(cave.coords, {
-          radius: 8,
-          fillColor: '#f43f5e',
-          color: '#ffffff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.9
-        })
-        .bindTooltip(cave.label, { permanent: true, direction: 'right', className: 'site-tooltip cave-tip', offset: [8, 0] })
-        .bindPopup(`<b>${cave.code}</b><br/>${cave.length}<br/><i>${cave.role}</i>`)
-        .on('click', () => focusSingleCave(cIdx));
-
-        cMarker.addTo(krongNoLayerGroup);
-        caveMarkers.push(cMarker);
-      });
-
-      // Initialize Map 2: MOON & MARS (NASA Solar System Treks WMTS)
-      planetMap = L.map('planet-map', {
-        crs: L.CRS.EPSG3857,
-        minZoom: 2,
-        maxZoom: 9
-      }).setView(analogs[0].planetCoords, analogs[0].planetZoom);
-
-      moonTrekLayer = L.tileLayer('https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
-        attribution: 'NASA Moon Trek (LRO WAC)',
-        tms: false,
-        noWrap: true,
-        maxNativeZoom: 7,
-        maxZoom: 12
-      });
-
-      marsTrekLayer = L.tileLayer('https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
-        attribution: 'NASA Mars Trek (Viking MDIM21)',
-        tms: false,
-        noWrap: true,
-        maxNativeZoom: 7,
-        maxZoom: 12
-      });
-
-      marsMolaLayer = L.tileLayer('https://trek.nasa.gov/tiles/Mars/EQ/Mars_MOLA_blend200ppx_HRSC_ClrShade_clon0dd_200mpp_lzw/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
-        attribution: 'NASA Mars Trek (MOLA/HRSC DEM)',
-        tms: false,
-        noWrap: true,
-        maxNativeZoom: 7,
-        maxZoom: 12
-      });
-
-      moonTrekLayer.addTo(planetMap);
-      planetMarker = L.marker(analogs[0].planetCoords).addTo(planetMap);
-
-      L.control.layers(
-        {
-          "🌑 Moon: Surface Mosaic (NASA LRO)": moonTrekLayer,
-          "🔴 Mars: Color Mosaic (NASA Viking)": marsTrekLayer,
-          "🏔️ Mars: Elevation Relief (MOLA DEM)": marsMolaLayer
-        },
-        {},
-        { collapsed: true, position: 'bottomright' }
-      ).addTo(planetMap);
-
-      // Initialize Radar Chart safely if Chart.js is available
-      if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('radarChart').getContext('2d');
-        radarChart = new Chart(ctx, {
-          type: 'radar',
-          data: {
-            labels: ['Mineralogy', 'Slope', 'Temperature', 'Pressure'],
-            datasets: [{
-              label: 'Component ESI (0 - 1)',
-              data: [0.9, 0.9, 0.9, 0.0],
-              backgroundColor: 'rgba(56, 189, 248, 0.25)',
-              borderColor: '#38bdf8',
-              pointBackgroundColor: '#38bdf8',
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-              padding: { top: 10, right: 30, bottom: 10, left: 30 }
-            },
-            scales: {
-              r: {
-                min: 0, max: 1,
-                ticks: { display: false, stepSize: 0.2 },
-                grid: { color: '#334155' },
-                angleLines: { color: '#334155' },
-                pointLabels: {
-                  color: '#cbd5e1',
-                  font: { size: 11.5, weight: '600' },
-                  padding: 6
-                }
-              }
-            },
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: (context) => `Component Sᵢ: ${(context.raw * 100).toFixed(1)}%`
-                }
-              }
-            }
-          }
+        criteriaKeys.forEach((k) => {
+          document.getElementById(`mi-e-${k}`).value = '';
+          document.getElementById(`mi-p-${k}`).value = '';
         });
       }
+    }
 
-      renderEarthMarkers();
-      renderTopButtons();
-      selectSite(0, true);
+    function closeModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    function parseCoordPair(str, fallback) {
+      const parts = (str || '').split(',').map((v) => parseFloat(v.trim()));
+      if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        return [parts[0], parts[1]];
+      }
+      return fallback;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function saveSite() {
+      const bodyType = document.getElementById('m-body').value;
+      const nameVi = document.getElementById('m-name-vi').value.trim() || 'Địa điểm tùy chỉnh';
+      const nameEn = document.getElementById('m-name-en').value.trim() || nameVi;
+      const planetSiteName = document.getElementById('m-planet-name').value.trim() || (bodyType === 'moon' ? 'Lunar Mare' : 'Mars Surface');
+      const earthCoords = parseCoordPair(document.getElementById('m-earth-coords').value, [12.485, 107.902]);
+      const planetCoords = parseCoordPair(document.getElementById('m-planet-coords').value, [14.0, -56.0]);
+
+      const earthData = {};
+      const planetData = {};
+      criteriaKeys.forEach((k) => {
+        earthData[k] = parseFloat(document.getElementById(`mi-e-${k}`).value) || 0;
+        planetData[k] = parseFloat(document.getElementById(`mi-p-${k}`).value) || 0;
+      });
+
+      const geoText = document.getElementById('m-geology').value.trim();
+      const limitText = document.getElementById('m-limits').value.trim();
+
+      if (editMode === 'add') {
+        analogs.push({
+          id: 'custom-' + Date.now(),
+          nameVi,
+          nameEn,
+          isBaseline: false,
+          bodyType,
+          earthCoords,
+          earthZoom: 11,
+          planetCoords,
+          planetZoom: 7,
+          planetSiteName,
+          targetVi: bodyType === 'moon' ? `MẶT TRĂNG (${planetSiteName.toUpperCase()})` : `SAO HỎA (${planetSiteName.toUpperCase()})`,
+          targetEn: bodyType === 'moon' ? `MOON (${planetSiteName.toUpperCase()})` : `MARS (${planetSiteName.toUpperCase()})`,
+          earth: earthData,
+          planet: planetData,
+          geologyVi: geoText || 'Dữ liệu mô phỏng tùy chỉnh do người dùng thêm vào hệ thống.',
+          geologyEn: geoText || 'Custom analog site added by user for quantitative ESI evaluation.',
+          limitsVi: limitText || 'Cần hiệu chỉnh thêm sai số khí quyển và trọng lực 1g của Trái Đất.',
+          limitsEn: limitText || 'Requires calibration for terrestrial atmosphere and 1g gravity.'
+        });
+        currentIndex = analogs.length - 1;
+      } else {
+        const existing = analogs[currentIndex];
+        existing.nameVi = nameVi;
+        existing.nameEn = nameEn;
+        existing.bodyType = bodyType;
+        existing.planetSiteName = planetSiteName;
+        existing.targetVi = bodyType === 'moon' ? `MẶT TRĂNG (${planetSiteName.toUpperCase()})` : `SAO HỎA (${planetSiteName.toUpperCase()})`;
+        existing.targetEn = bodyType === 'moon' ? `MOON (${planetSiteName.toUpperCase()})` : `MARS (${planetSiteName.toUpperCase()})`;
+        existing.earthCoords = earthCoords;
+        existing.planetCoords = planetCoords;
+        existing.earth = earthData;
+        existing.planet = planetData;
+        if (currentLang === 'vi') {
+          existing.geologyVi = geoText;
+          existing.limitsVi = limitText;
+        } else {
+          existing.geologyEn = geoText;
+          existing.limitsEn = limitText;
+        }
+      }
+
+      closeModal();
+      refreshEarthMarkers();
+      selectSite(currentIndex);
+      showToast(i18n[currentLang].savedToast);
+    }
+
+    function deleteCurrentSite() {
+      if (analogs.length <= 1) return;
+      analogs.splice(currentIndex, 1);
+      currentIndex = Math.max(0, currentIndex - 1);
+      closeModal();
+      refreshEarthMarkers();
+      selectSite(currentIndex);
+      showToast(i18n[currentLang].deletedToast);
+    }
+
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('site-dropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        closeSiteDropdown();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeSiteDropdown();
+      }
+    });
+
+    // 12. Initialize Application on Window Load
+    window.addEventListener('load', () => {
+      renderLatexFormula();
+      renderPresets();
+      renderSliders();
+      renderModalInputs();
+      refreshEarthMarkers();
+      selectSite(0);
 
       setTimeout(() => {
         earthMap.invalidateSize();
         planetMap.invalidateSize();
-        const globalBtn = document.getElementById('btn-global');
-        if (globalBtn) globalBtn.classList.add('active');
-        if (earthMarkers.length > 0) {
-          const group = new L.featureGroup(earthMarkers);
-          earthMap.fitBounds(group.getBounds().pad(0.18));
-        }
-      }, 250);
-    }
-
-    
-    window.addEventListener('resize', () => {
-      if (earthMap) earthMap.invalidateSize();
-      if (planetMap) planetMap.invalidateSize();
+      }, 200);
     });
 
-    window.addEventListener('load', initApp);
+    window.addEventListener('resize', () => {
+      earthMap.invalidateSize();
+      planetMap.invalidateSize();
+    });
   </script>
 </body>
 </html>
