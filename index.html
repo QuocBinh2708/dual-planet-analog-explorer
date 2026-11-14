@@ -21,6 +21,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --bg-canvas: #090a0d;
@@ -343,6 +346,25 @@
       align-items: center;
       gap: 8px;
       white-space: nowrap;
+    }
+
+    .cloud-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+    .cloud-pill .hud-dot {
+      width: 6.5px;
+      height: 6.5px;
+      border-radius: 50%;
     }
 
     .btn-ghost {
@@ -1138,6 +1160,11 @@
     </div>
 
     <div class="header-actions">
+      <div class="cloud-pill" id="cloud-pill" title="Supabase Cloud Database Status">
+        <span class="hud-dot" id="cloud-dot" style="background: #10b981;"></span>
+        <span id="cloud-pill-text">Cloud Sync</span>
+      </div>
+
       <button class="btn-ghost" onclick="openModal('add')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19" />
@@ -1356,6 +1383,32 @@
   <div id="toast" class="toast-msg"></div>
 
   <script>
+    // 0. Supabase Cloud Database Client Configuration
+    const SUPABASE_URL = "https://prhngciivgzoarwoburu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_k73tqrzFpZ7zMfoRxJGK7A_XmsFmZJ7";
+    const supabaseClient = (window.supabase && SUPABASE_KEY)
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+      : null;
+
+    function updateCloudStatus(status, text) {
+      const dot = document.getElementById('cloud-dot');
+      const txt = document.getElementById('cloud-pill-text');
+      if (!dot || !txt) return;
+      if (status === 'online') {
+        dot.style.background = '#10b981';
+        txt.innerText = text || 'Cloud Sync';
+      } else if (status === 'syncing') {
+        dot.style.background = '#3b82f6';
+        txt.innerText = text || 'Syncing...';
+      } else if (status === 'offline') {
+        dot.style.background = '#eab308';
+        txt.innerText = text || 'Local Mode';
+      } else {
+        dot.style.background = '#ef4444';
+        txt.innerText = text || 'Cloud Error';
+      }
+    }
+
     // 1. Bilingual Dictionary (Vietnamese & English)
     const i18n = {
       vi: {
@@ -2183,16 +2236,206 @@
       refreshEarthMarkers();
       selectSite(currentIndex);
       showToast(i18n[currentLang].savedToast);
+
+      // Sync updated/new site to Supabase cloud
+      syncSiteToSupabase(analogs[currentIndex]);
     }
 
     function deleteCurrentSite() {
       if (analogs.length <= 1) return;
+      const siteToDelete = analogs[currentIndex];
       analogs.splice(currentIndex, 1);
       currentIndex = Math.max(0, currentIndex - 1);
       closeModal();
       refreshEarthMarkers();
       selectSite(currentIndex);
       showToast(i18n[currentLang].deletedToast);
+
+      if (siteToDelete && siteToDelete.id) {
+        deleteSiteFromSupabase(siteToDelete.id);
+      }
+    }
+
+    // --- Supabase Cloud Sync Routines ---
+    async function loadSitesFromSupabase() {
+      if (!supabaseClient) {
+        updateCloudStatus('offline', 'Local Cache');
+        return;
+      }
+      try {
+        updateCloudStatus('syncing', 'Connecting...');
+        const { data, error } = await supabaseClient
+          .from('analog_sites')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.warn('Supabase fetch notice:', error.message);
+          updateCloudStatus('offline', 'Local Mode');
+          return;
+        }
+
+        if (data && data.length > 0) {
+          analogs = data.map((row) => ({
+            id: row.id,
+            nameVi: row.name_vi,
+            nameEn: row.name_en,
+            isBaseline: !!row.is_baseline,
+            bodyType: row.body_type,
+            earthCoords: [row.earth_lat, row.earth_lon],
+            earthZoom: row.earth_zoom || 11,
+            planetCoords: [row.planet_lat, row.planet_lon],
+            planetZoom: row.planet_zoom || 7,
+            planetSiteName: row.planet_site_name,
+            targetVi: row.target_vi || (row.body_type === 'moon' ? `MẶT TRĂNG (${row.planet_site_name.toUpperCase()})` : `SAO HỎA (${row.planet_site_name.toUpperCase()})`),
+            targetEn: row.target_en || (row.body_type === 'moon' ? `MOON (${row.planet_site_name.toUpperCase()})` : `MARS (${row.planet_site_name.toUpperCase()})`),
+            earth: {
+              c_sio2: row.earth_sio2,
+              c_feo: row.earth_feo,
+              c_tio2: row.earth_tio2,
+              c_density: row.earth_density,
+              c_thermal: row.earth_thermal,
+              c_roof: row.earth_roof,
+              c_gravity: row.earth_gravity
+            },
+            planet: {
+              c_sio2: row.planet_sio2,
+              c_feo: row.planet_feo,
+              c_tio2: row.planet_tio2,
+              c_density: row.planet_density,
+              c_thermal: row.planet_thermal,
+              c_roof: row.planet_roof,
+              c_gravity: row.planet_gravity
+            },
+            geologyVi: row.geology_vi,
+            geologyEn: row.geology_en,
+            limitsVi: row.limits_vi,
+            limitsEn: row.limits_en
+          }));
+
+          renderSiteDropdown();
+          refreshEarthMarkers();
+          selectSite(0);
+          updateCloudStatus('online', `${data.length} Sites Synced`);
+        } else {
+          // Table exists but is empty -> auto seed default 7 sites!
+          updateCloudStatus('syncing', 'Seeding DB...');
+          await seedDefaultSitesToSupabase();
+          updateCloudStatus('online', 'Cloud Ready');
+        }
+      } catch (err) {
+        console.warn('Supabase connect error:', err);
+        updateCloudStatus('offline', 'Local Mode');
+      }
+    }
+
+    async function seedDefaultSitesToSupabase() {
+      if (!supabaseClient) return;
+      try {
+        const rows = analogs.map((s) => ({
+          id: s.id,
+          name_vi: s.nameVi,
+          name_en: s.nameEn,
+          body_type: s.bodyType,
+          is_baseline: s.isBaseline || false,
+          earth_lat: s.earthCoords[0],
+          earth_lon: s.earthCoords[1],
+          earth_zoom: s.earthZoom,
+          planet_lat: s.planetCoords[0],
+          planet_lon: s.planetCoords[1],
+          planet_zoom: s.planetZoom,
+          planet_site_name: s.planetSiteName,
+          target_vi: s.targetVi,
+          target_en: s.targetEn,
+          earth_sio2: s.earth.c_sio2,
+          earth_feo: s.earth.c_feo,
+          earth_tio2: s.earth.c_tio2,
+          earth_density: s.earth.c_density,
+          earth_thermal: s.earth.c_thermal,
+          earth_roof: s.earth.c_roof,
+          earth_gravity: s.earth.c_gravity,
+          planet_sio2: s.planet.c_sio2,
+          planet_feo: s.planet.c_feo,
+          planet_tio2: s.planet.c_tio2,
+          planet_density: s.planet.c_density,
+          planet_thermal: s.planet.c_thermal,
+          planet_roof: s.planet.c_roof,
+          planet_gravity: s.planet.c_gravity,
+          geology_vi: s.geologyVi,
+          geology_en: s.geologyEn,
+          limits_vi: s.limitsVi,
+          limits_en: s.limitsEn
+        }));
+        await supabaseClient.from('analog_sites').upsert(rows);
+        console.log('Seeded default sites to Supabase successfully!');
+      } catch (e) {
+        console.warn('Seed notice:', e);
+      }
+    }
+
+    async function syncSiteToSupabase(site) {
+      if (!supabaseClient) return;
+      try {
+        updateCloudStatus('syncing', 'Saving...');
+        const row = {
+          id: site.id,
+          name_vi: site.nameVi,
+          name_en: site.nameEn,
+          body_type: site.bodyType,
+          is_baseline: site.isBaseline || false,
+          earth_lat: site.earthCoords[0],
+          earth_lon: site.earthCoords[1],
+          earth_zoom: site.earthZoom || 11,
+          planet_lat: site.planetCoords[0],
+          planet_lon: site.planetCoords[1],
+          planet_zoom: site.planetZoom || 7,
+          planet_site_name: site.planetSiteName,
+          target_vi: site.targetVi,
+          target_en: site.targetEn,
+          earth_sio2: site.earth.c_sio2,
+          earth_feo: site.earth.c_feo,
+          earth_tio2: site.earth.c_tio2,
+          earth_density: site.earth.c_density,
+          earth_thermal: site.earth.c_thermal,
+          earth_roof: site.earth.c_roof,
+          earth_gravity: site.earth.c_gravity,
+          planet_sio2: site.planet.c_sio2,
+          planet_feo: site.planet.c_feo,
+          planet_tio2: site.planet.c_tio2,
+          planet_density: site.planet.c_density,
+          planet_thermal: site.planet.c_thermal,
+          planet_roof: site.planet.c_roof,
+          planet_gravity: site.planet.c_gravity,
+          geology_vi: site.geologyVi,
+          geology_en: site.geologyEn,
+          limits_vi: site.limitsVi,
+          limits_en: site.limitsEn
+        };
+        const { error } = await supabaseClient.from('analog_sites').upsert(row);
+        if (!error) {
+          updateCloudStatus('online', `${analogs.length} Sites Synced`);
+          showToast('☁️ Đã đồng bộ lên Supabase Cloud thành công!');
+        } else {
+          console.warn('Supabase upsert error:', error.message);
+          updateCloudStatus('offline', 'Saved Locally');
+        }
+      } catch (e) {
+        console.warn('Sync site error:', e);
+        updateCloudStatus('offline', 'Saved Locally');
+      }
+    }
+
+    async function deleteSiteFromSupabase(siteId) {
+      if (!supabaseClient) return;
+      try {
+        updateCloudStatus('syncing', 'Deleting...');
+        const { error } = await supabaseClient.from('analog_sites').delete().eq('id', siteId);
+        if (!error) {
+          updateCloudStatus('online', `${analogs.length} Sites Synced`);
+        }
+      } catch (e) {
+        console.warn('Delete site error:', e);
+      }
     }
 
     document.addEventListener('click', (e) => {
@@ -2217,6 +2460,9 @@
       renderModalInputs();
       refreshEarthMarkers();
       selectSite(0);
+
+      // Connect and sync with Supabase Cloud Database
+      loadSitesFromSupabase();
 
       setTimeout(() => {
         earthMap.invalidateSize();
