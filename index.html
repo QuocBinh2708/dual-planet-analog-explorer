@@ -222,6 +222,67 @@
     .site-target-pill.pill-mars:hover {
       background: rgba(249, 115, 22, 0.25); border-color: #f97316; color: #ffffff;
     }
+    
+    /* Sub-80% (< 80%) Score Rule: marked with distinct amber/yellow (neither blue nor red) */
+    .site-target-pill.pill-sub80 {
+      background: rgba(234, 179, 8, 0.16) !important;
+      color: #fde047 !important;
+      border: 1px solid rgba(234, 179, 8, 0.5) !important;
+    }
+    .site-target-pill.pill-sub80:hover {
+      background: rgba(234, 179, 8, 0.3) !important;
+      border-color: #facc15 !important;
+      color: #ffffff !important;
+    }
+    .site-target-pill.pill-sub80.active {
+      background: #ca8a04 !important;
+      color: #ffffff !important;
+      border-color: #fde047 !important;
+      box-shadow: 0 0 10px rgba(234, 179, 8, 0.6) !important;
+    }
+
+    .chip-pill.chip-pill-sub80 {
+      background: rgba(234, 179, 8, 0.22) !important;
+      color: #fde047 !important;
+      border: 1px solid rgba(234, 179, 8, 0.5) !important;
+    }
+
+    .t-badge.t-badge-sub80 {
+      background: rgba(234, 179, 8, 0.2) !important;
+      color: #fde047 !important;
+      border: 1px solid rgba(234, 179, 8, 0.45) !important;
+    }
+    .target-planet-btn.active.sub80-active {
+      background: rgba(234, 179, 8, 0.15) !important;
+      border-color: #ca8a04 !important;
+      color: #fde047 !important;
+      box-shadow: 0 0 12px rgba(234, 179, 8, 0.3) !important;
+    }
+    .target-planet-btn.active.sub80-active .t-badge {
+      background: #ca8a04 !important;
+      color: #ffffff !important;
+      border: 1px solid #fde047 !important;
+    }
+
+    .asi-display.asi-sub80 {
+      background: linear-gradient(135deg, #b45309, #78350f) !important;
+      border: 1px solid #f59e0b;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+    }
+    .asi-display.asi-mars {
+      background: linear-gradient(135deg, #ea580c, #9a3412);
+    }
+    .asi-display.asi-moon {
+      background: linear-gradient(135deg, #0284c7, #1e40af);
+    }
+
+    .map-target-pill.active.pill-sub80 {
+      background: #ca8a04 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 10px rgba(234, 179, 8, 0.5) !important;
+      border-color: #fde047 !important;
+    }
+
     .site-target-pill.pill-mars.active {
       background: #ea580c; color: #ffffff; border-color: #fb923c;
       box-shadow: 0 0 8px rgba(249, 115, 22, 0.45);
@@ -2565,6 +2626,17 @@
       return { sMineral, sSlope, sTemp, sPress, esi: esi.toFixed(1) };
     }
 
+    
+    function getEsiColorClass(scoreNum, bodyType) {
+      if (scoreNum < 80) return 'pill-sub80';
+      return bodyType === 'moon' ? 'pill-moon' : 'pill-mars';
+    }
+
+    function getEsiTextColor(scoreNum, bodyType) {
+      if (scoreNum < 80) return '#facc15';
+      return bodyType === 'moon' ? '#7dd3fc' : '#fdba74';
+    }
+
     function switchTargetBody(body) {
       if (body !== 'moon' && body !== 'mars') return;
       currentTargetBody = body;
@@ -2707,17 +2779,27 @@
       analogs.forEach((site, idx) => {
         ensureDualTargets(site);
         const m = computeMetrics(site, currentTargetBody);
+        const curScoreNum = parseFloat(m.esi);
         const pill = document.getElementById(`pill-${idx}`);
-        if (pill) pill.innerText = `${m.esi}%`;
+        if (pill) {
+          pill.innerText = `${m.esi}%`;
+          pill.className = `chip-pill ${curScoreNum < 80 ? 'chip-pill-sub80' : ''}`;
+        }
         const ddMoonPill = document.getElementById(`dd-moon-pill-${idx}`);
         if (ddMoonPill) {
           const mMoon = computeMetrics(site, 'moon');
+          const mScore = parseFloat(mMoon.esi);
           ddMoonPill.innerText = `🌑 ${mMoon.esi}%`;
+          const mClass = getEsiColorClass(mScore, 'moon');
+          ddMoonPill.className = `site-target-pill ${mClass} ${idx === currentIndex && currentTargetBody === 'moon' ? 'active' : ''}`;
         }
         const ddMarsPill = document.getElementById(`dd-mars-pill-${idx}`);
         if (ddMarsPill) {
           const mMars = computeMetrics(site, 'mars');
+          const rScore = parseFloat(mMars.esi);
           ddMarsPill.innerText = `🔴 ${mMars.esi}%`;
+          const rClass = getEsiColorClass(rScore, 'mars');
+          ddMarsPill.className = `site-target-pill ${rClass} ${idx === currentIndex && currentTargetBody === 'mars' ? 'active' : ''}`;
         }
       });
 
@@ -2738,38 +2820,83 @@
       if (hIcon) hIcon.innerText = getSiteFlag(site);
       if (hTitle) hTitle.innerText = `${currentIndex + 1}. ${cleanLabel}`;
       if (hScore) {
+        const moonScoreNum = parseFloat(mMoon.esi);
+        const marsScoreNum = parseFloat(mMars.esi);
+        const moonColor = getEsiTextColor(moonScoreNum, 'moon');
+        const marsColor = getEsiTextColor(marsScoreNum, 'mars');
+
         if (window.innerWidth < 900) {
-          hScore.innerHTML = currentTargetBody === 'moon' ? `🌑 ${mMoon.esi}%` : `🔴 ${mMars.esi}%`;
+          const isMoon = currentTargetBody === 'moon';
+          const actScore = isMoon ? mMoon.esi : mMars.esi;
+          const actScoreNum = parseFloat(actScore);
+          const actColor = getEsiTextColor(actScoreNum, currentTargetBody);
+          const actIcon = isMoon ? '🌑' : '🔴';
+          hScore.innerHTML = `<span style="color:${actColor}; font-weight:800;">${actIcon} ${actScore}%</span>`;
         } else {
-          hScore.innerHTML = `🌑 ${mMoon.esi}% <span style="opacity:0.35;margin:0 2px;">|</span> 🔴 ${mMars.esi}%`;
+          hScore.innerHTML = `<span style="color:${moonColor}; font-weight:800;">🌑 ${mMoon.esi}%</span> <span style="opacity:0.35;margin:0 2px;">|</span> <span style="color:${marsColor}; font-weight:800;">🔴 ${mMars.esi}%</span>`;
         }
       }
 
       // Update target-planet-deck in sidebar
+      const moonScoreNum = parseFloat(mMoon.esi);
+      const marsScoreNum = parseFloat(mMars.esi);
+      const curScoreNum = parseFloat(metrics.esi);
+      const isSub80 = curScoreNum < 80;
+
       const tMoonName = document.getElementById('t-moon-name');
       const tMoonScore = document.getElementById('t-moon-score');
       const tMarsName = document.getElementById('t-mars-name');
       const tMarsScore = document.getElementById('t-mars-score');
       if (tMoonName) tMoonName.innerText = (site.targets.moon.planetSiteName || 'Marius Hills').replace(/\s*\(Moon\)/i, '');
-      if (tMoonScore) tMoonScore.innerText = `${mMoon.esi}%`;
+      if (tMoonScore) {
+        tMoonScore.innerText = `${mMoon.esi}%`;
+        tMoonScore.className = `t-badge ${moonScoreNum < 80 ? 't-badge-sub80' : ''}`;
+      }
       if (tMarsName) tMarsName.innerText = (site.targets.mars.planetSiteName || 'Arsia Mons').replace(/\s*\(Mars\)/i, '');
-      if (tMarsScore) tMarsScore.innerText = `${mMars.esi}%`;
+      if (tMarsScore) {
+        tMarsScore.innerText = `${mMars.esi}%`;
+        tMarsScore.className = `t-badge ${marsScoreNum < 80 ? 't-badge-sub80' : ''}`;
+      }
 
       const tbtnMoon = document.getElementById('tbtn-moon');
       const tbtnMars = document.getElementById('tbtn-mars');
       if (tbtnMoon) {
         tbtnMoon.classList.toggle('active', currentTargetBody === 'moon');
-        tbtnMoon.classList.toggle('moon-active', currentTargetBody === 'moon');
+        tbtnMoon.classList.toggle('moon-active', currentTargetBody === 'moon' && moonScoreNum >= 80);
+        tbtnMoon.classList.toggle('sub80-active', currentTargetBody === 'moon' && moonScoreNum < 80);
       }
       if (tbtnMars) {
         tbtnMars.classList.toggle('active', currentTargetBody === 'mars');
-        tbtnMars.classList.toggle('mars-active', currentTargetBody === 'mars');
+        tbtnMars.classList.toggle('mars-active', currentTargetBody === 'mars' && marsScoreNum >= 80);
+        tbtnMars.classList.toggle('sub80-active', currentTargetBody === 'mars' && marsScoreNum < 80);
       }
 
       const pillMoon = document.getElementById('map-pill-moon');
       const pillMars = document.getElementById('map-pill-mars');
-      if (pillMoon) pillMoon.classList.toggle('active', currentTargetBody === 'moon');
-      if (pillMars) pillMars.classList.toggle('active', currentTargetBody === 'mars');
+      if (pillMoon) {
+        pillMoon.classList.toggle('active', currentTargetBody === 'moon');
+        pillMoon.classList.toggle('pill-sub80', currentTargetBody === 'moon' && moonScoreNum < 80);
+      }
+      if (pillMars) {
+        pillMars.classList.toggle('active', currentTargetBody === 'mars');
+        pillMars.classList.toggle('pill-sub80', currentTargetBody === 'mars' && marsScoreNum < 80);
+      }
+
+      // Update Analog ESI Score Display Card
+      const asiBox = document.querySelector('.asi-display');
+      const asiLabel = asiBox ? asiBox.querySelector('.label') : null;
+      if (asiBox) {
+        if (isSub80) {
+          asiBox.className = 'asi-display asi-sub80';
+          if (asiLabel) asiLabel.innerHTML = 'Analog ESI Score <span style="color:#fde047;font-weight:700;">(&lt;80% Caution)</span>';
+        } else if (currentTargetBody === 'mars') {
+          asiBox.className = 'asi-display asi-mars';
+          if (asiLabel) asiLabel.innerText = 'Analog ESI Score';
+        } else {
+          asiBox.className = 'asi-display asi-moon';
+          if (asiLabel) asiLabel.innerText = 'Analog ESI Score';
+        }
+      }
 
       document.getElementById('asi-score').innerText = `${metrics.esi}%`;
       document.getElementById('target-tag').innerText = `TARGET: ${(targetData.target || targetData.planetSiteName).toUpperCase()}`;
@@ -2794,31 +2921,40 @@
           <td>Mineralogy</td>
           <td>${earthMinDisplay}</td>
           <td>${planetMinDisplay}</td>
-          <td class="num">${(metrics.sMineral * 100).toFixed(0)}%</td>
+          <td class="num" style="${metrics.sMineral < 0.8 ? 'color:#facc15;font-weight:700;' : ''}">${(metrics.sMineral * 100).toFixed(0)}%</td>
         </tr>
         <tr>
           <td>Mean Slope</td>
           <td class="num">${site.earth.slope}°</td>
           <td class="num">${targetData.slope}°</td>
-          <td class="num">${(metrics.sSlope * 100).toFixed(0)}%</td>
+          <td class="num" style="${metrics.sSlope < 0.8 ? 'color:#facc15;font-weight:700;' : ''}">${(metrics.sSlope * 100).toFixed(0)}%</td>
         </tr>
         <tr>
           <td>Mean Temp</td>
           <td class="num">${site.earth.tempK} K</td>
           <td class="num">${targetData.tempK} K</td>
-          <td class="num">${(metrics.sTemp * 100).toFixed(0)}%</td>
+          <td class="num" style="${metrics.sTemp < 0.8 ? 'color:#facc15;font-weight:700;' : ''}">${(metrics.sTemp * 100).toFixed(0)}%</td>
         </tr>
         <tr>
           <td>Pressure</td>
           <td class="num">${site.earth.pressureKpa} kPa</td>
           <td class="num">${targetData.pressureKpa} kPa</td>
-          <td class="num">${(metrics.sPress * 100).toFixed(1)}%</td>
+          <td class="num" style="${metrics.sPress < 0.8 ? 'color:#facc15;font-weight:700;' : ''}">${(metrics.sPress * 100).toFixed(1)}%</td>
         </tr>
       `;
 
       if (radarChart) {
-        const chartColor = currentTargetBody === 'moon' ? '#38bdf8' : '#fb923c';
-        const chartBg = currentTargetBody === 'moon' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(251, 146, 60, 0.25)';
+        let chartColor, chartBg;
+        if (isSub80) {
+          chartColor = '#eab308'; // Amber/Yellow (< 80% is not good: neither blue nor red)
+          chartBg = 'rgba(234, 179, 8, 0.25)';
+        } else if (currentTargetBody === 'moon') {
+          chartColor = '#38bdf8'; // Moon Blue
+          chartBg = 'rgba(56, 189, 248, 0.25)';
+        } else {
+          chartColor = '#fb923c'; // Mars Red/Orange
+          chartBg = 'rgba(251, 146, 60, 0.25)';
+        }
         radarChart.data.datasets[0].borderColor = chartColor;
         radarChart.data.datasets[0].pointBackgroundColor = chartColor;
         radarChart.data.datasets[0].backgroundColor = chartBg;
@@ -2950,8 +3086,20 @@
         const moonM = computeMetrics(site, 'moon');
         const marsM = computeMetrics(site, 'mars');
 
+        const moonScore = parseFloat(moonM.esi);
+        const marsScore = parseFloat(marsM.esi);
+        const moonClass = getEsiColorClass(moonScore, 'moon');
+        const marsClass = getEsiColorClass(marsScore, 'mars');
+
         const isMoonActive = (idx === currentIndex && currentTargetBody === 'moon');
         const isMarsActive = (idx === currentIndex && currentTargetBody === 'mars');
+
+        const moonTitle = moonScore < 80 
+          ? `Moon: ${site.targets?.moon?.planetSiteName || 'Moon'} (Sub-optimal: ${moonScore}% < 80%)`
+          : `Moon: ${site.targets?.moon?.planetSiteName || 'Moon'} (${moonScore}%)`;
+        const marsTitle = marsScore < 80 
+          ? `Mars: ${site.targets?.mars?.planetSiteName || 'Mars'} (Sub-optimal: ${marsScore}% < 80%)`
+          : `Mars: ${site.targets?.mars?.planetSiteName || 'Mars'} (${marsScore}%)`;
 
         item.innerHTML = `
           <div class="site-item-left">
@@ -2959,15 +3107,15 @@
             <span class="site-item-name" title="${site.name}">${site.name}</span>
           </div>
           <div class="site-item-right">
-            <span class="site-target-pill pill-moon ${isMoonActive ? 'active' : ''}" 
+            <span class="site-target-pill ${moonClass} ${isMoonActive ? 'active' : ''}" 
                   id="dd-moon-pill-${idx}"
-                  title="Target Moon: ${site.targets?.moon?.planetSiteName || 'Moon'}"
+                  title="${moonTitle}"
                   onclick="event.stopPropagation(); selectSite(${idx}, false, 'moon'); closeSiteDropdown();">
               🌑 ${moonM.esi}%
             </span>
-            <span class="site-target-pill pill-mars ${isMarsActive ? 'active' : ''}" 
+            <span class="site-target-pill ${marsClass} ${isMarsActive ? 'active' : ''}" 
                   id="dd-mars-pill-${idx}"
-                  title="Target Mars: ${site.targets?.mars?.planetSiteName || 'Mars'}"
+                  title="${marsTitle}"
                   onclick="event.stopPropagation(); selectSite(${idx}, false, 'mars'); closeSiteDropdown();">
               🔴 ${marsM.esi}%
             </span>
@@ -3189,7 +3337,10 @@
       }
 
       const liveEsiEl = document.getElementById('modal-live-esi');
-      if (liveEsiEl) liveEsiEl.innerText = `${esi.toFixed(1)}%`;
+      if (liveEsiEl) {
+        liveEsiEl.innerText = `${esi.toFixed(1)}%`;
+        liveEsiEl.style.color = (esi < 80) ? '#fde047' : '#38bdf8';
+      }
 
       const fMin = document.getElementById('meter-fill-min');
       const vMin = document.getElementById('meter-val-min');
