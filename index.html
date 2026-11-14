@@ -458,6 +458,60 @@
     }
     .site-tooltip.base-tip { border-color: #f59e0b; color: #fde68a; }
 
+    /* Planetary Waypoint Tooltips & Active Highlighting */
+    .site-tooltip.moon-tip {
+      background: rgba(11, 20, 38, 0.94);
+      border-color: #38bdf8;
+      color: #e0f2fe;
+    }
+    .site-tooltip.mars-tip {
+      background: rgba(36, 16, 12, 0.94);
+      border-color: #f97316;
+      color: #ffedd5;
+    }
+    .site-tooltip.sub80-tip {
+      border-color: #f59e0b !important;
+      color: #fef08a !important;
+    }
+    .site-tooltip.active-target-tip {
+      background: #0284c7 !important;
+      border-color: #ffffff !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.7) !important;
+      transform: scale(1.08);
+      z-index: 9999 !important;
+    }
+    .site-tooltip.mars-tip.active-target-tip {
+      background: #ea580c !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.7) !important;
+    }
+    .site-tooltip.sub80-tip.active-target-tip {
+      background: #ca8a04 !important;
+      border-color: #fef08a !important;
+      box-shadow: 0 0 12px rgba(234, 179, 8, 0.7) !important;
+    }
+
+    .map-target-pill.pill-all-targets {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      margin-left: 2px;
+    }
+    .map-target-pill.pill-all-targets:hover {
+      background: #334155;
+      color: #ffffff;
+      border-color: #94a3b8;
+    }
+    .map-target-pill.pill-all-targets.active {
+      background: #059669;
+      color: #ffffff;
+      border-color: #34d399;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+    }
+
+
     /* Map Labels */
     .map-label {
       position: absolute; bottom: 12px; left: 12px; z-index: 999;
@@ -1333,6 +1387,7 @@
       <div class="map-planet-switch-overlay">
         <button class="map-target-pill pill-moon active" id="map-pill-moon" onclick="switchTargetBody('moon')">🌑 Moon</button>
         <button class="map-target-pill pill-mars" id="map-pill-mars" onclick="switchTargetBody('mars')">🔴 Mars</button>
+        <button class="map-target-pill pill-all-targets" id="map-pill-all" onclick="showAllPlanetWaypoints()" title="View all waypoints across this planetary body">🌐 All Waypoints</button>
       </div>
       <div class="map-label planet-tag" id="planet-label">
         <span>🌑 LUNAR FRONTIER // MARIUS HILLS (MOON)</span>
@@ -2511,7 +2566,7 @@
     let currentIndex = 0;
     let earthMap, planetMap;
     let moonTrekLayer, marsTrekLayer, marsMolaLayer;
-    let earthMarkers = [], planetMarker;
+    let earthMarkers = [], planetMarkers = [], planetMarker = null;
     let krongNoLayerGroup = null;
     let caveMarkers = [];
     let radarChart = null;
@@ -2651,6 +2706,7 @@
       if (btnMoon) btnMoon.classList.toggle('active', body === 'moon');
       if (btnMars) btnMars.classList.toggle('active', body === 'mars');
 
+      renderPlanetMarkers();
       flyPlanetMapToTarget();
       updateAll();
       renderDropdownList();
@@ -2677,13 +2733,95 @@
         if (pLabel) pLabel.innerHTML = `<span>🔴 MARTIAN FRONTIER // ${(targetData.planetSiteName || 'MARTIAN ANALOG').toUpperCase()}</span>`;
       }
 
+      const allBtn = document.getElementById('map-pill-all');
+      if (allBtn) allBtn.classList.remove('active');
+
+      renderPlanetMarkers();
+
       planetMap.flyTo(targetData.planetCoords, targetData.planetZoom || 7, { duration: 1.2 });
-      if (planetMarker) {
-        planetMarker.setLatLng(targetData.planetCoords).bindPopup(`<b>${targetData.planetSiteName}</b>`).openPopup();
+      if (planetMarkers[currentIndex]) {
+        planetMarkers[currentIndex].openPopup();
       }
     }
 
     // 4. Map & Layer Operations
+    
+    function renderPlanetMarkers() {
+      if (!planetMap || typeof L === 'undefined') return;
+      planetMarkers.forEach(m => planetMap.removeLayer(m));
+      planetMarkers = [];
+
+      analogs.forEach((site, idx) => {
+        ensureDualTargets(site);
+        const targetData = site.targets[currentTargetBody] || site.targets.moon;
+        if (!targetData || !targetData.planetCoords) return;
+
+        const m = computeMetrics(site, currentTargetBody);
+        const scoreNum = parseFloat(m.esi);
+        const isSub80 = scoreNum < 80;
+        const isActive = (idx === currentIndex);
+
+        const isMoon = currentTargetBody === 'moon';
+        const cleanTargetName = (targetData.planetSiteName || 'Target').replace(/\s*\((Moon|Mars)\)/i, '');
+        const tipClass = `site-tooltip ${isMoon ? 'moon-tip' : 'mars-tip'} ${isSub80 ? 'sub80-tip' : ''} ${isActive ? 'active-target-tip' : ''}`;
+
+        const marker = L.marker(targetData.planetCoords)
+          .bindTooltip(`${idx + 1}. ${cleanTargetName}`, {
+            permanent: true,
+            direction: 'top',
+            className: tipClass,
+            offset: [0, -10]
+          })
+          .bindPopup(`
+            <div style="font-family:'Segoe UI',system-ui,sans-serif; min-width:190px; color:#0f172a; padding:2px;">
+              <div style="font-size:10px; font-weight:800; color:${isMoon ? '#0284c7' : '#ea580c'}; text-transform:uppercase; letter-spacing:0.5px;">
+                ${isMoon ? '🌑 NASA LUNAR WAYPOINT' : '🔴 NASA MARTIAN WAYPOINT'}
+              </div>
+              <div style="font-size:13px; font-weight:700; margin:2px 0 2px 0;">
+                ${idx + 1}. ${targetData.planetSiteName}
+              </div>
+              <div style="font-size:11px; color:#475569;">
+                Earth Analog: <b>${site.name}</b>
+              </div>
+              <div style="font-size:11px; margin-top:4px; font-weight:700; color:${isSub80 ? '#b45309' : '#047857'}; background:${isSub80 ? '#fef3c7' : '#d1fae5'}; padding:2px 6px; border-radius:4px; display:inline-block;">
+                Similarity: ${m.esi}% ${isSub80 ? '(Caution: <80%)' : '✓'}
+              </div>
+            </div>
+          `)
+          .on('click', () => {
+            selectSite(idx, false, currentTargetBody);
+          });
+
+        marker.addTo(planetMap);
+        planetMarkers.push(marker);
+
+        if (isActive) {
+          planetMarker = marker;
+        }
+      });
+    }
+
+    function showAllPlanetWaypoints() {
+      if (!planetMap) return;
+      const isMoon = currentTargetBody === 'moon';
+      const pLabel = document.getElementById('planet-label');
+      if (pLabel) {
+        pLabel.innerHTML = isMoon
+          ? `<span>🌑 ALL LUNAR WAYPOINTS // ${analogs.length} TARGET SITES</span>`
+          : `<span>🔴 ALL MARTIAN WAYPOINTS // ${analogs.length} TARGET SITES</span>`;
+      }
+
+      const allBtn = document.getElementById('map-pill-all');
+      if (allBtn) allBtn.classList.add('active');
+
+      if (planetMarkers.length > 0) {
+        const group = new L.featureGroup(planetMarkers);
+        planetMap.flyToBounds(group.getBounds().pad(0.25), { duration: 1.2 });
+      } else {
+        planetMap.flyTo([0, 0], 2, { duration: 1.2 });
+      }
+    }
+
     function renderEarthMarkers() {
       if (!earthMap || typeof L === 'undefined') return;
       earthMarkers.forEach(m => earthMap.removeLayer(m));
@@ -2752,6 +2890,10 @@
       } else {
         earthMap.flyTo([20, 20], 2, { duration: 1.2 });
       }
+
+      // Also display all waypoints across the active planetary body
+      showAllPlanetWaypoints();
+
       document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
       const globalBtn = document.getElementById('btn-global');
       if (globalBtn) globalBtn.classList.add('active');
@@ -3516,6 +3658,7 @@
       analogs = [...defaultAnalogs, ...customAnalogs];
 
       renderEarthMarkers();
+      renderPlanetMarkers();
       renderTopButtons();
       resetStudioModal();
       closeAddModal();
@@ -3534,6 +3677,7 @@
       analogs = [...defaultAnalogs, ...customAnalogs];
 
       renderEarthMarkers();
+      renderPlanetMarkers();
       renderTopButtons();
       selectSite(0, false);
 
@@ -3654,6 +3798,7 @@
           analogs.forEach(s => ensureDualTargets(s));
           renderTopButtons();
           renderEarthMarkers();
+          renderPlanetMarkers();
           selectSite(currentIndex, true);
           setCloudStatus('online', `${analogs.length} Sites Synced`);
         } else {
@@ -4110,10 +4255,6 @@
       });
 
       moonTrekLayer.addTo(planetMap);
-      const initPCoords = (analogs[0].targets && analogs[0].targets[currentTargetBody])
-        ? analogs[0].targets[currentTargetBody].planetCoords
-        : (analogs[0].planetCoords || [14.0, -56.0]);
-      planetMarker = L.marker(initPCoords).addTo(planetMap);
 
       L.control.layers(
         {
@@ -4161,6 +4302,7 @@
       }
 
       renderEarthMarkers();
+      renderPlanetMarkers();
       renderTopButtons();
       selectSite(0, true);
 
