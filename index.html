@@ -93,6 +93,11 @@
     }
 
     /* Dropdown Popover Menu */
+    
+    .leaflet-top, .leaflet-bottom { z-index: 400 !important; }
+    .mission-header-bar { z-index: 9999 !important; }
+    .site-dropdown-menu { z-index: 10000 !important; }
+
     .site-dropdown-menu {
       position: absolute; top: calc(100% + 6px); left: 0;
       width: 370px; max-height: 440px;
@@ -176,7 +181,7 @@
     }
     .site-item-left {
       display: flex; align-items: center; gap: 8px;
-      overflow: hidden;
+      overflow: hidden; flex: 1; min-width: 0;
     }
     .site-item-flag { font-size: 14px; }
     .site-item-name {
@@ -192,6 +197,35 @@
     }
     .body-moon { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.4); }
     .body-mars { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); }
+
+    
+    .site-target-pill {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px;
+      cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent;
+      user-select: none;
+    }
+    .site-target-pill.pill-moon {
+      background: rgba(56, 189, 248, 0.12); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.3);
+    }
+    .site-target-pill.pill-moon:hover {
+      background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #ffffff;
+    }
+    .site-target-pill.pill-moon.active {
+      background: #0284c7; color: #ffffff; border-color: #38bdf8;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.45);
+    }
+    .site-target-pill.pill-mars {
+      background: rgba(249, 115, 22, 0.12); color: #fdba74; border-color: rgba(249, 115, 22, 0.3);
+    }
+    .site-target-pill.pill-mars:hover {
+      background: rgba(249, 115, 22, 0.25); border-color: #f97316; color: #ffffff;
+    }
+    .site-target-pill.pill-mars.active {
+      background: #ea580c; color: #ffffff; border-color: #fb923c;
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.45);
+    }
 
     .site-item-esi {
       font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
@@ -372,6 +406,78 @@
     }
     .earth-tag { color: #34d399; border-color: #059669; }
     .planet-tag { color: #fb923c; border-color: #ea580c; }
+
+    /* Dual-Planet Target Switcher Styles */
+    .map-planet-switch-overlay {
+      position: absolute; top: 10px; right: 10px; z-index: 999;
+      display: flex; background: rgba(11, 17, 32, 0.92); border: 1px solid #334155;
+      border-radius: 6px; padding: 2px; gap: 2px; backdrop-filter: blur(6px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .map-target-pill {
+      background: transparent; border: none; color: #94a3b8;
+      padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s ease; display: inline-flex;
+      align-items: center; gap: 4px;
+    }
+    .map-target-pill:hover { color: #f8fafc; }
+    .map-target-pill.active.pill-moon {
+      background: #0284c7; color: #ffffff; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .map-target-pill.active.pill-mars {
+      background: #ea580c; color: #ffffff; box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+    }
+
+    .target-planet-deck {
+      background: rgba(15, 23, 42, 0.8); border: 1px solid #334155;
+      border-radius: 8px; padding: 8px 10px; margin: 4px 0 6px 0;
+    }
+    .target-deck-label {
+      font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 6px; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 4px;
+    }
+    .target-deck-buttons {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .target-planet-btn {
+      background: #090d16; border: 1px solid #334155; color: #94a3b8;
+      border-radius: 6px; padding: 6px 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .target-planet-btn:hover { border-color: #64748b; color: #f8fafc; }
+    .target-planet-btn.active.moon-active {
+      background: rgba(56, 189, 248, 0.15); border-color: #0284c7; color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+    .target-planet-btn.active.mars-active {
+      background: rgba(249, 115, 22, 0.15); border-color: #ea580c; color: #fb923c;
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
+    }
+    .t-btn-left { display: flex; align-items: center; gap: 6px; overflow: hidden; }
+    .t-icon { font-size: 14px; flex-shrink: 0; }
+    .t-meta { text-align: left; overflow: hidden; }
+    .t-name { font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .t-sub { font-size: 9.5px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+    .t-badge {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 800;
+      padding: 1px 5px; border-radius: 4px; flex-shrink: 0;
+      background: rgba(255,255,255,0.06); color: #cbd5e1;
+    }
+    .target-planet-btn.active.moon-active .t-badge {
+      background: rgba(56, 189, 248, 0.25); color: #7dd3fc;
+    }
+    .target-planet-btn.active.mars-active .t-badge {
+      background: rgba(249, 115, 22, 0.25); color: #fdba74;
+    }
+    .badge-moon-active { background: #0369a1 !important; color: #e0f2fe !important; border: 1px solid #38bdf8; }
+    .badge-mars-active { background: #9a3412 !important; color: #ffedd5 !important; border: 1px solid #f97316; }
+
+    @media (max-width: 500px) {
+      .target-deck-buttons { grid-template-columns: 1fr; gap: 6px; }
+    }
+
 
     /* Right Analytical Sidebar */
     #sidebar {
@@ -988,7 +1094,12 @@
       }
 
       /* Dropdown Menu on Mobile -> Native Floating Card */
-      .site-dropdown-menu {
+      
+    .leaflet-top, .leaflet-bottom { z-index: 400 !important; }
+    .mission-header-bar { z-index: 9999 !important; }
+    .site-dropdown-menu { z-index: 10000 !important; }
+
+    .site-dropdown-menu {
         position: fixed !important;
         top: 48px !important;
         left: 8px !important;
@@ -1157,7 +1268,11 @@
 
     <!-- Lower Map: Planetary Target Body (Moon / Mars) -->
     <div class="map-pane">
-      <div id="planet-map"></div>
+            <div id="planet-map"></div>
+      <div class="map-planet-switch-overlay">
+        <button class="map-target-pill pill-moon active" id="map-pill-moon" onclick="switchTargetBody('moon')">🌑 Moon</button>
+        <button class="map-target-pill pill-mars" id="map-pill-mars" onclick="switchTargetBody('mars')">🔴 Mars</button>
+      </div>
       <div class="map-label planet-tag" id="planet-label">
         <span>🌑 LUNAR FRONTIER // MARIUS HILLS (MOON)</span>
       </div>
@@ -1195,6 +1310,36 @@
         </div>
       </div>
       <h1 id="site-title">Site Name</h1>
+    </div>
+
+    <!-- Dual-Planet Target Switcher Deck -->
+    <div class="target-planet-deck">
+      <div class="target-deck-label">
+        <span>Dual Planetary Analog Target</span>
+        <span style="font-size:9.5px; color:#64748b;">(Compare Moon vs Mars for this Earth site)</span>
+      </div>
+      <div class="target-deck-buttons">
+        <button class="target-planet-btn active moon-active" id="tbtn-moon" onclick="switchTargetBody('moon')">
+          <div class="t-btn-left">
+            <span class="t-icon">🌑</span>
+            <div class="t-meta">
+              <div class="t-name">Moon Target</div>
+              <div class="t-sub" id="t-moon-name">Marius Hills</div>
+            </div>
+          </div>
+          <div class="t-badge" id="t-moon-score">--%</div>
+        </button>
+        <button class="target-planet-btn mars-active" id="tbtn-mars" onclick="switchTargetBody('mars')">
+          <div class="t-btn-left">
+            <span class="t-icon">🔴</span>
+            <div class="t-meta">
+              <div class="t-name">Mars Target</div>
+              <div class="t-sub" id="t-mars-name">Arsia Mons</div>
+            </div>
+          </div>
+          <div class="t-badge" id="t-mars-score">--%</div>
+        </button>
+      </div>
     </div>
 
     <!-- Dedicated Sub-Card for Krong No Caves -->
@@ -1262,7 +1407,7 @@
             <tr>
               <th>Parameter</th>
               <th>Earth Site</th>
-              <th>Target Body</th>
+              <th id="table-target-name">Target Body</th>
               <th>ESI (Sᵢ)</th>
             </tr>
           </thead>
@@ -1575,452 +1720,669 @@
   </div>
 
   <script>
+    let currentTargetBody = 'moon';
     // 1. Base Quantitative Dataset for 12 Planetary Analog Sites (NASA 4-Parameter ESI Model)
     const defaultAnalogs = [
-      {
-            "id": "krongno",
-            "name": "1. Krong No – Chu Bluk (Vietnam)",
-            "shortLabel": "🇻🇳 Krong No",
-            "isVietnam": true,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "moon",
-            "earthCoords": [
-                  12.5185,
-                  107.9045
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  14.0,
-                  -56.0
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Marius Hills Lava Tubes (Moon)",
-            "target": "MOON (MARIUS HILLS)",
-            "earth": {
-                  "slope": 9.0,
-                  "tempK": 296.6,
-                  "pressureKpa": 96.0,
-                  "mineralScore": 0.9,
-                  "mineralText": "Basalt (FeO 12%, TiO2 2.5%)"
-            },
-            "planet": {
-                  "slope": 9.5,
-                  "tempK": 253.0,
-                  "pressureKpa": 0.0,
-                  "mineralScore": 0.9,
-                  "mineralText": "Mare Basalt (FeO 17%, TiO2 4.5%)"
-            },
-            "geology": "Longest basalt lava tube cave system in Southeast Asia (>25 km, 50+ tubes) in Dak Nong Geopark. Thick basalt roof preserves stable temperature (20-22°C / 295 K) and shields cosmic radiation, ideal for testing autonomous SLAM rovers and subsurface lunar habitats.",
-            "limits": "Tropical monsoon surface weathering, 1g Earth gravity (6x lunar gravity), atmospheric moisture, and absence of ultra-high vacuum conditions."
+  {
+    "id": "krongno",
+    "name": "1. Krong No – Chu Bluk (Vietnam)",
+    "shortLabel": "🇻🇳 Krong No",
+    "isVietnam": true,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      12.5185,
+      107.9045
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 9.0,
+      "tempK": 296.6,
+      "pressureKpa": 96.0,
+      "mineralScore": 0.9,
+      "mineralText": "Basalt (FeO 12%, TiO2 2.5%)"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Marius Hills Lava Tubes (Moon)",
+        "planetCoords": [
+          14.0,
+          -56.0
+        ],
+        "planetZoom": 7,
+        "target": "MOON (MARIUS HILLS)",
+        "slope": 9.5,
+        "tempK": 253.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.9,
+        "mineralText": "Mare Basalt (FeO 17%, TiO2 4.5%)",
+        "geology": "Longest basalt lava tube cave system in Southeast Asia (>25 km, 50+ tubes) in Dak Nong UNESCO Geopark. Thick basalt roof preserves stable temperature (20-22°C / 295 K) and shields cosmic radiation, ideal for testing autonomous SLAM rovers and subsurface lunar habitats.",
+        "limits": "Tropical monsoon surface weathering, 1g Earth gravity (6x lunar gravity), atmospheric moisture, and absence of ultra-high vacuum conditions."
       },
-      {
-            "id": "lanzarote",
-            "name": "2. Lanzarote Island (Spain)",
-            "shortLabel": "🇪🇸 Lanzarote",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  29.035,
-                  -13.633
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -11.5,
-                  -121.0
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Arsia Mons Skylights (Mars)",
-            "target": "MARS (ARSIA MONS)",
-            "earth": {
-                  "slope": 14.0,
-                  "tempK": 294.0,
-                  "pressureKpa": 101.0,
-                  "mineralScore": 0.88,
-                  "mineralText": "Tholeiitic Basalt, Basanite, Volcanic Ash"
-            },
-            "planet": {
-                  "slope": 15.0,
-                  "tempK": 195.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.88,
-                  "mineralText": "Martian Basalt, Lava Tube Minerals"
-            },
-            "geology": "Young basaltic volcanic landscape in Timanfaya National Park featuring extensive lava flows, cinder cones, and lava tubes. Primary European testbed for rover traction, volcanic field mapping, and planetary cave exploration technologies (ESA PANGEA).",
-            "limits": "Maritime island climate, oceanic air humidity, biological colonization, and weathering differ significantly from the hyper-arid, subzero, low-pressure Martian surface."
-      },
-      {
-            "id": "meteor_crater",
-            "name": "3. Meteor Crater (Arizona, USA)",
-            "shortLabel": "🇺🇸 Meteor Crater",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  35.027,
-                  -111.022
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -5.4,
-                  137.8
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Gale Crater Floor (Mars)",
-            "target": "MARS (GALE CRATER)",
-            "earth": {
-                  "slope": 18.0,
-                  "tempK": 285.0,
-                  "pressureKpa": 95.0,
-                  "mineralScore": 0.88,
-                  "mineralText": "Impact-Brecciated Sandstone, Limestone, Shocked Minerals"
-            },
-            "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.88,
-                  "mineralText": "Martian Impact Breccia, Basalt, Regolith"
-            },
-            "geology": "Best-preserved meteorite impact crater on Earth (~50,000 years old, 1.2 km diameter) formed in layered sedimentary limestone and sandstone. Preserves shock metamorphism minerals (coesite, stishovite) and ejecta blanket for studying impact mechanics and Martian crater floors.",
-            "limits": "Dense terrestrial atmosphere, aeolian and fluvial weathering, 1g gravity, and target rocks dominated by sedimentary limestone/sandstone rather than primary Martian basaltic crust."
-      },
-      {
-            "id": "craters_moon",
-            "name": "4. Craters of the Moon (Idaho, USA)",
-            "shortLabel": "🇺🇸 Craters of Moon",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "moon",
-            "earthCoords": [
-                  43.461,
-                  -113.563
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  26.1,
-                  3.6
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Hadley Rille – Apollo 15 (Moon)",
-            "target": "MOON (HADLEY RILLE)",
-            "earth": {
-                  "slope": 12.0,
-                  "tempK": 280.0,
-                  "pressureKpa": 85.0,
-                  "mineralScore": 0.91,
-                  "mineralText": "Basalt, Scoria, Pahoehoe, Spatter Cones"
-            },
-            "planet": {
-                  "slope": 14.0,
-                  "tempK": 253.0,
-                  "pressureKpa": 0.0,
-                  "mineralScore": 0.91,
-                  "mineralText": "Mare Basalt, Hadley Scoria, Glass Spherules"
-            },
-            "geology": "Vast basaltic volcanic province along the Great Rift featuring 60+ lava flows, cinder cones, fissure eruptions, and tube networks. Serves as Apollo astronaut training site and NASA testbed for rover traverse mobility and lunar mare basalt sampling.",
-            "limits": "Terrestrial rainfall, seasonal snow, biological activity, and aqueous chemical weathering altering fresh basalt surfaces; 1g gravitational field."
-      },
-      {
-            "id": "lamayuru",
-            "name": "5. Lamayuru Valley (Ladakh, India)",
-            "shortLabel": "🇮🇳 Lamayuru",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  34.283,
-                  76.774
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -23.2,
-                  -33.2
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Eberswalde Crater Delta (Mars)",
-            "target": "MARS (EBERSWALDE CRATER)",
-            "earth": {
-                  "slope": 15.0,
-                  "tempK": 272.0,
-                  "pressureKpa": 67.0,
-                  "mineralScore": 0.85,
-                  "mineralText": "Lacustrine Clays, Siltstone, Evaporites"
-            },
-            "planet": {
-                  "slope": 12.0,
-                  "tempK": 210.0,
-                  "pressureKpa": 0.7,
-                  "mineralScore": 0.85,
-                  "mineralText": "Layered Phyllosilicates, Deltaic Sediments"
-            },
-            "geology": "High-altitude cold arid landscape ('Moonland') formed by deeply eroded ancient lacustrine paleolake sediments and exposed strata. Excellent terrestrial analog for rover navigation across ancient Martian lacustrine clay-rich basin floors.",
-            "limits": "Seasonal meltwater runoff, winter snowfall, ambient Earth pressure (65-70 kPa), and higher atmospheric density relative to Mars."
-      },
-      {
-            "id": "namib",
-            "name": "6. Moon Landscape (Namib Desert, Namibia)",
-            "shortLabel": "🇳🇦 Namib",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  -22.683,
-                  14.583
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -4.5,
-                  137.4
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Bagnold Dunes Field (Mars)",
-            "target": "MARS (BAGNOLD DUNES)",
-            "earth": {
-                  "slope": 16.0,
-                  "tempK": 292.0,
-                  "pressureKpa": 98.0,
-                  "mineralScore": 0.82,
-                  "mineralText": "Quartz, Iron Oxides, Dolerite, Granitic Gneiss"
-            },
-            "planet": {
-                  "slope": 18.0,
-                  "tempK": 220.0,
-                  "pressureKpa": 0.7,
-                  "mineralScore": 0.82,
-                  "mineralText": "Basaltic Active Dunes, Magnetite, Dust"
-            },
-            "geology": "Hyper-arid badlands carved by the Swakop River showcasing deeply incised bare bedrock, ancient crystalline basement, and hyper-arid weathering. Utilized for studying wind erosion, rover visual odometry, and Martian dune migration analogs.",
-            "limits": "Coastal fog moisture, episodic flash flooding, and Earth gravity (1g) altering sediment shear resistance relative to Martian gravity (0.38g)."
-      },
-      {
-            "id": "atacama",
-            "name": "⭐ 7. Valle de la Luna (Atacama Desert, Chile)",
-            "shortLabel": "⭐ Atacama",
-            "isVietnam": false,
-            "isBaseline": true,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  -22.96,
-                  -68.28
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -14.5,
-                  175.4
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Columbia Hills – Gusev (Mars)",
-            "target": "NASA MARS BASELINE (VALLE DE LA LUNA)",
-            "earth": {
-                  "slope": 15.0,
-                  "tempK": 289.0,
-                  "pressureKpa": 75.0,
-                  "mineralScore": 0.9,
-                  "mineralText": "Evaporites, Sulfates, Chlorides, Clay Minerals"
-            },
-            "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.0,
-                  "mineralScore": 0.9,
-                  "mineralText": "Martian Sulfates, Chlorides, Clay Minerals, Basalt"
-            },
-            "geology": "NASA GOLD BASELINE: Hyper-arid salt and clay badlands in the Cordillera de la Sal with evaporite crusts, halite deposits, and wind-sculpted yardangs. World standard for testing life-detection instruments, drill systems, and autonomous Martian navigation.",
-            "limits": "Altitude (~2,400 m) retains ~75 kPa atmospheric pressure (vs 0.7 kPa on Mars); atmospheric ozone shields solar ultraviolet radiation."
-      },
-      {
-            "id": "krafla",
-            "name": "⭐ 8. Krafla Volcanic Plateau (Iceland)",
-            "shortLabel": "⭐ Krafla",
-            "isVietnam": false,
-            "isBaseline": true,
-            "isCustom": false,
-            "bodyType": "moon",
-            "earthCoords": [
-                  65.715,
-                  -16.728
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  20.19,
-                  30.77
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Taurus-Littrow – Apollo 17 (Moon)",
-            "target": "NASA MOON BASELINE (KRAFLA PLATEAU)",
-            "earth": {
-                  "slope": 12.0,
-                  "tempK": 277.0,
-                  "pressureKpa": 92.0,
-                  "mineralScore": 0.86,
-                  "mineralText": "Basalt, Picro-Basalt, Hydrothermal Minerals"
-            },
-            "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.0,
-                  "mineralScore": 0.86,
-                  "mineralText": "Martian/Lunar Basalt, Pyroxene, Olivine, Clay"
-            },
-            "geology": "NASA GOLD BASELINE: Active volcanic caldera featuring tholeiitic basalt fissure eruptions, recent pahoehoe lava fields, and hydrothermal alteration zones. Historic training site for Apollo astronauts and Artemis spacesuit/geology field campaigns.",
-            "limits": "Intense geothermal moisture, seasonal precipitation, snow, subarctic air density, and biological colonization differing from lunar vacuum environment."
-      },
-      {
-            "id": "chott_djerid",
-            "name": "9. Chott el Djerid Salt Pan (Tunisia)",
-            "shortLabel": "🇹🇳 Chott el Djerid",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  33.7,
-                  8.4
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -14.6,
-                  175.5
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Gusev Crater Paleolake (Mars)",
-            "target": "MARS (GUSEV CRATER)",
-            "earth": {
-                  "slope": 4.0,
-                  "tempK": 298.0,
-                  "pressureKpa": 101.0,
-                  "mineralScore": 0.83,
-                  "mineralText": "Halite, Gypsum, Carbonates, Sulfate Crusts"
-            },
-            "planet": {
-                  "slope": 6.0,
-                  "tempK": 220.0,
-                  "pressureKpa": 0.8,
-                  "mineralScore": 0.83,
-                  "mineralText": "Sulfates, Evaporite Salts, Basaltic Dust"
-            },
-            "geology": "Extensive endorheic salt basin in southern Tunisia with massive sulfate and chloride evaporite crusts, seasonal salt pan dynamics, and hypersaline brine pools. Ideal analog for ancient Martian evaporite lakes and sulfate mineralogy identification.",
-            "limits": "Seasonal groundwater recharge, localized flash flooding, marine aerosol transport, and 1g gravitational compaction."
-      },
-      {
-            "id": "lonar",
-            "name": "10. Lonar Impact Crater (India)",
-            "shortLabel": "🇮🇳 Lonar Crater",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  19.9767,
-                  76.5083
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  18.38,
-                  77.58
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Jezero Crater Delta (Mars)",
-            "target": "MARS (JEZERO CRATER)",
-            "earth": {
-                  "slope": 14.0,
-                  "tempK": 299.0,
-                  "pressureKpa": 96.0,
-                  "mineralScore": 0.93,
-                  "mineralText": "Deccan Basalt, Impact Breccia, Carbonates"
-            },
-            "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.0,
-                  "mineralScore": 0.93,
-                  "mineralText": "Martian Basalt, Impact Breccia, Clay Minerals"
-            },
-            "geology": "Young ~1.8 km meteorite crater excavated entirely in Deccan Traps flood basalt. Contains impact-shocked maskelynite basalt, ejecta fallout, and hydrothermal clay alteration closely resembling impact structures on the basaltic crust of Mars.",
-            "limits": "Crater floor hosts a saline-alkaline perennial lake influenced by seasonal tropical monsoons, biological flora/fauna, and 1g gravity."
-      },
-      {
-            "id": "kamchatka",
-            "name": "11. Kamchatka Volcanic Complex (Russia)",
-            "shortLabel": "🇷🇺 Kamchatka",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  55.978,
-                  160.587
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  32.1,
-                  150.2
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Hecates Tholus Volcanic Caldera (Mars)",
-            "target": "MARS (HECATES THOLUS)",
-            "earth": {
-                  "slope": 22.0,
-                  "tempK": 268.0,
-                  "pressureKpa": 82.0,
-                  "mineralScore": 0.87,
-                  "mineralText": "Andesite, Basalt, Tephra, Hydrothermal Sulfur"
-            },
-            "planet": {
-                  "slope": 20.0,
-                  "tempK": 210.0,
-                  "pressureKpa": 0.5,
-                  "mineralScore": 0.87,
-                  "mineralText": "Volcanic Ash, Altered Basalt, Glaciovolcanic Tuff"
-            },
-            "geology": "Massive stratovolcanic subduction arc featuring basaltic-andesitic lava fields, volcanic ash blankets, and glaciovolcanic interactions. Superb analog for high-altitude Martian shield volcanism and volcano-ice interaction deposits.",
-            "limits": "Frequent subaerial eruptions, dense glacial ice and snow, maritime subarctic humidity, and Earth atmospheric shielding."
-      },
-      {
-            "id": "badlands",
-            "name": "12. Badlands National Park (South Dakota, USA)",
-            "shortLabel": "🇺🇸 Badlands",
-            "isVietnam": false,
-            "isBaseline": false,
-            "isCustom": false,
-            "bodyType": "mars",
-            "earthCoords": [
-                  43.834,
-                  -102.394
-            ],
-            "earthZoom": 11,
-            "planetCoords": [
-                  -5.0,
-                  137.5
-            ],
-            "planetZoom": 7,
-            "planetSiteName": "Mount Sharp Strata (Mars)",
-            "target": "MARS (MOUNT SHARP - GALE CRATER)",
-            "earth": {
-                  "slope": 12.0,
-                  "tempK": 283.0,
-                  "pressureKpa": 94.0,
-                  "mineralScore": 0.74,
-                  "mineralText": "Claystone, Siltstone, Sandstone, Volcanic Ash"
-            },
-            "planet": {
-                  "slope": 15.0,
-                  "tempK": 252.0,
-                  "pressureKpa": 0.6,
-                  "mineralScore": 0.74,
-                  "mineralText": "Martian Sedimentary Rocks, Clay Minerals, Sulfates"
-            },
-            "geology": "Extensively eroded sedimentary landscape exposing continuous stratigraphic layers, smectite clay beds, sandstones, and volcanic ash deposits. Ideal for simulating rover climb traverses, spectral clay detection, and layered Martian sedimentology.",
-            "limits": "Seasonal rainfall and snowmelt causing rapid surface mudflow erosion; presence of terrestrial vegetation and Earth ambient pressure (94 kPa)."
+      "mars": {
+        "planetSiteName": "Arsia Mons Skylights (Mars)",
+        "planetCoords": [
+          -11.5,
+          -121.0
+        ],
+        "planetZoom": 7,
+        "target": "MARS (ARSIA MONS)",
+        "slope": 15.0,
+        "tempK": 210.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.88,
+        "mineralText": "Martian Tholeiitic Basalt (FeO 18%)",
+        "geology": "Arsia Mons shield volcano hosts collapsed pit chains and skylights entering sub-surface lava tubes. Krong No's basalt tubes provide structural analog for testing robotic tethering and subterranean exploration on Mars.",
+        "limits": "Earth atmospheric density (96 kPa vs 0.6 kPa on Mars), seasonal rainfall, vegetation cover, and absence of perchlorate dust."
       }
+    }
+  },
+  {
+    "id": "lanzarote",
+    "name": "2. Lanzarote Island (Spain)",
+    "shortLabel": "🇪🇸 Lanzarote",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      29.035,
+      -13.633
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 14.0,
+      "tempK": 294.0,
+      "pressureKpa": 101.0,
+      "mineralScore": 0.88,
+      "mineralText": "Tholeiitic Basalt, Basanite, Volcanic Ash"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Taurus-Littrow Pyroclastics (Moon)",
+        "planetCoords": [
+          20.19,
+          30.77
+        ],
+        "planetZoom": 7,
+        "target": "MOON (TAURUS-LITTROW)",
+        "slope": 12.0,
+        "tempK": 250.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.89,
+        "mineralText": "High-Ti Mare Basalt, Pyroclastic Black Beads",
+        "geology": "Timanfaya's young basaltic volcanic fields and Cueva de los Verdes lava tube serve as premier ESA PANGAEA testing ground for lunar astronaut EVA exploration and lunar pyroclastic basalt mapping.",
+        "limits": "Oceanic island moisture, salt spray, and atmospheric pressure contrast with lunar hard vacuum."
+      },
+      "mars": {
+        "planetSiteName": "Arsia Mons Skylights (Mars)",
+        "planetCoords": [
+          -11.5,
+          -121.0
+        ],
+        "planetZoom": 7,
+        "target": "MARS (ARSIA MONS)",
+        "slope": 15.0,
+        "tempK": 210.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.88,
+        "mineralText": "Martian Basalt, Olivine, Pyroxene",
+        "geology": "Young basaltic volcanic landscape in Timanfaya National Park featuring extensive lava flows, cinder cones, and lava tubes. Extensively used for rover traction testing, volcanic geology mapping, and planetary cave exploration training (ESA PANGAEA).",
+        "limits": "Maritime island climate, oceanic air humidity, biological colonization, and weathering processes contrast with the arid, cold, low-pressure Martian environment."
+      }
+    }
+  },
+  {
+    "id": "meteor_crater",
+    "name": "3. Meteor Crater (Arizona, USA)",
+    "shortLabel": "🇺🇸 Meteor Crater",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      35.027,
+      -111.022
+    ],
+    "earthZoom": 14,
+    "earth": {
+      "slope": 18.0,
+      "tempK": 285.0,
+      "pressureKpa": 84.0,
+      "mineralScore": 0.88,
+      "mineralText": "Impact-Brecciated Sandstone, Dolomite, Coesite, Stishovite"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Tycho Crater Central Peak (Moon)",
+        "planetCoords": [
+          -43.3,
+          -11.2
+        ],
+        "planetZoom": 7,
+        "target": "MOON (TYCHO CRATER)",
+        "slope": 18.0,
+        "tempK": 250.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.87,
+        "mineralText": "Lunar Impact Breccia, Anorthositic Shocked Melt",
+        "geology": "Classic simple-to-complex impact crater analog where Apollo astronauts trained to identify shocked minerals, shatter cones, and impact ejecta blankets on the Moon.",
+        "limits": "Target rock is sedimentary limestone/sandstone whereas lunar highlands are anorthositic crystalline crust."
+      },
+      "mars": {
+        "planetSiteName": "Gale Crater Rim (Mars)",
+        "planetCoords": [
+          -5.4,
+          137.8
+        ],
+        "planetZoom": 7,
+        "target": "MARS (GALE CRATER)",
+        "slope": 15.0,
+        "tempK": 220.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.88,
+        "mineralText": "Martian Impact Breccia, Basalt, Regolith",
+        "geology": "Best-preserved meteorite impact crater on Earth (~50,000 years old, 1.2 km diameter). High-energy kinetic impact physics mirror Martian impact structures explored by the Curiosity and Opportunity rovers.",
+        "limits": "Dense terrestrial atmosphere, aeolian and fluvial weathering, 1g gravity, and target lithology differs from Martian basaltic crust."
+      }
+    }
+  },
+  {
+    "id": "craters_moon",
+    "name": "4. Craters of the Moon (Idaho, USA)",
+    "shortLabel": "🇺🇸 Craters of Moon",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      43.46,
+      -113.56
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 12.0,
+      "tempK": 282.0,
+      "pressureKpa": 83.0,
+      "mineralScore": 0.91,
+      "mineralText": "Pahoehoe & Aa Basalt, Scoria, Pyroxene, Plagioclase"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Hadley Rille - Apollo 15 (Moon)",
+        "planetCoords": [
+          26.1,
+          3.6
+        ],
+        "planetZoom": 7,
+        "target": "MOON (HADLEY RILLE)",
+        "slope": 14.0,
+        "tempK": 253.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.91,
+        "mineralText": "Mare Basalt, Pyroxene, Olivine",
+        "geology": "Extensive Holocene basaltic lava field along the Great Rift of Idaho with pahoehoe and aa lava flows, spatter cones, and collapsed lava tube caves. Key analog for lunar mare volcanic features and basaltic morphology.",
+        "limits": "Terrestrial subaerial lava emplacement with 1 atm air and meteoric water interaction; lunar lavas erupted in vacuum with much lower viscosity."
+      },
+      "mars": {
+        "planetSiteName": "Daedalia Planum Basalt Plains (Mars)",
+        "planetCoords": [
+          -21.0,
+          -128.0
+        ],
+        "planetZoom": 7,
+        "target": "MARS (DAEDALIA PLANUM)",
+        "slope": 12.0,
+        "tempK": 215.0,
+        "pressureKpa": 0.65,
+        "mineralScore": 0.87,
+        "mineralText": "Martian Flood Basalts, Olivine Phyric",
+        "geology": "Massive fissure-fed basalt plains with extensive pressure ridges, squeeze-ups, and inflated pahoehoe sheets directly analogous to Martian volcanic plains in Daedalia Planum.",
+        "limits": "Seasonal winter snow cover, high atmospheric oxygen, and biological lichen growth on lava surfaces."
+      }
+    }
+  },
+  {
+    "id": "lamayuru",
+    "name": "5. Lamayuru Valley (Ladakh, India)",
+    "shortLabel": "🇮🇳 Lamayuru",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      34.283,
+      76.774
+    ],
+    "earthZoom": 12,
+    "earth": {
+      "slope": 16.0,
+      "tempK": 280.0,
+      "pressureKpa": 65.0,
+      "mineralScore": 0.72,
+      "mineralText": "Lacustrine Silt, Clay, Gypsum, Carbonates"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Orientale Basin Highlands (Moon)",
+        "planetCoords": [
+          -19.4,
+          -92.8
+        ],
+        "planetZoom": 7,
+        "target": "MOON (ORIENTALE BASIN)",
+        "slope": 16.0,
+        "tempK": 245.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.65,
+        "mineralText": "Lunar Anorthosite, Shocked Feldspathic Crust",
+        "geology": "Barren, treeless high-altitude mountain valley landscape simulating lunar highland terrain navigation and extreme solar UV exposure.",
+        "limits": "Terrestrial lacustrine sediments contain clay and carbonates formed by liquid water, unlike desiccated lunar silicates."
+      },
+      "mars": {
+        "planetSiteName": "Eberswalde Crater Delta (Mars)",
+        "planetCoords": [
+          -24.0,
+          -33.3
+        ],
+        "planetZoom": 7,
+        "target": "MARS (EBERSWALDE CRATER)",
+        "slope": 15.0,
+        "tempK": 210.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.72,
+        "mineralText": "Martian Clay-Bearing Sediments, Smectite",
+        "geology": "High-altitude cold desert 'Moonland' paleolake basin in the Himalayas (~3,500 m elevation). Fine-grained clay lacustrine sediments and deeply dissected badlands landscape provide prime analog for ancient Martian deltaic and paleolake environments.",
+        "limits": "Tectonic uplift rates, higher terrestrial atmospheric density, and summer seasonal rainfall differ from hyperarid modern Mars."
+      }
+    }
+  },
+  {
+    "id": "namib",
+    "name": "6. Moon Landscape (Namib Desert, Namibia)",
+    "shortLabel": "🇳🇦 Namib",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      -22.689,
+      14.79
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 14.0,
+      "tempK": 291.0,
+      "pressureKpa": 98.0,
+      "mineralScore": 0.76,
+      "mineralText": "Granite, Quartz, Feldspathic Regolith, Aeolian Sand"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Deslandres Highland Regolith (Moon)",
+        "planetCoords": [
+          -32.5,
+          -5.2
+        ],
+        "planetZoom": 7,
+        "target": "MOON (DESLANDRES CRATER)",
+        "slope": 14.0,
+        "tempK": 250.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.72,
+        "mineralText": "Lunar Brecciated Regolith, Feldspathic Fragmental",
+        "geology": "Heavily eroded, desiccated bedrock canyons with sharp relief and fine abrasive sand simulating lunar crater rim traverses and rover track wear.",
+        "limits": "Aeolian wind transport of sand requires atmosphere; lunar dust transport is driven by electrostatic levitation and micrometeoroids."
+      },
+      "mars": {
+        "planetSiteName": "Bagnold Dunes - Gale (Mars)",
+        "planetCoords": [
+          -5.1,
+          137.8
+        ],
+        "planetZoom": 7,
+        "target": "MARS (BAGNOLD DUNES)",
+        "slope": 15.0,
+        "tempK": 215.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.76,
+        "mineralText": "Martian Basaltic Sand, Olivine Dunes",
+        "geology": "Hyperarid badlands canyon carved by the Swakop River combined with coastal Namib sand seas. Exemplifies wind-dominated aeolian erosion and rover mobility terrain analogous to Martian dune fields.",
+        "limits": "Presence of coastal fog humidity, oceanic moisture influence, terrestrial 1g gravity, and oxidizing Earth atmosphere."
+      }
+    }
+  },
+  {
+    "id": "atacama",
+    "name": "⭐ 7. Valle de la Luna (Atacama Desert, Chile)",
+    "shortLabel": "⭐ Atacama",
+    "isVietnam": false,
+    "isBaseline": true,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      -22.915,
+      -68.295
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 3.0,
+      "tempK": 289.0,
+      "pressureKpa": 76.0,
+      "mineralScore": 0.9,
+      "mineralText": "Halite, Gypsum, Perchlorates, Anhydrite, Clay"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Fra Mauro Regolith Plains (Moon)",
+        "planetCoords": [
+          -3.6,
+          -17.5
+        ],
+        "planetZoom": 7,
+        "target": "MOON (FRA MAURO)",
+        "slope": 5.0,
+        "tempK": 252.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.75,
+        "mineralText": "Lunar Imbrium Ejecta Breccia, KREEP Basalt",
+        "geology": "Extreme dryness and absence of soil organic carbon provide baseline testing conditions for solar UV degradation and ultra-dry sensor calibration.",
+        "limits": "Earth atmosphere provides UV shielding relative to the raw lunar surface; air pressure is 76 kPa."
+      },
+      "mars": {
+        "planetSiteName": "Meridiani Planum - Opportunity (Mars)",
+        "planetCoords": [
+          -0.2,
+          -5.5
+        ],
+        "planetZoom": 7,
+        "target": "NASA MARS BASELINE (VALLE DE LA LUNA)",
+        "slope": 2.5,
+        "tempK": 210.0,
+        "pressureKpa": 0.65,
+        "mineralScore": 0.9,
+        "mineralText": "Martian Sulfates, Hematite Spherules, Chlorides",
+        "geology": "Hyperarid core of the Atacama Desert, one of the driest places on Earth. Extreme ultraviolet radiation, perchlorate-bearing soils, and negligible precipitation make it NASA's primary terrestrial baseline for Martian soil astrobiology and rover instrument calibration.",
+        "limits": "Atmospheric pressure (76 kPa) is still two orders of magnitude higher than Mars (0.6 kPa); 1g gravity and microbial presence in deep subsurfaces."
+      }
+    }
+  },
+  {
+    "id": "krafla",
+    "name": "⭐ 8. Krafla Volcanic Plateau (Iceland)",
+    "shortLabel": "⭐ Krafla",
+    "isVietnam": false,
+    "isBaseline": true,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      65.718,
+      -16.754
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 10.0,
+      "tempK": 277.0,
+      "pressureKpa": 93.0,
+      "mineralScore": 0.86,
+      "mineralText": "High-Ti Basalt, Obsidian, Tephra, Palagonite"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Taurus-Littrow - Apollo 17 (Moon)",
+        "planetCoords": [
+          20.19,
+          30.77
+        ],
+        "planetZoom": 7,
+        "target": "NASA MOON BASELINE (KRAFLA PLATEAU)",
+        "slope": 11.0,
+        "tempK": 250.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.86,
+        "mineralText": "High-Ti Mare Basalt, Ilmenite",
+        "geology": "Active volcanic caldera along the Mid-Atlantic Ridge featuring fresh basaltic fissure eruptions, geothermal fields, and tephra deposits. NASA Apollo geology training site (1965-1967) and benchmark for lunar mare basalt petrology.",
+        "limits": "Abundant glacial water, hydrothermal steam vents, subglacial volcanism, and wet atmospheric interactions absent on the desiccated Moon."
+      },
+      "mars": {
+        "planetSiteName": "Elysium Planitia Fissures (Mars)",
+        "planetCoords": [
+          11.7,
+          147.2
+        ],
+        "planetZoom": 7,
+        "target": "MARS (ELYSIUM PLANITIA)",
+        "slope": 10.0,
+        "tempK": 210.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.85,
+        "mineralText": "Young Martian Basalt Flows, Plagioclase, Pyroxene",
+        "geology": "Volcanic fissure eruptions with fresh platy-ridged flood basalts and palagonitized tephra layers analogous to young flood lava plains in Elysium Planitia on Mars.",
+        "limits": "Cold rainy subarctic maritime weather and geothermal ground heating differ from freezing dry Martian climate."
+      }
+    }
+  },
+  {
+    "id": "chott_djerid",
+    "name": "9. Chott el Djerid Salt Pan (Tunisia)",
+    "shortLabel": "🇹🇳 Chott el Djerid",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      33.72,
+      8.43
+    ],
+    "earthZoom": 10,
+    "earth": {
+      "slope": 3.0,
+      "tempK": 296.0,
+      "pressureKpa": 101.0,
+      "mineralScore": 0.89,
+      "mineralText": "Halite, Gypsum, Sodium Sulfate, Anhydrite, Clay"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Oceanus Procellarum Evaporite Analog (Moon)",
+        "planetCoords": [
+          18.4,
+          -57.4
+        ],
+        "planetZoom": 7,
+        "target": "MOON (PROCELLARUM BASIN)",
+        "slope": 4.0,
+        "tempK": 253.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.68,
+        "mineralText": "Lunar Pyroclastic Glass, Mare Basalt",
+        "geology": "Flat expanses of crustal minerals testing long-range rover dead reckoning navigation and high-contrast glare visibility.",
+        "limits": "Earth playa salts are aqueous precipitates; Moon has no aqueous evaporite deposits."
+      },
+      "mars": {
+        "planetSiteName": "Gusev Crater Paleolake (Mars)",
+        "planetCoords": [
+          -14.5,
+          175.4
+        ],
+        "planetZoom": 7,
+        "target": "MARS (GUSEV CRATER)",
+        "slope": 7.0,
+        "tempK": 220.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.89,
+        "mineralText": "Martian Sulfate Evaporites, Gypsum, Halite",
+        "geology": "Massive endorheic salt lake (playa) in southern Tunisia rich in gypsum, halite, and clay minerals. Serves as an evaporite basin analog for ancient Martian chloride and sulfate deposits detected by Mars orbiters and rovers.",
+        "limits": "Seasonal flooding, shallow water table, and modern Earth atmospheric moisture contrast with long-desiccated Martian evaporite flats."
+      }
+    }
+  },
+  {
+    "id": "lonar",
+    "name": "10. Lonar Impact Crater (India)",
+    "shortLabel": "🇮🇳 Lonar Crater",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      19.976,
+      76.508
+    ],
+    "earthZoom": 14,
+    "earth": {
+      "slope": 20.0,
+      "tempK": 299.0,
+      "pressureKpa": 96.0,
+      "mineralScore": 0.93,
+      "mineralText": "Shocked Basalt, Maskelynite, Impact Spherules, Carbonates"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "South Pole-Aitken Basalt (Moon)",
+        "planetCoords": [
+          -53.0,
+          169.0
+        ],
+        "planetZoom": 7,
+        "target": "MOON (SOUTH POLE-AITKEN)",
+        "slope": 18.0,
+        "tempK": 240.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.91,
+        "mineralText": "Impact-Melted Basalt, Shocked Pyroxene (Maskelynite)",
+        "geology": "Premier terrestrial analog for hypervelocity meteorite impacts in basaltic crust, producing diaplectic glass (maskelynite) identical to Apollo lunar impact samples.",
+        "limits": "Crater lake water, tropical climate, and active microbial biosphere differ from lunar desiccated regolith."
+      },
+      "mars": {
+        "planetSiteName": "Jezero Crater - Perseverance (Mars)",
+        "planetCoords": [
+          18.38,
+          77.58
+        ],
+        "planetZoom": 7,
+        "target": "MARS (JEZERO CRATER)",
+        "slope": 15.0,
+        "tempK": 215.0,
+        "pressureKpa": 0.65,
+        "mineralScore": 0.93,
+        "mineralText": "Martian Basalt, Impact Breccia, Carbonates",
+        "geology": "Unique hypervelocity meteorite impact crater (~52,000 years old, 1.8 km diameter) carved entirely into Deccan Traps basaltic bedrock. Directly matches basaltic impact structures and hydrothermal alteration minerals in Jezero Crater, Mars.",
+        "limits": "Saline alkaline crater lake in the interior, tropical monsoon rainfall, dense vegetation, and biological ecosystem."
+      }
+    }
+  },
+  {
+    "id": "kamchatka",
+    "name": "11. Kamchatka Volcanic Complex (Russia)",
+    "shortLabel": "🇷🇺 Kamchatka",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      55.83,
+      160.33
+    ],
+    "earthZoom": 10,
+    "earth": {
+      "slope": 15.0,
+      "tempK": 265.0,
+      "pressureKpa": 55.0,
+      "mineralScore": 0.84,
+      "mineralText": "Andesitic Basalt, Pyroclastic Tephra, Volcanic Scoria"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Gruithuisen Domes Volcanic Complex (Moon)",
+        "planetCoords": [
+          36.3,
+          -40.0
+        ],
+        "planetZoom": 7,
+        "target": "MOON (GRUITHOISEN DOMES)",
+        "slope": 17.0,
+        "tempK": 248.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.82,
+        "mineralText": "Lunar Silicic Rhyolitic/Dacitic Domes",
+        "geology": "Steep composite cones and silicic volcanic domes testing robotic steep-slope climbing and ash traverse navigation.",
+        "limits": "Glacial ice, subduction-zone hydration, and atmospheric precipitation."
+      },
+      "mars": {
+        "planetSiteName": "Hecates Tholus Volcanic Ash (Mars)",
+        "planetCoords": [
+          32.1,
+          150.2
+        ],
+        "planetZoom": 7,
+        "target": "MARS (HECATES THOLUS)",
+        "slope": 15.0,
+        "tempK": 200.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.84,
+        "mineralText": "Martian Andesitic Basalt, Pyroclastic Ash",
+        "geology": "Subarctic volcanic wilderness with over 30 active stratovolcanoes, basaltic scoria cones, and extensive tephra plains (Tolbachik). Highly relevant analog for cold-climate Martian volcanism and rover autonomous traverse over coarse volcanic ash.",
+        "limits": "Subduction-zone calc-alkaline magmatism, heavy winter snowfall, glacial ice interactions, and active terrestrial biosphere."
+      }
+    }
+  },
+  {
+    "id": "badlands",
+    "name": "12. Badlands National Park (South Dakota, USA)",
+    "shortLabel": "🇺🇸 Badlands",
+    "isVietnam": false,
+    "isBaseline": false,
+    "isCustom": false,
+    "bodyType": "both",
+    "earthCoords": [
+      43.75,
+      -102.5
+    ],
+    "earthZoom": 11,
+    "earth": {
+      "slope": 12.0,
+      "tempK": 283.0,
+      "pressureKpa": 90.0,
+      "mineralScore": 0.74,
+      "mineralText": "Mudstone, Siltstone, Volcanic Ash Paleosols, Smectite"
+    },
+    "targets": {
+      "moon": {
+        "planetSiteName": "Vallis Schröteri Stratified Rille (Moon)",
+        "planetCoords": [
+          26.2,
+          -50.8
+        ],
+        "planetZoom": 7,
+        "target": "MOON (VALLIS SCHROTERI)",
+        "slope": 18.0,
+        "tempK": 250.0,
+        "pressureKpa": 0.0,
+        "mineralScore": 0.7,
+        "mineralText": "Lunar Layered Regolith and Basalt Wall Strata",
+        "geology": "Rhythmically bedded sedimentary cliff exposures useful for practicing stratigraphic column logging and cliffside robotic sampling.",
+        "limits": "Formed by fluvial river deposition on Earth; lunar rilles were carved by thermal erosion of turbulent lava flows."
+      },
+      "mars": {
+        "planetSiteName": "Mount Sharp Strata - Gale (Mars)",
+        "planetCoords": [
+          -5.0,
+          137.5
+        ],
+        "planetZoom": 7,
+        "target": "MARS (MOUNT SHARP - GALE CRATER)",
+        "slope": 15.0,
+        "tempK": 218.0,
+        "pressureKpa": 0.6,
+        "mineralScore": 0.74,
+        "mineralText": "Martian Rhythmic Sulfate & Smectite Clay Strata",
+        "geology": "Sharply eroded sedimentary pinnacles, gullies, and buttes featuring rhythmic alternating clay, siltstone, and volcanic ash paleosol layers. Directly analogous to layered sulfate and clay strata explored by the Curiosity rover at Mount Sharp, Mars.",
+        "limits": "Fluvial erosion driven by heavy continental rainstorms, seasonal freezing/thawing, and terrestrial vegetation."
+      }
+    }
+  }
 ];
 
 
@@ -2035,6 +2397,7 @@
 
     let customAnalogs = loadSavedCustomSites();
     let analogs = [...defaultAnalogs, ...customAnalogs];
+    analogs.forEach(s => ensureDualTargets(s));
 
     const krongNoCaves = [
       {
@@ -2093,21 +2456,97 @@
     let radarChart = null;
 
     // 3. Mathematical ESI Formula (Schulze-Makuch, 2011) across 4 NASA Parameters
+
     function esiComponent(xEarth, xTarget) {
       if (xEarth + xTarget === 0) return 1.0;
       return Math.max(0.0, 1.0 - Math.abs(xEarth - xTarget) / (xEarth + xTarget));
     }
 
-    function computeMetrics(site) {
-      const sMineral = site.earth.mineralScore;
-      const sSlope = esiComponent(site.earth.slope, site.planet.slope);
-      const sTemp = esiComponent(site.earth.tempK, site.planet.tempK);
-      const sPress = esiComponent(site.earth.pressureKpa, site.planet.pressureKpa);
+    function synthesizeCounterpart(site, targetBody) {
+      const isMoon = targetBody === 'moon';
+      const cleanName = (site.name || 'Site').replace(/^\d+\.\s*/, '');
+      const sLabel = site.shortLabel || cleanName;
+      if (isMoon) {
+        return {
+          planetSiteName: `${cleanName} (Moon Equivalent / Mare Basalt)`,
+          planetCoords: [14.0, -56.0],
+          planetZoom: 7,
+          target: `MOON (${sLabel.toUpperCase()})`,
+          slope: site.targets?.mars?.slope ?? site.earth?.slope ?? 11.0,
+          tempK: 250.0,
+          pressureKpa: 0.0,
+          mineralScore: Math.max(0.70, (site.targets?.mars?.mineralScore ?? 0.85) - 0.02),
+          mineralText: "Mare Basalt, Anorthositic Regolith",
+          geology: site.geology || "Terrestrial basaltic and volcanic terrain providing scientific analog for lunar mare exploration.",
+          limits: "Earth 1g gravity (6x lunar), atmospheric moisture, and absence of lunar hard vacuum."
+        };
+      } else {
+        return {
+          planetSiteName: `${cleanName} (Mars Equivalent / Volcanic Plains)`,
+          planetCoords: [-11.5, -121.0],
+          planetZoom: 7,
+          target: `MARS (${sLabel.toUpperCase()})`,
+          slope: site.targets?.moon?.slope ?? site.earth?.slope ?? 13.0,
+          tempK: 215.0,
+          pressureKpa: 0.6,
+          mineralScore: Math.max(0.70, (site.targets?.moon?.mineralScore ?? 0.85) - 0.03),
+          mineralText: "Martian Basalt, Olivine, Ferric Oxides",
+          geology: site.geology || "Arid terrestrial volcanic and sedimentary analog environment for Martian rover surface exploration.",
+          limits: "Earth 1g gravity (3x Mars), atmospheric pressure (100x Martian 0.6 kPa)."
+        };
+      }
+    }
 
-      const w1 = parseFloat(document.getElementById('w-mineral').value);
-      const w2 = parseFloat(document.getElementById('w-slope').value);
-      const w3 = parseFloat(document.getElementById('w-temp').value);
-      const w4 = parseFloat(document.getElementById('w-press').value);
+    function ensureDualTargets(site) {
+      if (!site) return site;
+      if (!site.targets) site.targets = {};
+      const baseBody = site.bodyType === 'mars' ? 'mars' : 'moon';
+      const otherBody = baseBody === 'moon' ? 'mars' : 'moon';
+
+      if (!site.targets[baseBody]) {
+        site.targets[baseBody] = {
+          planetSiteName: site.planetSiteName || (baseBody === 'moon' ? 'Marius Hills (Moon)' : 'Arsia Mons (Mars)'),
+          planetCoords: site.planetCoords || (baseBody === 'moon' ? [14.0, -56.0] : [-11.5, -121.0]),
+          planetZoom: site.planetZoom || 7,
+          target: site.target || (baseBody === 'moon' ? 'MOON (ANALOG)' : 'MARS (ANALOG)'),
+          slope: site.planet?.slope ?? (site.earth?.slope ? Math.round(site.earth.slope * 1.05 * 10) / 10 : 12.0),
+          tempK: site.planet?.tempK ?? (baseBody === 'moon' ? 250.0 : 215.0),
+          pressureKpa: site.planet?.pressureKpa ?? (baseBody === 'moon' ? 0.0 : 0.6),
+          mineralScore: site.planet?.mineralScore ?? site.earth?.mineralScore ?? 0.85,
+          mineralText: site.planet?.mineralText || (baseBody === 'moon' ? 'Mare Basalt' : 'Tholeiitic Basalt'),
+          geology: site.geology || 'Planetary analog simulation site.',
+          limits: site.limits || 'Earth 1g gravity and atmospheric pressure.'
+        };
+      }
+
+      if (!site.targets[otherBody]) {
+        site.targets[otherBody] = synthesizeCounterpart(site, otherBody);
+      }
+
+      const activeBody = (typeof currentTargetBody !== 'undefined' && currentTargetBody) ? currentTargetBody : 'moon';
+      const activeT = site.targets[activeBody] || site.targets.moon || site.targets.mars;
+      if (activeT) {
+        site.planetCoords = activeT.planetCoords;
+        site.planetZoom = activeT.planetZoom || 7;
+        site.planetSiteName = activeT.planetSiteName;
+        site.target = activeT.target;
+        site.planet = activeT;
+      }
+      return site;
+    }
+
+    function computeMetrics(site, targetBody = currentTargetBody) {
+      ensureDualTargets(site);
+      const targetData = (site.targets && site.targets[targetBody]) ? site.targets[targetBody] : (site.planet || {});
+      const sMineral = targetData.mineralScore != null ? targetData.mineralScore : (site.earth?.mineralScore || 0.85);
+      const sSlope = esiComponent(site.earth.slope, targetData.slope != null ? targetData.slope : 10);
+      const sTemp = esiComponent(site.earth.tempK, targetData.tempK != null ? targetData.tempK : 250);
+      const sPress = esiComponent(site.earth.pressureKpa, targetData.pressureKpa != null ? targetData.pressureKpa : 0);
+
+      const w1 = parseFloat(document.getElementById('w-mineral')?.value || 1);
+      const w2 = parseFloat(document.getElementById('w-slope')?.value || 1);
+      const w3 = parseFloat(document.getElementById('w-temp')?.value || 0.5);
+      const w4 = parseFloat(document.getElementById('w-press')?.value || 0);
 
       const sumW = w1 + w2 + w3 + w4;
       let esi = 0;
@@ -2124,6 +2563,52 @@
       }
 
       return { sMineral, sSlope, sTemp, sPress, esi: esi.toFixed(1) };
+    }
+
+    function switchTargetBody(body) {
+      if (body !== 'moon' && body !== 'mars') return;
+      currentTargetBody = body;
+
+      const pillMoon = document.getElementById('map-pill-moon');
+      const pillMars = document.getElementById('map-pill-mars');
+      if (pillMoon) pillMoon.classList.toggle('active', body === 'moon');
+      if (pillMars) pillMars.classList.toggle('active', body === 'mars');
+
+      const btnMoon = document.getElementById('tbtn-moon');
+      const btnMars = document.getElementById('tbtn-mars');
+      if (btnMoon) btnMoon.classList.toggle('active', body === 'moon');
+      if (btnMars) btnMars.classList.toggle('active', body === 'mars');
+
+      flyPlanetMapToTarget();
+      updateAll();
+      renderDropdownList();
+    }
+
+    function flyPlanetMapToTarget() {
+      if (!planetMap) return;
+      const site = analogs[currentIndex];
+      if (!site) return;
+      ensureDualTargets(site);
+      const targetData = site.targets[currentTargetBody] || site.targets.moon;
+
+      if (currentTargetBody === 'moon') {
+        if (planetMap.hasLayer(marsTrekLayer)) planetMap.removeLayer(marsTrekLayer);
+        if (planetMap.hasLayer(marsMolaLayer)) planetMap.removeLayer(marsMolaLayer);
+        if (!planetMap.hasLayer(moonTrekLayer)) moonTrekLayer.addTo(planetMap);
+        const pLabel = document.getElementById('planet-label');
+        if (pLabel) pLabel.innerHTML = `<span>🌑 LUNAR FRONTIER // ${(targetData.planetSiteName || 'LUNAR ANALOG').toUpperCase()}</span>`;
+      } else {
+        if (planetMap.hasLayer(moonTrekLayer)) planetMap.removeLayer(moonTrekLayer);
+        if (planetMap.hasLayer(marsMolaLayer)) planetMap.removeLayer(marsMolaLayer);
+        if (!planetMap.hasLayer(marsTrekLayer)) marsTrekLayer.addTo(planetMap);
+        const pLabel = document.getElementById('planet-label');
+        if (pLabel) pLabel.innerHTML = `<span>🔴 MARTIAN FRONTIER // ${(targetData.planetSiteName || 'MARTIAN ANALOG').toUpperCase()}</span>`;
+      }
+
+      planetMap.flyTo(targetData.planetCoords, targetData.planetZoom || 7, { duration: 1.2 });
+      if (planetMarker) {
+        planetMarker.setLatLng(targetData.planetCoords).bindPopup(`<b>${targetData.planetSiteName}</b>`).openPopup();
+      }
     }
 
     // 4. Map & Layer Operations
@@ -2220,44 +2705,89 @@
       document.getElementById('val-press').innerText = parseFloat(document.getElementById('w-press').value).toFixed(1);
 
       analogs.forEach((site, idx) => {
-        const m = computeMetrics(site);
+        ensureDualTargets(site);
+        const m = computeMetrics(site, currentTargetBody);
         const pill = document.getElementById(`pill-${idx}`);
         if (pill) pill.innerText = `${m.esi}%`;
-        const ddPill = document.getElementById(`dd-pill-${idx}`);
-        if (ddPill) ddPill.innerText = `${m.esi}%`;
-      });
-
-      // Update Header Dropdown Trigger Deck
-      const curSite = analogs[currentIndex];
-      if (curSite) {
-        const hIcon = document.getElementById('header-site-icon');
-        const hTitle = document.getElementById('header-site-title');
-        const hScore = document.getElementById('header-site-score');
-        if (hIcon) hIcon.innerText = getSiteFlag(curSite);
-        if (hTitle) hTitle.innerText = curSite.name;
-        if (hScore) {
-          const curM = computeMetrics(curSite);
-          hScore.innerText = `${curM.esi}%`;
+        const ddMoonPill = document.getElementById(`dd-moon-pill-${idx}`);
+        if (ddMoonPill) {
+          const mMoon = computeMetrics(site, 'moon');
+          ddMoonPill.innerText = `🌑 ${mMoon.esi}%`;
         }
-      }
+        const ddMarsPill = document.getElementById(`dd-mars-pill-${idx}`);
+        if (ddMarsPill) {
+          const mMars = computeMetrics(site, 'mars');
+          ddMarsPill.innerText = `🔴 ${mMars.esi}%`;
+        }
+      });
 
       const site = analogs[currentIndex];
       if (!site) return;
-      const metrics = computeMetrics(site);
+      ensureDualTargets(site);
+      const metrics = computeMetrics(site, currentTargetBody);
+      const mMoon = computeMetrics(site, 'moon');
+      const mMars = computeMetrics(site, 'mars');
+      const targetData = site.targets[currentTargetBody] || site.targets.moon;
+
+      // Update Header Dropdown Trigger Deck with Dual Scores
+      const hIcon = document.getElementById('header-site-icon');
+      const hTitle = document.getElementById('header-site-title');
+      const hScore = document.getElementById('header-site-score');
+      const rawLabel = site.shortLabel || site.name;
+      const cleanLabel = rawLabel.replace(/^[^\w\s\u00C0-\u024F\u1EA0-\u1EF9]+/u, '').trim();
+      if (hIcon) hIcon.innerText = getSiteFlag(site);
+      if (hTitle) hTitle.innerText = `${currentIndex + 1}. ${cleanLabel}`;
+      if (hScore) {
+        if (window.innerWidth < 900) {
+          hScore.innerHTML = currentTargetBody === 'moon' ? `🌑 ${mMoon.esi}%` : `🔴 ${mMars.esi}%`;
+        } else {
+          hScore.innerHTML = `🌑 ${mMoon.esi}% <span style="opacity:0.35;margin:0 2px;">|</span> 🔴 ${mMars.esi}%`;
+        }
+      }
+
+      // Update target-planet-deck in sidebar
+      const tMoonName = document.getElementById('t-moon-name');
+      const tMoonScore = document.getElementById('t-moon-score');
+      const tMarsName = document.getElementById('t-mars-name');
+      const tMarsScore = document.getElementById('t-mars-score');
+      if (tMoonName) tMoonName.innerText = (site.targets.moon.planetSiteName || 'Marius Hills').replace(/\s*\(Moon\)/i, '');
+      if (tMoonScore) tMoonScore.innerText = `${mMoon.esi}%`;
+      if (tMarsName) tMarsName.innerText = (site.targets.mars.planetSiteName || 'Arsia Mons').replace(/\s*\(Mars\)/i, '');
+      if (tMarsScore) tMarsScore.innerText = `${mMars.esi}%`;
+
+      const tbtnMoon = document.getElementById('tbtn-moon');
+      const tbtnMars = document.getElementById('tbtn-mars');
+      if (tbtnMoon) {
+        tbtnMoon.classList.toggle('active', currentTargetBody === 'moon');
+        tbtnMoon.classList.toggle('moon-active', currentTargetBody === 'moon');
+      }
+      if (tbtnMars) {
+        tbtnMars.classList.toggle('active', currentTargetBody === 'mars');
+        tbtnMars.classList.toggle('mars-active', currentTargetBody === 'mars');
+      }
+
+      const pillMoon = document.getElementById('map-pill-moon');
+      const pillMars = document.getElementById('map-pill-mars');
+      if (pillMoon) pillMoon.classList.toggle('active', currentTargetBody === 'moon');
+      if (pillMars) pillMars.classList.toggle('active', currentTargetBody === 'mars');
 
       document.getElementById('asi-score').innerText = `${metrics.esi}%`;
-      document.getElementById('target-tag').innerText = `TARGET: ${site.target}`;
+      document.getElementById('target-tag').innerText = `TARGET: ${(targetData.target || targetData.planetSiteName).toUpperCase()}`;
       document.getElementById('vn-tag').style.display = site.isVietnam ? 'inline-block' : 'none';
       document.getElementById('baseline-tag').style.display = site.isBaseline ? 'inline-block' : 'none';
       document.getElementById('custom-tag').style.display = site.isCustom ? 'inline-block' : 'none';
       document.getElementById('delete-site-btn').style.display = site.isCustom ? 'inline-block' : 'none';
       document.getElementById('cave-detail-card').style.display = (site.id === 'krongno') ? 'block' : 'none';
       document.getElementById('site-title').innerText = site.name;
-      document.getElementById('site-geology').innerText = site.geology;
-      document.getElementById('site-limits').innerText = site.limits;
+      document.getElementById('site-geology').innerText = targetData.geology || site.geology || '';
+      document.getElementById('site-limits').innerText = targetData.limits || site.limits || '';
 
       const earthMinDisplay = site.earth.mineralText || '';
-      const planetMinDisplay = site.planet.mineralText || '';
+      const planetMinDisplay = targetData.mineralText || '';
+      const tableTargetName = document.getElementById('table-target-name');
+      if (tableTargetName) {
+        tableTargetName.innerText = `Target Body (${currentTargetBody === 'moon' ? 'Moon' : 'Mars'})`;
+      }
 
       document.getElementById('quant-tbody').innerHTML = `
         <tr>
@@ -2269,26 +2799,26 @@
         <tr>
           <td>Mean Slope</td>
           <td class="num">${site.earth.slope}°</td>
-          <td class="num">${site.planet.slope}°</td>
+          <td class="num">${targetData.slope}°</td>
           <td class="num">${(metrics.sSlope * 100).toFixed(0)}%</td>
         </tr>
         <tr>
           <td>Mean Temp</td>
           <td class="num">${site.earth.tempK} K</td>
-          <td class="num">${site.planet.tempK} K</td>
+          <td class="num">${targetData.tempK} K</td>
           <td class="num">${(metrics.sTemp * 100).toFixed(0)}%</td>
         </tr>
         <tr>
           <td>Pressure</td>
           <td class="num">${site.earth.pressureKpa} kPa</td>
-          <td class="num">${site.planet.pressureKpa} kPa</td>
+          <td class="num">${targetData.pressureKpa} kPa</td>
           <td class="num">${(metrics.sPress * 100).toFixed(1)}%</td>
         </tr>
       `;
 
       if (radarChart) {
-        const chartColor = site.id === 'krongno' ? '#f43f5e' : (site.isBaseline ? '#f59e0b' : (site.isCustom ? '#a855f7' : '#38bdf8'));
-        const chartBg = site.id === 'krongno' ? 'rgba(244, 63, 94, 0.25)' : (site.isBaseline ? 'rgba(245, 158, 11, 0.25)' : (site.isCustom ? 'rgba(168, 85, 247, 0.25)' : 'rgba(56, 189, 248, 0.25)'));
+        const chartColor = currentTargetBody === 'moon' ? '#38bdf8' : '#fb923c';
+        const chartBg = currentTargetBody === 'moon' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(251, 146, 60, 0.25)';
         radarChart.data.datasets[0].borderColor = chartColor;
         radarChart.data.datasets[0].pointBackgroundColor = chartColor;
         radarChart.data.datasets[0].backgroundColor = chartBg;
@@ -2313,10 +2843,15 @@
       return '📍';
     }
 
-    function selectSite(index, skipEarthFly = false) {
+    function selectSite(index, skipEarthFly = false, targetBody = null) {
       currentIndex = index;
       const site = analogs[index];
       if (!site) return;
+      ensureDualTargets(site);
+
+      if (targetBody && (targetBody === 'moon' || targetBody === 'mars')) {
+        currentTargetBody = targetBody;
+      }
 
       // Update chip states
       document.querySelectorAll('.chip-btn, .loc-btn').forEach(b => b.classList.remove('active'));
@@ -2334,19 +2869,6 @@
       // Update global view button state
       const globalBtn = document.getElementById('btn-global');
       if (globalBtn) globalBtn.classList.remove('active');
-
-      // Update dropdown trigger button deck
-      const hIcon = document.getElementById('header-site-icon');
-      const hTitle = document.getElementById('header-site-title');
-      const hScore = document.getElementById('header-site-score');
-      const rawLabel = site.shortLabel || site.name;
-      const cleanLabel = rawLabel.replace(/^[^\w\s\u00C0-\u024F\u1EA0-\u1EF9]+/u, '').trim();
-      if (hIcon) hIcon.innerText = getSiteFlag(site);
-      if (hTitle) hTitle.innerText = `${index + 1}. ${cleanLabel}`;
-      if (hScore) {
-        const m = computeMetrics(site);
-        hScore.innerText = `${m.esi}%`;
-      }
 
       if (!skipEarthFly && earthMap) {
         earthMap.flyTo(site.earthCoords, site.earthZoom, { duration: 1.2 });
@@ -2378,24 +2900,7 @@
         }
       }
 
-      if (planetMap) {
-        if (site.bodyType === 'moon') {
-          if (planetMap.hasLayer(marsTrekLayer)) planetMap.removeLayer(marsTrekLayer);
-          if (planetMap.hasLayer(marsMolaLayer)) planetMap.removeLayer(marsMolaLayer);
-          if (!planetMap.hasLayer(moonTrekLayer)) moonTrekLayer.addTo(planetMap);
-          document.getElementById('planet-label').innerHTML = `<span>🌑 LUNAR FRONTIER // ${site.planetSiteName.toUpperCase()}</span>`;
-        } else {
-          if (planetMap.hasLayer(moonTrekLayer)) planetMap.removeLayer(moonTrekLayer);
-          if (!planetMap.hasLayer(marsTrekLayer)) marsTrekLayer.addTo(planetMap);
-          document.getElementById('planet-label').innerHTML = `<span>🔴 MARTIAN FRONTIER // ${site.planetSiteName.toUpperCase()}</span>`;
-        }
-
-        planetMap.flyTo(site.planetCoords, site.planetZoom, { duration: 1.2 });
-        if (planetMarker) {
-          planetMarker.setLatLng(site.planetCoords).bindPopup(`<b>${site.planetSiteName}</b>`).openPopup();
-        }
-      }
-
+      flyPlanetMapToTarget();
       updateAll();
     }
 
@@ -2405,6 +2910,7 @@
       if (btnGroup) {
         btnGroup.innerHTML = '';
         analogs.forEach((site, idx) => {
+          ensureDualTargets(site);
           const btn = document.createElement('button');
           let cls = 'chip-btn';
           if (site.isVietnam) cls += ' vn-chip';
@@ -2418,7 +2924,7 @@
           const rawLabel = site.shortLabel || site.name;
           const cleanLabel = rawLabel.replace(/^[^\w\s\u00C0-\u024F\u1EA0-\u1EF9]+/u, '').trim();
           btn.innerHTML = `<span>${flag}</span> <span>${cleanLabel}</span> <span class="chip-pill" id="pill-${idx}">...</span>`;
-          btn.title = `${site.name} → ${site.target}`;
+          btn.title = `${site.name} → Moon & Mars Dual Target`;
           btn.onclick = () => selectSite(idx);
           btnGroup.appendChild(btn);
         });
@@ -2434,15 +2940,18 @@
       container.innerHTML = '';
 
       analogs.forEach((site, idx) => {
+        ensureDualTargets(site);
         const item = document.createElement('div');
         item.className = 'menu-site-item' + (idx === currentIndex ? ' active' : '');
         item.id = `dd-item-${idx}`;
         item.setAttribute('data-idx', idx);
 
         const flag = getSiteFlag(site);
-        const isMoon = site.bodyType === 'moon';
-        const bodyClass = isMoon ? 'body-moon' : 'body-mars';
-        const bodyLabel = isMoon ? 'MOON' : 'MARS';
+        const moonM = computeMetrics(site, 'moon');
+        const marsM = computeMetrics(site, 'mars');
+
+        const isMoonActive = (idx === currentIndex && currentTargetBody === 'moon');
+        const isMarsActive = (idx === currentIndex && currentTargetBody === 'mars');
 
         item.innerHTML = `
           <div class="site-item-left">
@@ -2450,8 +2959,18 @@
             <span class="site-item-name" title="${site.name}">${site.name}</span>
           </div>
           <div class="site-item-right">
-            <span class="site-item-body ${bodyClass}">${bodyLabel}</span>
-            <span class="site-item-esi" id="dd-pill-${idx}">...</span>
+            <span class="site-target-pill pill-moon ${isMoonActive ? 'active' : ''}" 
+                  id="dd-moon-pill-${idx}"
+                  title="Target Moon: ${site.targets?.moon?.planetSiteName || 'Moon'}"
+                  onclick="event.stopPropagation(); selectSite(${idx}, false, 'moon'); closeSiteDropdown();">
+              🌑 ${moonM.esi}%
+            </span>
+            <span class="site-target-pill pill-mars ${isMarsActive ? 'active' : ''}" 
+                  id="dd-mars-pill-${idx}"
+                  title="Target Mars: ${site.targets?.mars?.planetSiteName || 'Mars'}"
+                  onclick="event.stopPropagation(); selectSite(${idx}, false, 'mars'); closeSiteDropdown();">
+              🔴 ${marsM.esi}%
+            </span>
           </div>
         `;
 
@@ -2501,6 +3020,13 @@
       currentCategory = cat;
       document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
+
+      if (cat === 'moon') {
+        switchTargetBody('moon');
+      } else if (cat === 'mars') {
+        switchTargetBody('mars');
+      }
+
       filterSiteList();
     }
 
@@ -2514,14 +3040,14 @@
         if (!site) return;
 
         let matchesCat = true;
-        if (currentCategory === 'moon') matchesCat = site.bodyType === 'moon';
-        else if (currentCategory === 'mars') matchesCat = site.bodyType === 'mars';
-        else if (currentCategory === 'vn') matchesCat = !!site.isVietnam;
+        if (currentCategory === 'vn') matchesCat = !!site.isVietnam;
         else if (currentCategory === 'custom') matchesCat = !!site.isCustom;
 
         let matchesQuery = true;
         if (query) {
-          const searchStr = `${site.name} ${site.shortLabel || ''} ${site.target || ''} ${site.planetSiteName || ''} ${site.geology || ''}`.toLowerCase();
+          const tMoon = site.targets?.moon?.planetSiteName || '';
+          const tMars = site.targets?.mars?.planetSiteName || '';
+          const searchStr = `${site.name} ${site.shortLabel || ''} ${tMoon} ${tMars} ${site.geology || ''}`.toLowerCase();
           matchesQuery = searchStr.includes(query);
         }
 
@@ -2546,7 +3072,6 @@
     });
 
     // 6. Modal & Student Templates Logic (Planetary Analog Studio)
-    // Mode Switching for Studio Modal
     function switchStudioMode(mode) {
       const autoContainer = document.getElementById('studio-auto-container');
       const manualContainer = document.getElementById('studio-manual-container');
@@ -2567,7 +3092,6 @@
       }
     }
 
-    // Cleanly and completely wipe CSV and modal state
     function resetStudioModal() {
       _pendingAutoMatch = null;
       
@@ -2835,6 +3359,7 @@
         limits: document.getElementById('inp-limits').value.trim()
       };
 
+      ensureDualTargets(newSite);
       customAnalogs.push(newSite);
       try { localStorage.setItem('kronos_custom_analogs_4', JSON.stringify(customAnalogs)); } catch(e){}
       analogs = [...defaultAnalogs, ...customAnalogs];
@@ -2975,6 +3500,7 @@
             try { localStorage.setItem('kronos_custom_analogs_4', JSON.stringify(customAnalogs)); } catch(e){}
           }
           analogs = [...defaultAnalogs, ...customAnalogs];
+          analogs.forEach(s => ensureDualTargets(s));
           renderTopButtons();
           renderEarthMarkers();
           selectSite(currentIndex, true);
@@ -3412,7 +3938,10 @@
         crs: L.CRS.EPSG3857,
         minZoom: 2,
         maxZoom: 9
-      }).setView(analogs[0].planetCoords, analogs[0].planetZoom);
+      }).setView(
+        (analogs[0].targets && analogs[0].targets[currentTargetBody] ? analogs[0].targets[currentTargetBody].planetCoords : [14.0, -56.0]),
+        (analogs[0].targets && analogs[0].targets[currentTargetBody] ? analogs[0].targets[currentTargetBody].planetZoom : 7)
+      );
 
       moonTrekLayer = L.tileLayer('https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg', {
         attribution: 'NASA Moon Trek (LRO WAC)',
@@ -3430,7 +3959,10 @@
       });
 
       moonTrekLayer.addTo(planetMap);
-      planetMarker = L.marker(analogs[0].planetCoords).addTo(planetMap);
+      const initPCoords = (analogs[0].targets && analogs[0].targets[currentTargetBody])
+        ? analogs[0].targets[currentTargetBody].planetCoords
+        : (analogs[0].planetCoords || [14.0, -56.0]);
+      planetMarker = L.marker(initPCoords).addTo(planetMap);
 
       L.control.layers(
         {
