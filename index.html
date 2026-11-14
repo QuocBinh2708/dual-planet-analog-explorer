@@ -370,64 +370,49 @@
       </p>
     </div>
 
-    <!-- Mission Weight Simulator (Image 2 style with locked sliders) -->
+    <!-- Mission Weight Simulator (Schulze-Makuch, 2011) -->
     <div class="card">
-      <h3>🎛️ ESI Weight Simulator (Schulze-Makuch, 2011)</h3>
+      <h3>🎲 ESI WEIGHT SIMULATOR (SCHULZE-MAKUCH, 2011)</h3>
       <div class="formula-pill">
         ESI = [ Π (1 - |Xᵢ - X₀| / (Xᵢ + X₀))^wᵢ ]^(1 / Σwᵢ)
       </div>
       <div class="preset-btns">
-        <button class="preset-btn active" id="btn-pre-geo" onclick="applyPreset(0, this)">Địa hóa & Đá (Geology)</button>
-        <button class="preset-btn" id="btn-pre-cave" onclick="applyPreset(1, this)">Căn cứ Hang ngầm (Cave Habitat)</button>
-        <button class="preset-btn" id="btn-pre-all" onclick="applyPreset(2, this)">Toàn diện (Full Equal)</button>
+        <button class="preset-btn active" id="btn-pre-def" onclick="applyPreset(1.0, 1.0, 0.5, 0.0, this)">Surface & Geology (Default)</button>
+        <button class="preset-btn" id="btn-pre-rov" onclick="applyPreset(1.0, 0.9, 0.1, 0.0, this)">Rover Mobility Test</button>
+        <button class="preset-btn" id="btn-pre-env" onclick="applyPreset(1.0, 0.3, 0.6, 0.2, this)">Full Environmental (Incl. Pressure)</button>
       </div>
 
       <div class="weight-row">
-        <label>SiO₂ (%)</label>
-        <input type="range" id="w-c_sio2" min="0" max="1" step="0.1" value="1.0" disabled>
-        <span id="val-c_sio2">1.0</span>
+        <label>Mineralogy & Lithology (w₁)</label>
+        <input type="range" id="w-mineral" min="0" max="1" step="0.1" value="1.0" oninput="updateAll()">
+        <span id="val-mineral">1.0</span>
       </div>
       <div class="weight-row">
-        <label>FeO (%)</label>
-        <input type="range" id="w-c_feo" min="0" max="1" step="0.1" value="1.0" disabled>
-        <span id="val-c_feo">1.0</span>
+        <label>Topographic Slope (w₂)</label>
+        <input type="range" id="w-slope" min="0" max="1" step="0.1" value="1.0" oninput="updateAll()">
+        <span id="val-slope">1.0</span>
       </div>
       <div class="weight-row">
-        <label>TiO₂ (%)</label>
-        <input type="range" id="w-c_tio2" min="0" max="1" step="0.1" value="1.0" disabled>
-        <span id="val-c_tio2">1.0</span>
+        <label>Surface Temperature (w₃)</label>
+        <input type="range" id="w-temp" min="0" max="1" step="0.1" value="0.5" oninput="updateAll()">
+        <span id="val-temp">0.5</span>
       </div>
       <div class="weight-row">
-        <label>Mật độ đá (g/cm³)</label>
-        <input type="range" id="w-c_density" min="0" max="1" step="0.1" value="0.8" disabled>
-        <span id="val-c_density">0.8</span>
-      </div>
-      <div class="weight-row">
-        <label>Đệm nhiệt (%)</label>
-        <input type="range" id="w-c_thermal" min="0" max="1" step="0.1" value="0.5" disabled>
-        <span id="val-c_thermal">0.5</span>
-      </div>
-      <div class="weight-row">
-        <label>Độ dày trần hang (m)</label>
-        <input type="range" id="w-c_roof" min="0" max="1" step="0.1" value="0.0" disabled>
-        <span id="val-c_roof">0.0</span>
-      </div>
-      <div class="weight-row">
-        <label>Trọng trường (m/s²)</label>
-        <input type="range" id="w-c_gravity" min="0" max="1" step="0.1" value="0.0" disabled>
-        <span id="val-c_gravity">0.0</span>
+        <label>Atmospheric Pressure (w₄)</label>
+        <input type="range" id="w-press" min="0" max="1" step="0.1" value="0.0" oninput="updateAll()">
+        <span id="val-press">0.0</span>
       </div>
     </div>
 
-    <!-- Quantitative Data Comparison Table (7 Criteria) -->
+    <!-- Quantitative Parameters (NASA Datasets) Table -->
     <div class="card">
-      <h3>📊 Bảng Đối Chiếu Định Lượng (7 Tiêu Chí ESI)</h3>
+      <h3>📊 QUANTITATIVE PARAMETERS (NASA DATASETS)</h3>
       <table class="data-table">
         <thead>
           <tr>
-            <th>Tiêu chí</th>
-            <th>Trái Đất</th>
-            <th>Hành tinh</th>
+            <th>Parameter</th>
+            <th>Earth Site</th>
+            <th>Target Body</th>
             <th>ESI (Sᵢ)</th>
           </tr>
         </thead>
@@ -435,9 +420,9 @@
       </table>
     </div>
 
-    <!-- Multi-Dimensional Radar Chart (7 Axes matching Image 2) -->
+    <!-- Multi-Dimensional Radar Chart -->
     <div class="card">
-      <h3>📈 Biểu Đồ Tương Đồng Đa Chiều (7 Tiêu Chí)</h3>
+      <h3>📈 MULTI-DIMENSIONAL ESI PROFILE</h3>
       <div class="chart-box">
         <canvas id="radarChart"></canvas>
       </div>
@@ -516,54 +501,37 @@
             <input type="number" step="any" id="inp-plon" required placeholder="-56.0" />
           </div>
 
-          <div class="form-section-title">3. Thông Số Định Lượng (Trái Đất vs Hành Tinh)</div>
+          <div class="form-section-title">3. Quantitative Parameters (NASA Datasets)</div>
           <div class="form-group">
-            <label>SiO₂ (%) - Trái Đất / Hành Tinh</label>
+            <label>Mineralogy Similarity Score (0.0 – 1.0)</label>
+            <input type="number" step="0.01" min="0" max="1" id="inp-minscore" required value="0.88" />
+          </div>
+          <div class="form-group">
+            <label>Earth vs Target Mineralogy Text</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" id="inp-e-sio2" required placeholder="Trái Đất (50.2)" />
-              <input type="number" step="0.1" id="inp-p-sio2" required placeholder="Mục tiêu (45.5)" />
+              <input type="text" id="inp-mintext-earth" required placeholder="Trái Đất (VD: Basalt, Scoria)" />
+              <input type="text" id="inp-mintext-planet" required placeholder="Hành tinh (VD: Mare Basalt)" />
             </div>
           </div>
           <div class="form-group">
-            <label>FeO (%) - Trái Đất / Hành Tinh</label>
+            <label>Topographic Slope (°) - Earth / Target Body</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" id="inp-e-feo" required placeholder="Trái Đất (12.1)" />
-              <input type="number" step="0.1" id="inp-p-feo" required placeholder="Mục tiêu (17.5)" />
+              <input type="number" step="0.1" min="0" max="90" id="inp-eslope" required placeholder="Trái Đất (12.0°)" />
+              <input type="number" step="0.1" min="0" max="90" id="inp-pslope" required placeholder="Mục tiêu (14.0°)" />
             </div>
           </div>
           <div class="form-group">
-            <label>TiO₂ (%) - Trái Đất / Hành Tinh</label>
+            <label>Surface Temperature (K) - Earth / Target Body</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" id="inp-e-tio2" required placeholder="Trái Đất (1.5)" />
-              <input type="number" step="0.1" id="inp-p-tio2" required placeholder="Mục tiêu (4.5)" />
+              <input type="number" step="0.1" min="50" max="500" id="inp-etemp" required placeholder="Trái Đất (295.0 K)" />
+              <input type="number" step="0.1" min="50" max="500" id="inp-ptemp" required placeholder="Mục tiêu (252.0 K)" />
             </div>
           </div>
           <div class="form-group">
-            <label>Mật độ đá (g/cm³) - Trái Đất / Hành Tinh</label>
+            <label>Atmospheric Pressure (kPa) - Earth / Target Body</label>
             <div style="display:flex; gap:6px;">
-              <input type="number" step="0.01" id="inp-e-density" required placeholder="Trái Đất (2.80)" />
-              <input type="number" step="0.01" id="inp-p-density" required placeholder="Mục tiêu (3.10)" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Đệm nhiệt (%) - Trái Đất / Hành Tinh</label>
-            <div style="display:flex; gap:6px;">
-              <input type="number" step="1" id="inp-e-thermal" required placeholder="Trái Đất (85)" />
-              <input type="number" step="1" id="inp-p-thermal" required placeholder="Mục tiêu (92)" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Độ dày trần hang (m) - Trái Đất / Hành Tinh</label>
-            <div style="display:flex; gap:6px;">
-              <input type="number" step="0.1" id="inp-e-roof" required placeholder="Trái Đất (15.0)" />
-              <input type="number" step="0.1" id="inp-p-roof" required placeholder="Mục tiêu (20.0)" />
-            </div>
-          </div>
-          <div class="form-group full">
-            <label>Trọng trường (m/s²) - Trái Đất (9.81) / Mặt Trăng (1.62) / Sao Hỏa (3.72)</label>
-            <div style="display:flex; gap:6px;">
-              <input type="number" step="0.01" id="inp-e-gravity" required value="9.81" />
-              <input type="number" step="0.01" id="inp-p-gravity" required value="1.62" />
+              <input type="number" step="0.1" min="0" max="200" id="inp-epress" required placeholder="Trái Đất (95.0 kPa)" />
+              <input type="number" step="0.1" min="0" max="200" id="inp-ppress" required placeholder="Mục tiêu (0.0 kPa)" />
             </div>
           </div>
 
@@ -587,45 +555,7 @@
   </div>
 
   <script>
-    // 1. Definition of 7 Detailed Criteria (Matching Image 2)
-    const criteriaKeys = [
-      'c_sio2',
-      'c_feo',
-      'c_tio2',
-      'c_density',
-      'c_thermal',
-      'c_roof',
-      'c_gravity'
-    ];
-
-    const criteriaLabels = {
-      c_sio2: 'SiO₂ (%)',
-      c_feo: 'FeO (%)',
-      c_tio2: 'TiO₂ (%)',
-      c_density: 'Mật độ đá (g/cm³)',
-      c_thermal: 'Đệm nhiệt (%)',
-      c_roof: 'Độ dày trần hang (m)',
-      c_gravity: 'Trọng trường (m/s²)'
-    };
-
-    const criteriaRadarLabels = [
-      'SiO₂',
-      'FeO',
-      'TiO₂',
-      'Mật độ đá',
-      'Đệm nhiệt',
-      'Độ dày trần hang',
-      'Trọng trường'
-    ];
-
-    // Presets for the 7 criteria
-    const missionPresets = [
-      { name: "Địa hóa & Đá (Geology)", weights: [1.0, 1.0, 1.0, 0.8, 0.5, 0.0, 0.0] },
-      { name: "Căn cứ Hang ngầm (Cave Habitat)", weights: [0.6, 0.6, 0.3, 0.8, 1.0, 1.0, 0.2] },
-      { name: "Toàn diện (Full Equal)", weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] }
-    ];
-
-    // 2. Base Quantitative Dataset for 7 Core Analog Sites (ESI-7)
+    // 1. Base Quantitative Dataset for 12 Planetary Analog Sites (NASA 4-Parameter ESI Model)
     const defaultAnalogs = [
       {
             "id": "krongno",
@@ -648,24 +578,20 @@
             "planetSiteName": "Marius Hills (Moon)",
             "target": "MẶT TRĂNG (MARIUS HILLS)",
             "earth": {
-                  "c_sio2": 50.2,
-                  "c_feo": 12.1,
-                  "c_tio2": 1.5,
-                  "c_density": 2.8,
-                  "c_thermal": 85,
-                  "c_roof": 15.0,
-                  "c_gravity": 9.81
+                  "slope": 9.0,
+                  "tempK": 296.6,
+                  "pressureKpa": 96.0,
+                  "mineralScore": 0.9,
+                  "mineralText": "Basalt (FeO 12%)"
             },
             "planet": {
-                  "c_sio2": 45.5,
-                  "c_feo": 17.5,
-                  "c_tio2": 4.5,
-                  "c_density": 3.1,
-                  "c_thermal": 92,
-                  "c_roof": 20.0,
-                  "c_gravity": 1.62
+                  "slope": 9.5,
+                  "tempK": 253.0,
+                  "pressureKpa": 0.0,
+                  "mineralScore": 0.9,
+                  "mineralText": "Mare Basalt (FeO 17%)"
             },
-            "geology": "Hệ thống hang động ống dung nham dài nhất Đông Nam Á (>25 km, 50+ hang) tại Công viên Địa chất Đắk Nông. Trần vòm bazan dày ~15 m giữ nhiệt độ ổn định (20–22°C) và che chắn bức xạ vũ trụ, lý tưởng để thử nghiệm căn cứ ngầm và robot tự hành SLAM không GPS.",
+            "geology": "Hệ thống hang động ống dung nham dài nhất Đông Nam Á (>25 km, 50+ hang) tại Công viên Địa chất Đắk Nông. Trần vòm bazan dày giữ nhiệt độ ổn định (20–22°C / 295 K), che chắn bức xạ vũ trụ, lý tưởng để thử nghiệm robot tự hành SLAM và căn cứ ngầm.",
             "limits": "Khí hậu nhiệt đới gió mùa gây phong hóa hóa học bề mặt; trọng lực 1g (gấp 6 lần Mặt Trăng) và không có môi trường chân không."
       },
       {
@@ -689,22 +615,18 @@
             "planetSiteName": "Arsia Mons Skylights (Mars)",
             "target": "SAO HỎA (ARSIA MONS)",
             "earth": {
-                  "c_sio2": 48.0,
-                  "c_feo": 12.5,
-                  "c_tio2": 2.8,
-                  "c_density": 2.85,
-                  "c_thermal": 78,
-                  "c_roof": 8.0,
-                  "c_gravity": 9.81
+                  "slope": 12.0,
+                  "tempK": 294.0,
+                  "pressureKpa": 100.0,
+                  "mineralScore": 0.83,
+                  "mineralText": "Basalt, Olivine, Pyroxene, Volcanic Ash"
             },
             "planet": {
-                  "c_sio2": 44.0,
-                  "c_feo": 17.0,
-                  "c_tio2": 1.2,
-                  "c_density": 2.85,
-                  "c_thermal": 85,
-                  "c_roof": 45.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.83,
+                  "mineralText": "Martian Basalt, Olivine, Pyroxene"
             },
             "geology": "Địa hình núi lửa trẻ thuộc Công viên Quốc gia Timanfaya với các dòng chảy dung nham bazan, nón núi lửa và ống dung nham. Phục vụ thử nghiệm độ bám bánh xe rover, lập bản đồ địa chất núi lửa và công nghệ thám hiểm hang ngầm hành tinh (ESA PANGEA).",
             "limits": "Khí hậu hải đảo, độ ẩm không khí, sự xâm lấn sinh học và phong hóa mặt đất khác biệt đáng kể so với môi trường khô lạnh, áp suất thấp của Sao Hỏa."
@@ -730,24 +652,20 @@
             "planetSiteName": "Gale Crater Rim (Mars)",
             "target": "SAO HỎA (HỐ GALE)",
             "earth": {
-                  "c_sio2": 65.0,
-                  "c_feo": 5.2,
-                  "c_tio2": 0.5,
-                  "c_density": 2.5,
-                  "c_thermal": 68,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 18.0,
+                  "tempK": 285.0,
+                  "pressureKpa": 95.0,
+                  "mineralScore": 0.88,
+                  "mineralText": "Impact-Brecciated Sandstone, Limestone, Shocked Minerals"
             },
             "planet": {
-                  "c_sio2": 47.2,
-                  "c_feo": 15.8,
-                  "c_tio2": 0.9,
-                  "c_density": 2.5,
-                  "c_thermal": 74,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.88,
+                  "mineralText": "Martian Impact Breccia, Basalt, Regolith"
             },
-            "geology": "Hố va chạm thiên thạch hình thành khoảng 50.000 năm trước trong đá trầm tích bởi thiên thạch sắt-niken, đường kính ~1.2 km. Lưu giữ vật liệu đá biến chất va chạm và lớp trầm tích ejecta, hữu ích để nghiên cứu hố va chạm và cấu trúc địa chất Sao Hỏa.",
+            "geology": "Hố va chạm thiên thạch hình thành khoảng 50.000 năm trước trong đá trầm tích bởi thiên thạch sắt-niken, đường kính ~1.2 km. Lưu giữ vật liệu đá biến chất va chạm và lớp ejecta, hữu ích để nghiên cứu hố va chạm và cấu trúc địa chất Sao Hỏa.",
             "limits": "Khí quyển Trái Đất, xói mòn, phong hóa và trọng lực 1g khác với Sao Hỏa. Đá mục tiêu chủ yếu là sa thạch/đá vôi trầm tích thay vì lớp vỏ bazan Sao Hỏa."
       },
       {
@@ -771,24 +689,20 @@
             "planetSiteName": "Hadley Rille - Apollo 15 (Moon)",
             "target": "MẶT TRĂNG (HADLEY RILLE)",
             "earth": {
-                  "c_sio2": 51.0,
-                  "c_feo": 13.5,
-                  "c_tio2": 2.2,
-                  "c_density": 2.82,
-                  "c_thermal": 76,
-                  "c_roof": 5.0,
-                  "c_gravity": 9.81
+                  "slope": 10.0,
+                  "tempK": 282.0,
+                  "pressureKpa": 80.0,
+                  "mineralScore": 0.91,
+                  "mineralText": "Basalt, Picro-Basalt, Scoria, Volcanic Glass"
             },
             "planet": {
-                  "c_sio2": 45.5,
-                  "c_feo": 17.5,
-                  "c_tio2": 4.5,
-                  "c_density": 3.1,
-                  "c_thermal": 90,
-                  "c_roof": 15.0,
-                  "c_gravity": 1.62
+                  "slope": 14.0,
+                  "tempK": 253.0,
+                  "pressureKpa": 0.0,
+                  "mineralScore": 0.91,
+                  "mineralText": "Mare Basalt, Pyroxene, Olivine"
             },
-            "geology": "Cánh đồng núi lửa bazan rộng lớn chứa hơn 60 dòng dung nham, nón xỉ và hệ thống khe nứt phun trào. Rất phù hợp để thử nghiệm di chuyển của xe tự hành rover, lấy mẫu bazan và lập bản đồ các dòng chảy dung nham Mặt Trăng / Sao Hỏa.",
+            "geology": "Cánh đồng núi lửa bazan rộng lớn chứa hơn 60 dòng dung nham, nón xỉ và khe nứt phun trào. Rất phù hợp để thử nghiệm di chuyển xe rover, lấy mẫu bazan và lập bản đồ các dòng chảy dung nham Mặt Trăng.",
             "limits": "Khí quyển Trái Đất, tuyết theo mùa, hoạt động sinh học và phong hóa do nước làm biến đổi bề mặt dung nham; trọng lực lớn hơn Mặt Trăng 6 lần."
       },
       {
@@ -812,22 +726,18 @@
             "planetSiteName": "Eberswalde Crater (Mars)",
             "target": "SAO HỎA (EBERSWALDE)",
             "earth": {
-                  "c_sio2": 58.0,
-                  "c_feo": 6.0,
-                  "c_tio2": 0.8,
-                  "c_density": 2.4,
-                  "c_thermal": 64,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 14.0,
+                  "tempK": 280.0,
+                  "pressureKpa": 65.0,
+                  "mineralScore": 0.72,
+                  "mineralText": "Sedimentary Rocks, Clay Minerals, Sulfates, Sandstone"
             },
             "planet": {
-                  "c_sio2": 46.0,
-                  "c_feo": 16.5,
-                  "c_tio2": 1.0,
-                  "c_density": 2.6,
-                  "c_thermal": 70,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.72,
+                  "mineralText": "Martian Basalt, Clay-Bearing Sediments"
             },
             "geology": "Cảnh quan khô hạn trên cao nguyên độ cao lớn ('Moonland') với các cấu trúc trầm tích lòng hồ cổ đại bị xói mòn mạnh và các tầng địa chất lộ thiên. Thích hợp thử nghiệm dẫn đường rover và giải mã địa hình trầm tích ngập nước cổ trên Sao Hỏa.",
             "limits": "Lượng mưa theo mùa, tuyết, nước lỏng và điều kiện khí quyển Trái Đất tác động đến xói mòn và độ kết dính bề mặt."
@@ -853,22 +763,18 @@
             "planetSiteName": "Bagnold Dunes - Gale (Mars)",
             "target": "SAO HỎA (CỒN CÁT BAGNOLD)",
             "earth": {
-                  "c_sio2": 68.0,
-                  "c_feo": 4.5,
-                  "c_tio2": 0.6,
-                  "c_density": 2.35,
-                  "c_thermal": 60,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 13.0,
+                  "tempK": 291.0,
+                  "pressureKpa": 99.0,
+                  "mineralScore": 0.76,
+                  "mineralText": "Weathered Bedrock, Quartz, Feldspar, Desert Sediments"
             },
             "planet": {
-                  "c_sio2": 47.0,
-                  "c_feo": 16.0,
-                  "c_tio2": 0.9,
-                  "c_density": 2.5,
-                  "c_thermal": 72,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.76,
+                  "mineralText": "Martian Regolith, Basalt, Iron Oxides"
             },
             "geology": "Cảnh quan khô hạn đặc trưng bởi địa hình bị xói mòn sâu, bề mặt đá trơ trụi và các tầng trầm tích cổ. Hữu ích cho nghiên cứu quá trình phong hóa gió aeolian, hình thái bề mặt, dẫn đường robot và lập bản đồ sa mạc Sao Hỏa.",
             "limits": "Hơi ẩm khí quyển ven biển, vận chuyển trầm tích do bão cát và mưa rào không thường xuyên tác động đến bề mặt."
@@ -894,22 +800,18 @@
             "planetSiteName": "Meridiani Planum (Mars)",
             "target": "CHUẨN MÔ PHỎNG SAO HỎA (NASA)",
             "earth": {
-                  "c_sio2": 56.2,
-                  "c_feo": 7.8,
-                  "c_tio2": 0.8,
-                  "c_density": 2.55,
-                  "c_thermal": 71,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 4.0,
+                  "tempK": 289.0,
+                  "pressureKpa": 75.0,
+                  "mineralScore": 0.9,
+                  "mineralText": "Evaporites, Sulfates, Chlorides, Clay Minerals"
             },
             "planet": {
-                  "c_sio2": 44.0,
-                  "c_feo": 18.0,
-                  "c_tio2": 1.0,
-                  "c_density": 2.9,
-                  "c_thermal": 75,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 2.5,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.65,
+                  "mineralScore": 0.9,
+                  "mineralText": "Martian Sulfates, Chlorides, Clay Minerals, Basalt"
             },
             "geology": "VÙNG CHUẨN NASA: Cảnh quan siêu khô hạn trong sa mạc Atacama chứa các mỏ muối bốc hơi, cấu trúc trầm tích và đá bị gió mài mòn. Rất hữu ích để kiểm tra thiết bị phân tích đất Sao Hỏa, phát hiện khoáng chất và công nghệ tìm kiếm sự sống.",
             "limits": "Nằm ở độ cao ~2.400 m nên áp suất khí quyển vẫn đạt ~75 kPa; có lớp khí quyển che chắn bức xạ mặt trời."
@@ -935,22 +837,18 @@
             "planetSiteName": "Taurus-Littrow - Apollo 17 (Moon)",
             "target": "CHUẨN MÔ PHỎNG MẶT TRĂNG (NASA)",
             "earth": {
-                  "c_sio2": 49.5,
-                  "c_feo": 13.0,
-                  "c_tio2": 1.9,
-                  "c_density": 2.88,
-                  "c_thermal": 78,
-                  "c_roof": 4.0,
-                  "c_gravity": 9.81
+                  "slope": 10.0,
+                  "tempK": 277.0,
+                  "pressureKpa": 92.0,
+                  "mineralScore": 0.86,
+                  "mineralText": "Basalt, Picro-Basalt, Rhyolite, Andesite"
             },
             "planet": {
-                  "c_sio2": 42.5,
-                  "c_feo": 17.2,
-                  "c_tio2": 5.5,
-                  "c_density": 3.15,
-                  "c_thermal": 82,
-                  "c_roof": 5.0,
-                  "c_gravity": 1.62
+                  "slope": 11.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.0,
+                  "mineralScore": 0.86,
+                  "mineralText": "Basalt, Pyroxene, Olivine, Clay Minerals"
             },
             "geology": "VÙNG CHUẨN NASA: Hệ thống núi lửa còn hoạt động chứa miệng núi lửa trung tâm, các vụ phun trào khe nứt bazan, dòng dung nham tươi và các vùng thủy nhiệt biến chất. Nơi huấn luyện phi hành gia Apollo 17 và thử nghiệm bộ đồ EVA Artemis.",
             "limits": "Hoạt động địa nhiệt cao, nước lỏng, tuyết, khí quyển dày và các quá trình sinh học khác biệt với điều kiện bề mặt Mặt Trăng."
@@ -976,22 +874,18 @@
             "planetSiteName": "Gusev Crater Paleolake (Mars)",
             "target": "SAO HỎA (HỐ GUSEV)",
             "earth": {
-                  "c_sio2": 42.0,
-                  "c_feo": 10.0,
-                  "c_tio2": 1.1,
-                  "c_density": 2.45,
-                  "c_thermal": 65,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 3.0,
+                  "tempK": 296.0,
+                  "pressureKpa": 101.0,
+                  "mineralScore": 0.89,
+                  "mineralText": "Halite, Gypsum, Sulfates, Evaporites, Clay Minerals"
             },
             "planet": {
-                  "c_sio2": 45.0,
-                  "c_feo": 16.5,
-                  "c_tio2": 0.8,
-                  "c_density": 2.6,
-                  "c_thermal": 70,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 7.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.89,
+                  "mineralText": "Martian Sulfates, Chlorides, Evaporite Deposits"
             },
             "geology": "Vùng trũng nước mặn lớn ở tây nam Tunisia với các mỏ evaporite rộng lớn, lớp vỏ muối kết tinh và biến thiên độ ẩm theo mùa. Thích hợp nghiên cứu hồ cổ đại Sao Hỏa, quá trình hình thành muối bốc hơi và bằng chứng khoáng vật học về nước lỏng cổ.",
             "limits": "Nước ngầm theo mùa, lũ lụt cục bộ, hoạt động sinh học và độ ẩm không khí ảnh hưởng đến sự hình thành muối."
@@ -1017,22 +911,18 @@
             "planetSiteName": "Jezero Crater (Mars)",
             "target": "SAO HỎA (HỐ JEZERO)",
             "earth": {
-                  "c_sio2": 49.8,
-                  "c_feo": 13.4,
-                  "c_tio2": 2.2,
-                  "c_density": 2.9,
-                  "c_thermal": 72,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 20.5,
+                  "tempK": 299.0,
+                  "pressureKpa": 96.0,
+                  "mineralScore": 0.93,
+                  "mineralText": "Deccan Basalt, Impact Breccia, Saponite, Carbonates"
             },
             "planet": {
-                  "c_sio2": 44.5,
-                  "c_feo": 18.2,
-                  "c_tio2": 1.1,
-                  "c_density": 2.95,
-                  "c_thermal": 76,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.65,
+                  "mineralScore": 0.93,
+                  "mineralText": "Martian Basalt, Impact Breccia, Clay Minerals"
             },
             "geology": "Hố va chạm rộng ~1.8 km hình thành trong địa hình núi lửa bazan Deccan. Chứa bazan biến chất va chạm (maskelynite), trầm tích ejecta và khoáng chất biến đổi thủy nhiệt, tương đồng sâu sắc với cấu trúc va chạm hố Jezero trên Sao Hỏa.",
             "limits": "Lòng hố chứa hồ nước mặn siêu kiềm chịu ảnh hưởng của mưa mùa và vi sinh vật hoạt động mạnh."
@@ -1058,24 +948,20 @@
             "planetSiteName": "Hecates Tholus (Mars)",
             "target": "SAO HỎA (HECATES THOLUS)",
             "earth": {
-                  "c_sio2": 52.0,
-                  "c_feo": 11.0,
-                  "c_tio2": 1.6,
-                  "c_density": 2.75,
-                  "c_thermal": 70,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 15.0,
+                  "tempK": 265.0,
+                  "pressureKpa": 55.0,
+                  "mineralScore": 0.84,
+                  "mineralText": "Basalt, Andesite, Pyroclastic Deposits, Volcanic Ash"
             },
             "planet": {
-                  "c_sio2": 46.0,
-                  "c_feo": 17.0,
-                  "c_tio2": 1.0,
-                  "c_density": 2.85,
-                  "c_thermal": 78,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.84,
+                  "mineralText": "Martian Basalt, Pyroxene, Olivine, Volcanic Deposits"
             },
-            "geology": "Hệ thống núi lửa dạng tầng lớn tại vòng cung núi lửa Đông Kamchatka với các dòng dung nham bazan/andesit, tro mạt vụn và trầm tích băng tuyết núi cao. Hữu ích để nghiên cứu hình thái núi lửa băng (cryovolcanism) và lấy mẫu đá núi lửa Sao Hỏa.",
+            "geology": "Hệ thống núi lửa dạng tầng lớn tại vòng cung núi lửa Đông Kamchatka với các dòng dung nham bazan/andesit, tro mạt vụn và trầm tích băng tuyết núi cao. Hữu ích để nghiên cứu hình thái núi lửa băng và lấy mẫu đá núi lửa Sao Hỏa.",
             "limits": "Hoạt động phun trào thường xuyên, băng hà, tuyết dày, độ ẩm không khí và phong hóa sinh học."
       },
       {
@@ -1099,24 +985,20 @@
             "planetSiteName": "Mount Sharp Strata (Mars)",
             "target": "SAO HỎA (ĐỈNH SHARP - GALE)",
             "earth": {
-                  "c_sio2": 60.0,
-                  "c_feo": 6.8,
-                  "c_tio2": 0.7,
-                  "c_density": 2.3,
-                  "c_thermal": 62,
-                  "c_roof": 0.0,
-                  "c_gravity": 9.81
+                  "slope": 12.0,
+                  "tempK": 283.0,
+                  "pressureKpa": 94.0,
+                  "mineralScore": 0.74,
+                  "mineralText": "Claystone, Siltstone, Sandstone, Volcanic Ash"
             },
             "planet": {
-                  "c_sio2": 48.0,
-                  "c_feo": 16.5,
-                  "c_tio2": 1.0,
-                  "c_density": 2.65,
-                  "c_thermal": 72,
-                  "c_roof": 0.0,
-                  "c_gravity": 3.72
+                  "slope": 15.0,
+                  "tempK": 252.0,
+                  "pressureKpa": 0.6,
+                  "mineralScore": 0.74,
+                  "mineralText": "Martian Sedimentary Rocks, Clay Minerals, Sulfates"
             },
-            "geology": "Cảnh quan trầm tích bị xói mòn sâu rộng chứa các tầng địa chất lộ thiên, đất sét giàu khoáng chất, sa thạch và trầm tích tro núi lửa. Hữu ích để nghiên cứu địa chất trầm tích Sao Hỏa và khảo sát các tầng địa tầng bằng xe rover (như Mount Sharp ở Gale Crater).",
+            "geology": "Cảnh quan trầm tích bị xói mòn sâu rộng chứa các tầng địa chất lộ thiên, đất sét giàu khoáng chất, sa thạch và trầm tích tro núi lửa. Hữu ích để nghiên cứu địa chất trầm tích Sao Hỏa và khảo sát các tầng địa tầng bằng xe rover.",
             "limits": "Lượng mưa, tuyết mùa đông, xói mòn do sông suối, thảm thực vật và các quá trình sinh học khác biệt với bề mặt Sao Hỏa hiện đại."
       }
 ];
@@ -1189,31 +1071,38 @@
     let caveMarkers = [];
     let radarChart = null;
 
-    // 3. Mathematical ESI Formula across 7 Criteria (Schulze-Makuch, 2011)
+    // 3. Mathematical ESI Formula (Schulze-Makuch, 2011) across 4 NASA Parameters
     function esiComponent(xEarth, xTarget) {
       if (xEarth + xTarget === 0) return 1.0;
-      return 1.0 - Math.abs(xEarth - xTarget) / (xEarth + xTarget);
+      return Math.max(0.0, 1.0 - Math.abs(xEarth - xTarget) / (xEarth + xTarget));
     }
 
     function computeMetrics(site) {
-      const n = criteriaKeys.length;
-      let product = 1.0;
-      let totalW = 0;
-      const scores = [];
+      const sMineral = site.earth.mineralScore;
+      const sSlope = esiComponent(site.earth.slope, site.planet.slope);
+      const sTemp = esiComponent(site.earth.tempK, site.planet.tempK);
+      const sPress = esiComponent(site.earth.pressureKpa, site.planet.pressureKpa);
 
-      criteriaKeys.forEach((key) => {
-        const sliderEl = document.getElementById(`w-${key}`);
-        const w = sliderEl ? parseFloat(sliderEl.value) : 1.0;
-        const s = esiComponent(site.earth[key], site.planet[key]);
-        scores.push(s);
-        if (w > 0) {
-          product *= Math.pow(Math.max(0.01, s), w);
-          totalW += w;
-        }
-      });
+      const w1 = parseFloat(document.getElementById('w-mineral').value);
+      const w2 = parseFloat(document.getElementById('w-slope').value);
+      const w3 = parseFloat(document.getElementById('w-temp').value);
+      const w4 = parseFloat(document.getElementById('w-press').value);
 
-      const esi = totalW > 0 ? (Math.pow(product, 1.0 / totalW) * 100).toFixed(1) : '0.0';
-      return { esi, scores };
+      const sumW = w1 + w2 + w3 + w4;
+      let esi = 0;
+
+      if (sumW > 0) {
+        const safeSPress = Math.max(0.01, sPress);
+        const product =
+          Math.pow(Math.max(0.01, sMineral), w1) *
+          Math.pow(Math.max(0.01, sSlope), w2) *
+          Math.pow(Math.max(0.01, sTemp), w3) *
+          Math.pow(safeSPress, w4);
+
+        esi = Math.pow(product, 1.0 / sumW) * 100;
+      }
+
+      return { sMineral, sSlope, sTemp, sPress, esi: esi.toFixed(1) };
     }
 
     // 4. Map & Layer Operations
@@ -1286,15 +1175,12 @@
       if (globalBtn) globalBtn.classList.add('active');
     }
 
-    // 5. Weight Presets & Update Logic
-    function applyPreset(presetIdx, btn) {
-      const preset = missionPresets[presetIdx];
-      if (!preset) return;
-
-      criteriaKeys.forEach((key, idx) => {
-        const slider = document.getElementById(`w-${key}`);
-        if (slider) slider.value = preset.weights[idx];
-      });
+    // 5. Weight Presets & Update Logic (NASA 4-Parameter Model)
+    function applyPreset(w1, w2, w3, w4, btn) {
+      document.getElementById('w-mineral').value = w1;
+      document.getElementById('w-slope').value = w2;
+      document.getElementById('w-temp').value = w3;
+      document.getElementById('w-press').value = w4;
 
       document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
@@ -1303,11 +1189,10 @@
     }
 
     function updateAll() {
-      criteriaKeys.forEach((key) => {
-        const slider = document.getElementById(`w-${key}`);
-        const span = document.getElementById(`val-${key}`);
-        if (slider && span) span.innerText = parseFloat(slider.value).toFixed(1);
-      });
+      document.getElementById('val-mineral').innerText = parseFloat(document.getElementById('w-mineral').value).toFixed(1);
+      document.getElementById('val-slope').innerText = parseFloat(document.getElementById('w-slope').value).toFixed(1);
+      document.getElementById('val-temp').innerText = parseFloat(document.getElementById('w-temp').value).toFixed(1);
+      document.getElementById('val-press').innerText = parseFloat(document.getElementById('w-press').value).toFixed(1);
 
       analogs.forEach((site, idx) => {
         const m = computeMetrics(site);
@@ -1320,7 +1205,7 @@
       const metrics = computeMetrics(site);
 
       document.getElementById('asi-score').innerText = `${metrics.esi}%`;
-      document.getElementById('target-tag').innerText = `MỤC TIÊU: ${site.target}`;
+      document.getElementById('target-tag').innerText = `TARGET: ${site.target}`;
       document.getElementById('vn-tag').style.display = site.isVietnam ? 'inline-block' : 'none';
       document.getElementById('baseline-tag').style.display = site.isBaseline ? 'inline-block' : 'none';
       document.getElementById('custom-tag').style.display = site.isCustom ? 'inline-block' : 'none';
@@ -1330,34 +1215,43 @@
       document.getElementById('site-geology').innerText = site.geology;
       document.getElementById('site-limits').innerText = site.limits;
 
-      // Render 7-row Quantitative Comparison Table
-      let tbodyHTML = '';
-      criteriaKeys.forEach((key, i) => {
-        const pct = Math.round(metrics.scores[i] * 100);
-        tbodyHTML += `
-          <tr>
-            <td>${criteriaLabels[key]}</td>
-            <td class="num">${site.earth[key]}</td>
-            <td class="num">${site.planet[key]}</td>
-            <td class="num">
-              <div class="sim-bar-wrap">
-                <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%;"></div></div>
-                <span>${pct}%</span>
-              </div>
-            </td>
-          </tr>
-        `;
-      });
-      document.getElementById('quant-tbody').innerHTML = tbodyHTML;
+      const earthMinDisplay = site.earth.mineralText || '';
+      const planetMinDisplay = site.planet.mineralText || '';
 
-      // Update 7-axis Radar Chart (Matching Image 2)
+      document.getElementById('quant-tbody').innerHTML = `
+        <tr>
+          <td>Mineralogy</td>
+          <td>${earthMinDisplay}</td>
+          <td>${planetMinDisplay}</td>
+          <td class="num">${(metrics.sMineral * 100).toFixed(0)}%</td>
+        </tr>
+        <tr>
+          <td>Mean Slope</td>
+          <td class="num">${site.earth.slope}°</td>
+          <td class="num">${site.planet.slope}°</td>
+          <td class="num">${(metrics.sSlope * 100).toFixed(0)}%</td>
+        </tr>
+        <tr>
+          <td>Mean Temp</td>
+          <td class="num">${site.earth.tempK} K</td>
+          <td class="num">${site.planet.tempK} K</td>
+          <td class="num">${(metrics.sTemp * 100).toFixed(0)}%</td>
+        </tr>
+        <tr>
+          <td>Pressure</td>
+          <td class="num">${site.earth.pressureKpa} kPa</td>
+          <td class="num">${site.planet.pressureKpa} kPa</td>
+          <td class="num">${(metrics.sPress * 100).toFixed(1)}%</td>
+        </tr>
+      `;
+
       if (radarChart) {
         const chartColor = site.id === 'krongno' ? '#f43f5e' : (site.isBaseline ? '#f59e0b' : (site.isCustom ? '#a855f7' : '#38bdf8'));
-        const chartBg = site.id === 'krongno' ? 'rgba(244, 63, 94, 0.22)' : (site.isBaseline ? 'rgba(245, 158, 11, 0.22)' : (site.isCustom ? 'rgba(168, 85, 247, 0.22)' : 'rgba(56, 189, 248, 0.22)'));
+        const chartBg = site.id === 'krongno' ? 'rgba(244, 63, 94, 0.25)' : (site.isBaseline ? 'rgba(245, 158, 11, 0.25)' : (site.isCustom ? 'rgba(168, 85, 247, 0.25)' : 'rgba(56, 189, 248, 0.25)'));
         radarChart.data.datasets[0].borderColor = chartColor;
         radarChart.data.datasets[0].pointBackgroundColor = chartColor;
         radarChart.data.datasets[0].backgroundColor = chartBg;
-        radarChart.data.datasets[0].data = metrics.scores;
+        radarChart.data.datasets[0].data = [metrics.sMineral, metrics.sSlope, metrics.sTemp, metrics.sPress];
         radarChart.update();
       }
     }
@@ -1439,45 +1333,56 @@
 
     const studentTemplates = {
       chudangya: {
-        name: "8. Núi Lửa Chư Đăng Ya (Gia Lai, VN)",
+        name: "Núi lửa Chư Đăng Ya (Việt Nam)",
         short: "🇻🇳 Chư Đăng Ya",
         elat: 14.113, elon: 108.027,
         body: "moon", pname: "Hadley Rille - Apollo 15 (Moon)",
         plat: 26.1, plon: 3.6,
-        sio2: [49.5, 45.2], feo: [12.8, 17.5], tio2: [2.1, 4.2],
-        density: [2.85, 3.12], thermal: [82, 90], roof: [8.0, 15.0], gravity: [9.81, 1.62],
-        geology: "Miệng nón xỉ bazan Đệ Tứ phun nổ tại Gia Lai, lưu giữ đá bọt xỉ và tro núi lửa mịn, tương đồng với các miệng núi lửa và rãnh Hadley trên Mặt Trăng trong sứ mệnh Apollo 15.",
-        limits: "Thảm thực vật nhiệt đới dày đặc và lượng mưa cao làm tăng độ ẩm đất, khác biệt với lớp regolith chân không hoàn toàn của Mặt Trăng."
+        minScore: 0.88,
+        minTextEarth: "Basalt, Scoria, Tephra",
+        minTextPlanet: "Mare Basalt, Hadley Scoria",
+        slope: [12.0, 14.0],
+        tempK: [295.0, 253.0],
+        press: [94.0, 0.0],
+        geology: "Miệng núi lửa hình nón triệu năm tuổi với địa hình sỏi xỉ bazan xốp và đá bọt, tương đồng cao với cấu trúc ejecta và nón tro rải rác quanh khe nứt Hadley Rille trên Mặt Trăng.",
+        limits: "Ảnh hưởng bởi gió mùa Tây Nguyên và thảm thực vật cây bụi; áp suất Trái Đất ~94 kPa và trọng lực 1g."
       },
       muine: {
-        name: "8. Đồi Cát Đỏ Mũi Né (Bình Thuận, VN)",
+        name: "Đồi cát đỏ Mũi Né (Việt Nam)",
         short: "🇻🇳 Cát Mũi Né",
-        elat: 10.949, elon: 108.295,
-        body: "mars", pname: "Bagnold Dunes - Gale Crater (Mars)",
+        elat: 10.951, elon: 108.287,
+        body: "mars", pname: "Bagnold Dunes - Gale (Mars)",
         plat: -5.1, plon: 137.8,
-        sio2: [62.0, 48.0], feo: [8.5, 17.2], tio2: [0.9, 1.5],
-        density: [2.45, 2.70], thermal: [65, 75], roof: [0.0, 0.0], gravity: [9.81, 3.72],
-        geology: "Cồn cát thạch anh giàu oxit sắt đỏ ven biển Bình Thuận hình thành do gió mùa di chuyển liên tục, là bãi thử nghiệm ma sát bánh xe rover và thuật toán chống lún cát mô phỏng cồn cát Bagnold trên Sao Hỏa.",
-        limits: "Gió biển mang hơi ẩm và độ kết dính hạt cát cao hơn cát khô trong áp suất cực thấp của Sao Hỏa."
+        minScore: 0.82,
+        minTextEarth: "Quartz, Iron-Oxide Dunes",
+        minTextPlanet: "Basaltic Dark Dunes, Iron Oxides",
+        slope: [18.0, 15.0],
+        tempK: [301.0, 220.0],
+        press: [101.0, 0.7],
+        geology: "Hệ thống cồn cát di động dải cát đỏ giàu oxit sắt, lý tưởng để thử nghiệm độ trượt bánh xe rover tự hành, thuật toán đo thị giác odometry và mô phỏng bão cát Sao Hỏa.",
+        limits: "Độ ẩm không khí biển và gió ven biển tạo lực kết dính bề mặt hạt cát; áp suất khí quyển 1 atm."
       },
       lyson: {
-        name: "8. Đảo Núi Lửa Lý Sơn (Quảng Ngãi, VN)",
+        name: "Đảo núi lửa Lý Sơn (Việt Nam)",
         short: "🇻🇳 Đảo Lý Sơn",
-        elat: 15.381, elon: 109.118,
+        elat: 15.378, elon: 109.112,
         body: "moon", pname: "Aristarchus Plateau (Moon)",
         plat: 23.7, plon: -47.4,
-        sio2: [48.2, 43.5], feo: [13.2, 18.0], tio2: [2.4, 5.0],
-        density: [2.90, 3.15], thermal: [80, 88], roof: [6.0, 8.0], gravity: [9.81, 1.62],
-        geology: "Đảo núi lửa biển với miệng nón Thới Lới và các vách bazan dạng cột (columnar basalt) xếp lớp, mô phỏng các vết đứt gãy dung nham và trầm tích mạt vụn núi lửa cao nguyên Aristarchus trên Mặt Trăng.",
-        limits: "Phong hóa nước biển và sóng ven bờ, áp suất 101.3 kPa ở mực nước biển."
+        minScore: 0.87,
+        minTextEarth: "Basaltic Cliff, Volcanic Tuff",
+        minTextPlanet: "Pyroclastic Mare Basalt",
+        slope: [16.0, 18.0],
+        tempK: [298.0, 250.0],
+        press: [101.3, 0.0],
+        geology: "Địa hình vách đá bazan dựng đứng và trầm tích mạt vụn núi lửa (pyroclastic deposit) ven biển, tương đồng với cao nguyên pyroclastic Aristarchus trên Mặt Trăng.",
+        limits: "Khí hậu hải đảo mặn, phong hóa sóng biển và khí quyển dày Trái Đất."
       }
     };
 
     function fillTemplate(key) {
       const t = studentTemplates[key];
       if (!t) return;
-      const nextNum = analogs.length + 1;
-      document.getElementById('inp-name').value = t.name.replace(/^8\./, `${nextNum}.`);
+      document.getElementById('inp-name').value = t.name;
       document.getElementById('inp-short').value = t.short;
       document.getElementById('inp-elat').value = t.elat;
       document.getElementById('inp-elon').value = t.elon;
@@ -1486,20 +1391,15 @@
       document.getElementById('inp-plat').value = t.plat;
       document.getElementById('inp-plon').value = t.plon;
 
-      document.getElementById('inp-e-sio2').value = t.sio2[0];
-      document.getElementById('inp-p-sio2').value = t.sio2[1];
-      document.getElementById('inp-e-feo').value = t.feo[0];
-      document.getElementById('inp-p-feo').value = t.feo[1];
-      document.getElementById('inp-e-tio2').value = t.tio2[0];
-      document.getElementById('inp-p-tio2').value = t.tio2[1];
-      document.getElementById('inp-e-density').value = t.density[0];
-      document.getElementById('inp-p-density').value = t.density[1];
-      document.getElementById('inp-e-thermal').value = t.thermal[0];
-      document.getElementById('inp-p-thermal').value = t.thermal[1];
-      document.getElementById('inp-e-roof').value = t.roof[0];
-      document.getElementById('inp-p-roof').value = t.roof[1];
-      document.getElementById('inp-e-gravity').value = t.gravity[0];
-      document.getElementById('inp-p-gravity').value = t.gravity[1];
+      document.getElementById('inp-minscore').value = t.minScore;
+      document.getElementById('inp-mintext-earth').value = t.minTextEarth;
+      document.getElementById('inp-mintext-planet').value = t.minTextPlanet;
+      document.getElementById('inp-eslope').value = t.slope[0];
+      document.getElementById('inp-pslope').value = t.slope[1];
+      document.getElementById('inp-etemp').value = t.tempK[0];
+      document.getElementById('inp-ptemp').value = t.tempK[1];
+      document.getElementById('inp-epress').value = t.press[0];
+      document.getElementById('inp-ppress').value = t.press[1];
 
       document.getElementById('inp-geology').value = t.geology;
       document.getElementById('inp-limits').value = t.limits;
@@ -1509,6 +1409,7 @@
       e.preventDefault();
       const bodyType = document.getElementById('inp-body').value;
       const pname = document.getElementById('inp-pname').value.trim();
+      const minScore = parseFloat(document.getElementById('inp-minscore').value) || 0.85;
 
       const newSite = {
         id: "custom_" + Date.now(),
@@ -1519,35 +1420,31 @@
         isCustom: true,
         bodyType: bodyType,
         earthCoords: [parseFloat(document.getElementById('inp-elat').value), parseFloat(document.getElementById('inp-elon').value)],
-        earthZoom: 13,
+        earthZoom: 12,
         planetCoords: [parseFloat(document.getElementById('inp-plat').value), parseFloat(document.getElementById('inp-plon').value)],
         planetZoom: 7,
         planetSiteName: pname,
         target: `${bodyType === 'moon' ? 'MẶT TRĂNG' : 'SAO HỎA'} (${pname.toUpperCase()})`,
         earth: {
-          c_sio2: parseFloat(document.getElementById('inp-e-sio2').value) || 50,
-          c_feo: parseFloat(document.getElementById('inp-e-feo').value) || 12,
-          c_tio2: parseFloat(document.getElementById('inp-e-tio2').value) || 1.5,
-          c_density: parseFloat(document.getElementById('inp-e-density').value) || 2.8,
-          c_thermal: parseFloat(document.getElementById('inp-e-thermal').value) || 80,
-          c_roof: parseFloat(document.getElementById('inp-e-roof').value) || 10,
-          c_gravity: parseFloat(document.getElementById('inp-e-gravity').value) || 9.81
+          slope: parseFloat(document.getElementById('inp-eslope').value) || 10,
+          tempK: parseFloat(document.getElementById('inp-etemp').value) || 295,
+          pressureKpa: parseFloat(document.getElementById('inp-epress').value) || 95,
+          mineralScore: minScore,
+          mineralText: document.getElementById('inp-mintext-earth').value.trim() || 'Basalt'
         },
         planet: {
-          c_sio2: parseFloat(document.getElementById('inp-p-sio2').value) || 45,
-          c_feo: parseFloat(document.getElementById('inp-p-feo').value) || 17,
-          c_tio2: parseFloat(document.getElementById('inp-p-tio2').value) || 4.5,
-          c_density: parseFloat(document.getElementById('inp-p-density').value) || 3.1,
-          c_thermal: parseFloat(document.getElementById('inp-p-thermal').value) || 90,
-          c_roof: parseFloat(document.getElementById('inp-p-roof').value) || 15,
-          c_gravity: parseFloat(document.getElementById('inp-p-gravity').value) || (bodyType === 'moon' ? 1.62 : 3.72)
+          slope: parseFloat(document.getElementById('inp-pslope').value) || 12,
+          tempK: parseFloat(document.getElementById('inp-ptemp').value) || 252,
+          pressureKpa: parseFloat(document.getElementById('inp-ppress').value) || 0,
+          mineralScore: minScore,
+          mineralText: document.getElementById('inp-mintext-planet').value.trim() || 'Basalt'
         },
         geology: document.getElementById('inp-geology').value.trim(),
         limits: document.getElementById('inp-limits').value.trim()
       };
 
       customAnalogs.push(newSite);
-      try { localStorage.setItem('kronos_custom_analogs_7', JSON.stringify(customAnalogs)); } catch(e){}
+      try { localStorage.setItem('kronos_custom_analogs_4', JSON.stringify(customAnalogs)); } catch(e){}
       analogs = [...defaultAnalogs, ...customAnalogs];
 
       renderEarthMarkers();
@@ -1564,7 +1461,7 @@
       if (!site || !site.isCustom) return;
       const deletedId = site.id;
       customAnalogs = customAnalogs.filter(s => s.id !== site.id);
-      try { localStorage.setItem('kronos_custom_analogs_7', JSON.stringify(customAnalogs)); } catch(e){}
+      try { localStorage.setItem('kronos_custom_analogs_4', JSON.stringify(customAnalogs)); } catch(e){}
       analogs = [...defaultAnalogs, ...customAnalogs];
 
       renderEarthMarkers();
@@ -1616,7 +1513,7 @@
         setCloudStatus('syncing', 'Connecting...');
         const { data, error } = await supabaseClient.from('analog_sites').select('*').order('created_at', { ascending: true });
         if (error) {
-          console.warn('Supabase table notice:', error.message);
+          console.warn('Supabase notice:', error.message);
           setCloudStatus('offline', 'Local Mode');
           return;
         }
@@ -1624,37 +1521,25 @@
           const cloudMap = new Map();
           data.forEach(r => cloudMap.set(r.id, r));
 
-          // Sync default sites if modified in cloud
           defaultAnalogs.forEach(site => {
             if (cloudMap.has(site.id)) {
               const r = cloudMap.get(site.id);
               if (r.name_vi || r.name) site.name = r.name_vi || r.name;
               if (r.short_label) site.shortLabel = r.short_label;
               if (r.body_type) site.bodyType = r.body_type;
-              if (r.earth_lat !== null && r.earth_lat !== undefined && r.earth_lon !== null && r.earth_lon !== undefined) {
-                site.earthCoords = [parseFloat(r.earth_lat), parseFloat(r.earth_lon)];
-              }
-              if (r.planet_lat !== null && r.planet_lat !== undefined && r.planet_lon !== null && r.planet_lon !== undefined) {
-                site.planetCoords = [parseFloat(r.planet_lat), parseFloat(r.planet_lon)];
-              }
+              if (r.earth_lat != null && r.earth_lon != null) site.earthCoords = [parseFloat(r.earth_lat), parseFloat(r.earth_lon)];
+              if (r.planet_lat != null && r.planet_lon != null) site.planetCoords = [parseFloat(r.planet_lat), parseFloat(r.planet_lon)];
               if (r.planet_site_name) site.planetSiteName = r.planet_site_name;
               if (r.target_vi || r.target) site.target = r.target_vi || r.target;
-              if (r.earth_sio2 != null) site.earth.c_sio2 = parseFloat(r.earth_sio2);
-              if (r.earth_feo != null) site.earth.c_feo = parseFloat(r.earth_feo);
-              if (r.earth_tio2 != null) site.earth.c_tio2 = parseFloat(r.earth_tio2);
-              if (r.earth_density != null) site.earth.c_density = parseFloat(r.earth_density);
-              if (r.earth_thermal != null) site.earth.c_thermal = parseFloat(r.earth_thermal);
-              if (r.earth_roof != null) site.earth.c_roof = parseFloat(r.earth_roof);
-              if (r.earth_gravity != null) site.earth.c_gravity = parseFloat(r.earth_gravity);
-
-              if (r.planet_sio2 != null) site.planet.c_sio2 = parseFloat(r.planet_sio2);
-              if (r.planet_feo != null) site.planet.c_feo = parseFloat(r.planet_feo);
-              if (r.planet_tio2 != null) site.planet.c_tio2 = parseFloat(r.planet_tio2);
-              if (r.planet_density != null) site.planet.c_density = parseFloat(r.planet_density);
-              if (r.planet_thermal != null) site.planet.c_thermal = parseFloat(r.planet_thermal);
-              if (r.planet_roof != null) site.planet.c_roof = parseFloat(r.planet_roof);
-              if (r.planet_gravity != null) site.planet.c_gravity = parseFloat(r.planet_gravity);
-
+              if (r.mineral_score != null) site.earth.mineralScore = parseFloat(r.mineral_score);
+              if (r.earth_mineral) site.earth.mineralText = r.earth_mineral;
+              if (r.planet_mineral) site.planet.mineralText = r.planet_mineral;
+              if (r.earth_slope != null) site.earth.slope = parseFloat(r.earth_slope);
+              if (r.planet_slope != null) site.planet.slope = parseFloat(r.planet_slope);
+              if (r.earth_temp_k != null) site.earth.tempK = parseFloat(r.earth_temp_k);
+              if (r.planet_temp_k != null) site.planet.tempK = parseFloat(r.planet_temp_k);
+              if (r.earth_pressure_kpa != null) site.earth.pressureKpa = parseFloat(r.earth_pressure_kpa);
+              if (r.planet_pressure_kpa != null) site.planet.pressureKpa = parseFloat(r.planet_pressure_kpa);
               if (r.geology_vi || r.geology) site.geology = r.geology_vi || r.geology;
               if (r.limits_vi || r.limits) site.limits = r.limits_vi || r.limits;
             }
@@ -1675,22 +1560,18 @@
             planetSiteName: r.planet_site_name || 'Target Body',
             target: r.target_vi || r.target || 'MISSION TARGET',
             earth: {
-              c_sio2: parseFloat(r.earth_sio2) || 50,
-              c_feo: parseFloat(r.earth_feo) || 12,
-              c_tio2: parseFloat(r.earth_tio2) || 1.5,
-              c_density: parseFloat(r.earth_density) || 2.8,
-              c_thermal: parseFloat(r.earth_thermal) || 80,
-              c_roof: parseFloat(r.earth_roof) || 10,
-              c_gravity: parseFloat(r.earth_gravity) || 9.81
+              slope: parseFloat(r.earth_slope) || 10,
+              tempK: parseFloat(r.earth_temp_k) || 295,
+              pressureKpa: parseFloat(r.earth_pressure_kpa) || 95,
+              mineralScore: parseFloat(r.mineral_score) || 0.85,
+              mineralText: r.earth_mineral || ''
             },
             planet: {
-              c_sio2: parseFloat(r.planet_sio2) || 45,
-              c_feo: parseFloat(r.planet_feo) || 17,
-              c_tio2: parseFloat(r.planet_tio2) || 4.5,
-              c_density: parseFloat(r.planet_density) || 3.1,
-              c_thermal: parseFloat(r.planet_thermal) || 90,
-              c_roof: parseFloat(r.planet_roof) || 15,
-              c_gravity: parseFloat(r.planet_gravity) || 1.62
+              slope: parseFloat(r.planet_slope) || 12,
+              tempK: parseFloat(r.planet_temp_k) || 252,
+              pressureKpa: parseFloat(r.planet_pressure_kpa) || 0,
+              mineralScore: parseFloat(r.mineral_score) || 0.85,
+              mineralText: r.planet_mineral || ''
             },
             geology: r.geology_vi || r.geology || '',
             limits: r.limits_vi || r.limits || ''
@@ -1698,7 +1579,7 @@
 
           if (cloudCustoms.length > 0) {
             customAnalogs = cloudCustoms;
-            try { localStorage.setItem('kronos_custom_analogs_7', JSON.stringify(customAnalogs)); } catch(e){}
+            try { localStorage.setItem('kronos_custom_analogs_4', JSON.stringify(customAnalogs)); } catch(e){}
           }
           analogs = [...defaultAnalogs, ...customAnalogs];
           renderTopButtons();
@@ -1738,20 +1619,15 @@
           target_vi: site.target,
           target_en: site.target,
           target: site.target,
-          earth_sio2: site.earth.c_sio2,
-          earth_feo: site.earth.c_feo,
-          earth_tio2: site.earth.c_tio2,
-          earth_density: site.earth.c_density,
-          earth_thermal: site.earth.c_thermal,
-          earth_roof: site.earth.c_roof,
-          earth_gravity: site.earth.c_gravity,
-          planet_sio2: site.planet.c_sio2,
-          planet_feo: site.planet.c_feo,
-          planet_tio2: site.planet.c_tio2,
-          planet_density: site.planet.c_density,
-          planet_thermal: site.planet.c_thermal,
-          planet_roof: site.planet.c_roof,
-          planet_gravity: site.planet.c_gravity,
+          mineral_score: site.earth.mineralScore,
+          earth_mineral: site.earth.mineralText,
+          planet_mineral: site.planet.mineralText,
+          earth_slope: site.earth.slope,
+          planet_slope: site.planet.slope,
+          earth_temp_k: site.earth.tempK,
+          planet_temp_k: site.planet.tempK,
+          earth_pressure_kpa: site.earth.pressureKpa,
+          planet_pressure_kpa: site.planet.pressureKpa,
           geology_vi: site.geology,
           geology: site.geology,
           limits_vi: site.limits,
@@ -1809,6 +1685,8 @@
           let t2mSum = 0, t2mCnt = 0;
           let rangeSum = 0, rangeCnt = 0;
 
+          let psSum = 0, psCnt = 0;
+
           for (let i = headerIdx + 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
@@ -1817,33 +1695,27 @@
               const val = parseFloat(cols[t2mIdx]);
               if (!isNaN(val) && val > -900) { t2mSum += val; t2mCnt++; }
             }
-            if (rangeIdx !== -1 && cols[rangeIdx] !== undefined) {
-              const val = parseFloat(cols[rangeIdx]);
-              if (!isNaN(val) && val > -900) { rangeSum += val; rangeCnt++; }
+            if (psIdx !== -1 && cols[psIdx] !== undefined) {
+              const val = parseFloat(cols[psIdx]);
+              if (!isNaN(val) && val > 0) { psSum += val; psCnt++; }
             }
           }
 
-          let meanT2m = 25.0, meanRange = 10.0;
+          let meanT2m = 23.5, meanPs = 96.0;
           if (t2mCnt > 0) meanT2m = t2mSum / t2mCnt;
-          if (rangeCnt > 0) meanRange = rangeSum / rangeCnt;
+          if (psCnt > 0) meanPs = psSum / psCnt;
 
-          // Estimated thermal buffering efficiency based on thermal dampening
-          const thermalBuffering = Math.min(98, Math.max(25, Math.round((1 - (1.0 / Math.max(1, meanRange))) * 100)));
+          const tempKelvin = (meanT2m + 273.15).toFixed(1);
 
-          document.getElementById('inp-e-thermal').value = thermalBuffering;
-          document.getElementById('inp-p-thermal').value = 92;
-          document.getElementById('inp-e-sio2').value = 49.8;
-          document.getElementById('inp-p-sio2').value = 45.5;
-          document.getElementById('inp-e-feo').value = 12.5;
-          document.getElementById('inp-p-feo').value = 17.5;
-          document.getElementById('inp-e-tio2').value = 1.8;
-          document.getElementById('inp-p-tio2').value = 4.5;
-          document.getElementById('inp-e-density').value = 2.82;
-          document.getElementById('inp-p-density').value = 3.10;
-          document.getElementById('inp-e-roof').value = 15.0;
-          document.getElementById('inp-p-roof').value = 20.0;
-          document.getElementById('inp-e-gravity').value = 9.81;
-          document.getElementById('inp-p-gravity').value = 1.62;
+          document.getElementById('inp-minscore').value = "0.88";
+          document.getElementById('inp-mintext-earth').value = "Basalt, Silicates";
+          document.getElementById('inp-mintext-planet').value = "Mare Basalt";
+          document.getElementById('inp-eslope').value = "10.0";
+          document.getElementById('inp-pslope').value = "12.0";
+          document.getElementById('inp-etemp').value = tempKelvin;
+          document.getElementById('inp-ptemp').value = "252.0";
+          document.getElementById('inp-epress').value = meanPs.toFixed(1);
+          document.getElementById('inp-ppress').value = "0.0";
 
           const nextNum = analogs.length + 1;
           const latVal = latMatch ? latMatch[1] : 'VN';
@@ -1856,8 +1728,8 @@
             statusBox.style.display = 'block';
             statusBox.innerHTML = `🎉 <b>Đã tự động đọc tệp NASA POWER:</b><br/>` +
               `• Tọa độ: <b>${latVal}°N, ${lonVal}°E</b> (${t2mCnt} ngày hợp lệ)<br/>` +
-              `• Nhiệt độ TB: <b>${meanT2m.toFixed(1)}°C</b> | Đệm nhiệt ước tính: <b>${thermalBuffering}%</b> (Biên độ ${meanRange.toFixed(1)}°C)<br/>` +
-              `<i>👉 Đã tự động nạp toàn bộ 7 thông số định lượng vào biểu mẫu!</i>`;
+              `• Nhiệt độ TB: <b>${meanT2m.toFixed(1)}°C (${tempKelvin} K)</b> | Áp suất TB: <b>${meanPs.toFixed(1)} kPa</b><br/>` +
+              `<i>👉 Đã tự động nạp 4 thông số định lượng NASA vào biểu mẫu!</i>`;
           }
         }
       };
@@ -1973,13 +1845,13 @@
         radarChart = new Chart(ctx, {
           type: 'radar',
           data: {
-            labels: criteriaRadarLabels,
+            labels: ['Mineralogy & Lithology', 'Topographic Slope', 'Surface Temperature', 'Atmospheric Pressure'],
             datasets: [{
-              label: 'Độ Tương Đồng ESI (0 – 1)',
-              data: [0.95, 0.82, 0.50, 0.95, 0.96, 0.86, 0.28],
-              backgroundColor: 'rgba(56, 189, 248, 0.22)',
-              borderColor: '#38bdf8',
-              pointBackgroundColor: '#38bdf8',
+              label: 'Component ESI (0 – 1)',
+              data: [0.90, 0.97, 0.92, 0.0],
+              backgroundColor: 'rgba(244, 63, 94, 0.25)',
+              borderColor: '#f43f5e',
+              pointBackgroundColor: '#f43f5e',
               borderWidth: 2
             }]
           },

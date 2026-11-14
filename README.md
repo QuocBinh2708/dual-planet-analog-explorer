@@ -74,14 +74,16 @@ The composite **Weighted Planetary Analog ESI** is calculated via weighted geome
 
 $$ESI_{\text{Analog}} = \left( \prod_{i=1}^{n} \max(\epsilon, S_i)^{w_i} \right)^{\frac{1}{\sum_{i=1}^{n} w_i}} \times 100\%$$
 
-* **Evaluated Criteria (7 Quantitative Parameters):**
-  1. $\text{SiO}_2$ Concentration (%)
-  2. $\text{FeO}$ Concentration (%)
-  3. $\text{TiO}_2$ Concentration (%)
-  4. Rock Density ($\text{g/cm}^3$)
-  5. Subterranean Thermal Buffering (%)
-  6. Cave/Lava Tube Ceiling Thickness (m)
-  7. Gravitational Acceleration ($\text{m/s}^2$)
+* **Evaluated Criteria (4 Quantitative NASA Parameters):**
+  1. $w_1$ — **Mineralogy & Lithology:** Indicator mineral assemblages from infrared reflectance spectra & petrology.
+  2. $w_2$ — **Topographic Slope (°):** Mean slope and ruggedness from digital elevation models (DEMs).
+  3. $w_3$ — **Mean Surface Temperature (K):** Thermodynamic temperature in Kelvin ($T_K = T_{^\circ\text{C}} + 273.15$).
+  4. $w_4$ — **Atmospheric Pressure (kPa):** Controlled via boundary floor $\epsilon = 0.01$ to avoid zero-product collapse in vacuum.
+
+### Mission Weight Presets ($w_1, w_2, w_3, w_4$):
+* **Surface & Geology (Default):** $w = [1.0, 1.0, 0.5, 0.0]$
+* **Rover Mobility Test:** $w = [1.0, 0.9, 0.1, 0.0]$
+* **Full Environmental (Incl. Pressure):** $w = [1.0, 0.3, 0.6, 0.2]$
 
 ---
 
